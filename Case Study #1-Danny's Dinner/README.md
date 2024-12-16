@@ -1,7 +1,7 @@
 <table style="border-collapse: collapse; width: 100%;">
   <tr>
     <td style="vertical-align: top; padding-right: 20px;">
-      <img src="project_images/project_logo.png" alt="Project Logo" width="500" height="480">
+      <img src="project_images/project_logo.png" alt="Project Logo" width="250" height="250">
     </td>
     <td style="vertical-align: top;">
       <p><strong>Contents:</strong></p>
