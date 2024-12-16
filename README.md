@@ -9,4 +9,4 @@ Through this repository, I aim to demonstrate my capability to solve complex SQL
 Tools Used 🛠️: PostgreSQL
 
 ## Contents:
-<li>[Case Study #1 - Denny's Diner](https://github.com/shdrn2402/Eight-week-SQL-challenge/tree/main/Case%20Study%20%231-Danny's%20Dinner)</li>
+-[Case Study #1 - Denny's Diner](https://github.com/shdrn2402/Eight-week-SQL-challenge/tree/main/Case%20Study%20%231-Danny's%20Dinner)
