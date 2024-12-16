@@ -1,11 +1,11 @@
-<table>
+<table style="width: 100%; border: none; table-layout: fixed;">
   <tr>
-    <td>
-      <img src="project_images/project_logo.png" width="250">
+    <td style="vertical-align: top; padding-right: 20px; width: 30%;">
+      <img src="project_images/project_logo.png" alt="Project Logo" width="100%" height="auto">
     </td>
-    <td style="vertical-align: top;">
+    <td style="vertical-align: top; width: 70%;">
       <p><strong>Contents:</strong></p>
-      <ul>
+      <ul style="margin: 0; padding: 0; list-style-type: none;">
         <li>Introduction</li>
         <li>Problem Statement</li>
         <li>Entity Relationship Diagram</li>
@@ -16,5 +16,3 @@
     </td>
   </tr>
 </table>
-
-  
