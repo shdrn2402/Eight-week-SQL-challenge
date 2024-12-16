@@ -7,3 +7,6 @@ The repository represents the culmination of my experience in solving various SQ
 Through this repository, I aim to demonstrate my capability to solve complex SQL challenges and effectively address real-world data problems. It reflects my growth, technical expertise, and innovative approach to working with SQL.
 
 Tools Used 🛠️: PostgreSQL
+
+## Contents:
+<li>Case Study #1 - Denny's Diner</li>
