@@ -10,7 +10,6 @@
         <li>Bonus Questions & Solutions</li>
         <li>Key Insights</li>
       </ul>
-     
     </td>
     <td>
      <img src="project_images/project_logo.png" width="250">
