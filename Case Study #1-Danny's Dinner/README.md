@@ -1,7 +1,7 @@
 <table>
   <tr>
     <td>
-      <img src="project_images/project_logo.png">
+      <img src="project_images/project_logo.png" width="250">
     </td>
     <td style="vertical-align: top;">
       <p><strong>Contents:</strong></p>
