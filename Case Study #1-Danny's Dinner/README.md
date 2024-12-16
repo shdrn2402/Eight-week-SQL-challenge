@@ -1,9 +1,11 @@
-| ![Project Logo](project_images/logo.png) | **Contents:**  
+![Project Logo](project_images/logo.png)
+
+**Contents:**  
 - [Introduction](#introduction)
 - Problem Statement  
 - Entity Relationship Diagram  
 - Case Study Questions & Solutions  
 - Bonus Questions & Solutions  
-- Key Insights |
+- Key Insights
   
 ### Introduction
