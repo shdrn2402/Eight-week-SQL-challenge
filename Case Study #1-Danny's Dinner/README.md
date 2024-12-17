@@ -23,6 +23,15 @@ He also needs simple, pre-generated datasets for his team to inspect without usi
 ### Entity Relationship Diagram
 ![Project Logo](project_images/entity_relationship_diagram.png)
 ### Case Study Questions & Solutions
+1. **What is the total amount each customer spent at the restaurant?**
+```SQL
+SELECT s.customer_id, SUM(m.price) AS total_spent
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+GROUP BY s.customer_id
+ORDER BY total_spent DESC;
+```
+
 ...
 ### Bonus Questions & Solutions
 ...
