@@ -85,7 +85,7 @@ VALUES
 ### Case Study Questions & Solutions
 1. **What is the total amount each customer spent at the restaurant?**
 
-***Query:***
+***query:***
 ```SQL
 SELECT s.customer_id, SUM(m.price) AS total_spent
 FROM sales s
@@ -94,7 +94,7 @@ GROUP BY s.customer_id
 ORDER BY total_spent DESC;
 ```
 
-***Description***
+***description:***
 The SQL query retrieves the customer_id and calculates the total amount spent (total_spent) by each customer at the restaurant.
 
 - It joins the sales table (s) and the menu table (m) using the product_id column, which serves as a common key between the two tables.
@@ -102,7 +102,7 @@ The SQL query retrieves the customer_id and calculates the total amount spent (t
 - The SUM() function calculates the total amount spent by each customer across all their purchases.
 - Finally, the results are sorted in descending order (DESC) based on the total_spent value, so customers who spent the most appear at the top.
 
-***Answer:***
+***answer:***
 | customer_id | total_spent |
 | ----------- | ----------- |
 | A           | 76          |
@@ -111,7 +111,7 @@ The SQL query retrieves the customer_id and calculates the total amount spent (t
 
 2. **How many days has each customer visited the restaurant?**
 
-***Query:***
+***query:***
 ```SQL
 SELECT customer_id, COUNT(DISTINCT order_date) AS visits_amount
 FROM sales
@@ -119,14 +119,14 @@ GROUP BY customer_id
 ORDER BY visits_amount ASC;
 ```
 
-***Description***
+***description:***
 The SQL query retrieves the customer_id and calculates the total number of unique visit dates (visits_amount) for each customer at the restaurant.
 
 - It uses the COUNT(DISTINCT order_date) function to count the number of unique dates each customer visited the restaurant, ensuring duplicate dates are not counted.
 - The query groups the results by customer_id, so the count of unique dates is calculated for each individual customer.
 - The results are then sorted in ascending order (ASC) based on visits_amount, so customers with the fewest visits appear first.
 
-***Answer:***
+***answer:***
 | customer_id | visits_amount |
 | ----------- | ------------- |
 | C           | 2             |
@@ -135,8 +135,9 @@ The SQL query retrieves the customer_id and calculates the total number of uniqu
 
 3. **What was the first item from the menu purchased by each customer?**
 
-***Query:***
-
+***query:***
+***description:***
+***answer:***
 ### Bonus Questions & Solutions
 ...
 ### Key Insights
