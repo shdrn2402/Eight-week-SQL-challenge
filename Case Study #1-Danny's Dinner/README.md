@@ -22,9 +22,6 @@ He also needs simple, pre-generated datasets for his team to inspect without usi
 - menu
 - members
 ### Entity Relationship Diagram
-![Project Logo](project_images/entity_relationship_diagram.png)
-
-
 <details>
   <summary><strong>Database Schema</strong></summary>
 
@@ -83,6 +80,7 @@ VALUES
 ```
 </details>
 
+![Project Logo](project_images/entity_relationship_diagram.png)
 
 ### Case Study Questions & Solutions
 1. **What is the total amount each customer spent at the restaurant?**
@@ -100,8 +98,6 @@ ORDER BY total_spent DESC;
 | A           | 76          |
 | B           | 74          |
 | C           | 36          |
-
-
 
 2. **How many days has each customer visited the restaurant?**
 
