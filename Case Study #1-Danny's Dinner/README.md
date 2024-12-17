@@ -21,7 +21,7 @@ He also needs simple, pre-generated datasets for his team to inspect without usi
 - menu
 - members
 ### Entity Relationship Diagram
-![Project Logo](project_images/Entity_relationship_diagram.png)
+![Project Logo](project_images/entity_relationship_diagram.png)
 ### Case Study Questions & Solutions
 ...
 ### Bonus Questions & Solutions
