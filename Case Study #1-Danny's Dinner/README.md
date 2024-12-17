@@ -23,7 +23,7 @@ He also needs simple, pre-generated datasets for his team to inspect without usi
 - members
 ### Entity Relationship Diagram
 <details>
-  <summary><strong>Database Schema</strong></summary>
+  <summary><strong>show database schema</strong></summary>
 
 ```SQL
 CREATE SCHEMA dannys_diner;
@@ -84,6 +84,7 @@ VALUES
 
 ### Case Study Questions & Solutions
 1. **What is the total amount each customer spent at the restaurant?**
+
 ***Query:***
 ```SQL
 SELECT s.customer_id, SUM(m.price) AS total_spent
@@ -92,6 +93,7 @@ JOIN menu m ON s.product_id = m.product_id
 GROUP BY s.customer_id
 ORDER BY total_spent DESC;
 ```
+
 ***Answer:***
 | customer_id | total_spent |
 | ----------- | ----------- |
@@ -100,6 +102,7 @@ ORDER BY total_spent DESC;
 | C           | 36          |
 
 2. **How many days has each customer visited the restaurant?**
+
 ***Query:***
 ```SQL
 SELECT customer_id, COUNT(DISTINCT order_date) AS visits_amount
@@ -107,6 +110,7 @@ FROM sales
 GROUP BY customer_id
 ORDER BY visits_amount ASC;
 ```
+
 ***Answer:***
 | customer_id | visits_amount |
 | ----------- | ------------- |
@@ -115,6 +119,7 @@ ORDER BY visits_amount ASC;
 | B           | 6             |
 
 3. **What was the first item from the menu purchased by each customer?**
+
 ***Query:***
 
 ### Bonus Questions & Solutions
