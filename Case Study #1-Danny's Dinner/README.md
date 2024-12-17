@@ -95,6 +95,7 @@ ORDER BY total_spent DESC;
 ```
 
 ***description:***
+
 The SQL query retrieves the customer_id and calculates the total amount spent (total_spent) by each customer at the restaurant.
 
 - It joins the sales table (s) and the menu table (m) using the product_id column, which serves as a common key between the two tables.
@@ -120,6 +121,7 @@ ORDER BY visits_amount ASC;
 ```
 
 ***description:***
+
 The SQL query retrieves the customer_id and calculates the total number of unique visit dates (visits_amount) for each customer at the restaurant.
 
 - It uses the COUNT(DISTINCT order_date) function to count the number of unique dates each customer visited the restaurant, ensuring duplicate dates are not counted.
@@ -136,8 +138,11 @@ The SQL query retrieves the customer_id and calculates the total number of uniqu
 3. **What was the first item from the menu purchased by each customer?**
 
 ***query:***
+
 ***description:***
+
 ***answer:***
+
 ### Bonus Questions & Solutions
 ...
 ### Key Insights
