@@ -4,7 +4,6 @@
 - [Introduction](#introduction)
 - [Problem Statement](#problem-statment) 
 - [Entity Relationship Diagram](#entity-relationship-diagram)
-- [Database schema](#database-schema)
 - [Case Study Questions & Solutions](#case-study-questions--solutions)
 - [Bonus Questions & Solutions](#bonus-questions--solutions)
 - [Key Insights](#key-insights)
@@ -25,9 +24,9 @@ He also needs simple, pre-generated datasets for his team to inspect without usi
 ### Entity Relationship Diagram
 ![Project Logo](project_images/entity_relationship_diagram.png)
 
-### Database Schema
+
 <details>
-  <summary><strong>Schema</strong></summary>
+  <summary><strong>Database Schema</strong></summary>
 
 ```SQL
 CREATE SCHEMA dannys_diner;
