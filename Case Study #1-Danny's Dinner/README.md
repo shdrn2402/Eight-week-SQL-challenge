@@ -83,7 +83,7 @@ VALUES
 ![Project Logo](project_images/entity_relationship_diagram.png)
 
 ## Case Study Questions & Solutions
-1. **What is the total amount each customer spent at the restaurant?**
+### 1. What is the total amount each customer spent at the restaurant?
 
 ***query:***
 ```SQL
@@ -110,7 +110,7 @@ The SQL query retrieves the `customer_id` and calculates the `total amount spent
 | B           | 74          |
 | C           | 36          |
 
-2. **How many days has each customer visited the restaurant?**
+### 2. How many days has each customer visited the restaurant?
 
 ***query:***
 ```SQL
