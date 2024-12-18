@@ -218,14 +218,47 @@ The final result displays the name of the most popular product(s) and their tota
 | ------------ | --------------- |
 | ramen        | 8               |
 
-
 5. **Which item was the most popular for each customer?**
 
 ***query:***
+```SQL
+WITH sold_per_customer AS (
+  SELECT
+    customer_id,
+    product_id,
+    COUNT(product_id) AS items_sold,
+    DENSE_RANK() OVER(PARTITION BY customer_id ORDER BY COUNT(product_id) DESC) AS rank_value
+  FROM sales
+  GROUP BY customer_id, product_id
+)
+SELECT customer_id, m.product_name, sold_per_customer.items_sold
+FROM sold_per_customer
+JOIN menu m ON sold_per_customer.product_id = m.product_id
+WHERE rank_value = 1
+ORDER BY customer_id;
+```
 
 ***description:***
 
+The SQL query uses a Common Table Expression (CTE) named sold_per_customer to generate a temporary result set that calculates the popularity of items purchased by each customer.
+
+- Within the CTE, it selects the customer_id, product_id, and calculates the number of times each product was purchased by the customer (items_sold) using the COUNT(product_id) function.
+- The results are grouped by customer_id and product_id using the GROUP BY clause, ensuring that the purchase count is calculated for each product of every customer.
+- The DENSE_RANK() function assigns a rank to each row within the partition of each customer_id, ordered by the purchase count (items_sold) in descending order. The most popular product(s) for each customer receive a rank of 1.
+- Next, the main query retrieves the customer_id, the purchase count (items_sold), and the product name (product_name) by joining the CTE with the menu table on the product_id field.
+It filters the results to include only the rows where the rank (rank_value) is equal to 1, which corresponds to the most purchased product(s) for each customer.
+- Finally, the results are sorted by customer_id, returning each customer's ID, their most popular product, and the number of times it was purchased. This query accounts for cases where multiple products are tied as the most popular for a single customer by including all such products in the result.
+
+The JOIN between the sold_per_customer CTE and the menu table is performed in the main query rather than inside the CTE. This approach ensures that the grouping, ranking, and filtering are applied to a smaller subset of data (only the sales table), which can improve performance when the menu table is large. By deferring the JOIN to the main query, the data processing is streamlined, focusing on only the necessary rows with rank_value = 1.
+
 ***answer:***
+| customer_id | product_name | items_sold |
+| ----------- | ------------ | ---------- |
+| A           | ramen        | 3          |
+| B           | sushi        | 2          |
+| B           | curry        | 2          |
+| B           | ramen        | 2          |
+| C           | ramen        | 3          |
 
 6. **Which item was purchased first by the customer after they became a member?**
 
