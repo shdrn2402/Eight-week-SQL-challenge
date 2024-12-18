@@ -162,11 +162,12 @@ ORDER BY fp.customer_id;
 
 The SQL query retrieves the customer_id and identifies the first menu item (product_name) purchased by each customer based on their earliest order date.
 
-It uses a Common Table Expression (CTE) named first_purchases to calculate the first order date (first_order_date) for each customer.
-Within the CTE, the MIN(order_date) function is applied to find the earliest purchase date for each customer_id, and the results are grouped by customer to ensure accuracy.
-The main query joins the result of the CTE (first_purchases) with the sales table on both customer_id and order_date to retrieve all rows corresponding to the first purchase date for each customer.
-It then joins the sales table with the menu table on product_id to extract the product name (product_name) of the items purchased on that date.
-The final result is sorted by customer_id to provide an organized output.
+- It uses a Common Table Expression (CTE) named first_purchases to calculate the first order date (first_order_date) for each customer.
+- Within the CTE, the MIN(order_date) function is applied to find the earliest purchase date for each customer_id, and the results are grouped by customer to ensure accuracy.
+- The main query joins the result of the CTE (first_purchases) with the sales table on both customer_id and order_date to retrieve all rows corresponding to the first purchase date for each customer.
+- It then joins the sales table with the menu table on product_id to extract the product name (product_name) of the items purchased on that date.
+- The final result is sorted by customer_id to provide an organized output.
+
 This query focuses on identifying items purchased on the first recorded date for each customer. It assumes that all purchases on the same date are part of a single order and doesn't account for the sequence of purchases within the day, as the dataset lacks time information.
 
 While the DENSE_RANK() function could also be used to identify the first purchase, this approach was chosen for its simplicity and clarity, given the dataset's structure.
@@ -180,6 +181,61 @@ While the DENSE_RANK() function could also be used to identify the first purchas
 | C           | ramen        |
 | C           | ramen        |
 
+4. What is the most purchased item on the menu and how many times was it purchased by all customers?
+
+***query:***
+
+***description:***
+
+***answer:***
+
+5. Which item was the most popular for each customer?
+
+***query:***
+
+***description:***
+
+***answer:***
+
+6. Which item was purchased first by the customer after they became a member?
+
+***query:***
+
+***description:***
+
+***answer:***
+
+7. Which item was purchased just before the customer became a member?
+
+***query:***
+
+***description:***
+
+***answer:***
+
+8. What is the total items and amount spent for each member before they became a member?
+
+***query:***
+
+***description:***
+
+***answer:***
+
+9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
+
+***query:***
+
+***description:***
+
+***answer:***
+
+10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
+
+***query:***
+
+***description:***
+
+***answer:***
 
 ### Bonus Questions & Solutions
 ...
