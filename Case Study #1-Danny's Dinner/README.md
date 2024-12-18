@@ -263,10 +263,45 @@ The JOIN between the sold_per_customer CTE and the menu table is performed in th
 6. **Which item was purchased first by the customer after they became a member?**
 
 ***query:***
+```SQL
+WITH first_purchase_date AS (
+  SELECT
+    s.customer_id,
+    MIN(s.order_date) AS first_order_date
+  FROM sales s
+  JOIN members mmbr ON s.customer_id = mmbr.customer_id
+  WHERE s.order_date >= mmbr.join_date
+  GROUP BY s.customer_id
+)
+SELECT
+    s.customer_id,
+    m.product_name,
+    s.order_date
+FROM sales s
+JOIN first_purchase_date fpd ON s.customer_id = fpd.customer_id AND s.order_date = fpd.first_order_date
+JOIN menu m ON s.product_id = m.product_id
+ORDER BY s.customer_id, s.order_date;
+```
 
 ***description:***
 
+The SQL query retrieves the first product purchased by each customer after they joined the loyalty program.
+
+- It uses a Common Table Expression (CTE) named `first_purchase_date` to calculate the first available order date (`first_order_date`) for each customer after their membership date.
+- Within the CTE, the `MIN(s.order_date)` function is used to identify the earliest order date for each customer, and the results are grouped by `customer_id` to ensure the calculation is accurate for each individual.
+- The main query joins the `sales` table with the CTE on `customer_id` and `first_order_date`, selecting only the orders that match the earliest date for each customer.
+- The query also joins the `sales` table with the `menu` table on `product_id`, enabling the retrieval of the product name (`product_name`) for the identified orders.
+- The `WHERE` clause in the CTE filters the results to include only orders made on or after the customer's `join_date`, ensuring that purchases prior to membership are excluded.
+- The `ORDER BY s.customer_id, s.order_date` clause ensures the results are sorted by customer and by the date of the order for clear organization.
+
+This query efficiently determines the first product purchased by each customer after joining, including all products purchased on the same first date.
+
+
 ***answer:***
+| customer_id | product_name | order_date |
+| ----------- | ------------ | ---------- |
+| A           | curry        | 2021-01-07 |
+| B           | sushi        | 2021-01-11 |
 
 7. **Which item was purchased just before the customer became a member?**
 
