@@ -138,10 +138,48 @@ The SQL query retrieves the customer_id and calculates the total number of uniqu
 3. **What was the first item from the menu purchased by each customer?**
 
 ***query:***
+```SQL
+WITH first_purchases AS (
+  SELECT 
+    customer_id,
+    MIN(order_date) AS first_order_date
+  FROM sales
+  GROUP BY customer_id
+)
+SELECT 
+  fp.customer_id,
+  m.product_name
+FROM first_purchases fp
+JOIN sales s 
+  ON fp.customer_id = s.customer_id 
+  AND fp.first_order_date = s.order_date
+JOIN menu m 
+  ON s.product_id = m.product_id
+ORDER BY fp.customer_id;
+```
 
 ***description:***
 
+The SQL query retrieves the customer_id and identifies the first menu item (product_name) purchased by each customer based on their earliest order date.
+
+It uses a Common Table Expression (CTE) named first_purchases to calculate the first order date (first_order_date) for each customer.
+Within the CTE, the MIN(order_date) function is applied to find the earliest purchase date for each customer_id, and the results are grouped by customer to ensure accuracy.
+The main query joins the result of the CTE (first_purchases) with the sales table on both customer_id and order_date to retrieve all rows corresponding to the first purchase date for each customer.
+It then joins the sales table with the menu table on product_id to extract the product name (product_name) of the items purchased on that date.
+The final result is sorted by customer_id to provide an organized output.
+This query focuses on identifying items purchased on the first recorded date for each customer. It assumes that all purchases on the same date are part of a single order and doesn't account for the sequence of purchases within the day, as the dataset lacks time information.
+
+While the DENSE_RANK() function could also be used to identify the first purchase, this approach was chosen for its simplicity and clarity, given the dataset's structure.
+
 ***answer:***
+| customer_id | product_name |
+| ----------- | ------------ |
+| A           | sushi        |
+| A           | curry        |
+| B           | curry        |
+| C           | ramen        |
+| C           | ramen        |
+
 
 ### Bonus Questions & Solutions
 ...
