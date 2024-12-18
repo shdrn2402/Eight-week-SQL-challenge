@@ -96,10 +96,10 @@ ORDER BY total_spent DESC;
 
 ***description:***
 
-The SQL query retrieves the customer_id and calculates the total amount spent (total_spent) by each customer at the restaurant.
+The SQL query retrieves the `customer_id` and calculates the `total amount spent` (total_spent) by each customer at the restaurant.
 
-- It joins the sales table (s) and the menu table (m) using the product_id column, which serves as a common key between the two tables.
-- The query then groups the results by customer_id, aggregating the total price (SUM(m.price)) for each customer.
+- It joins the sales table (s) and the menu table (m) using the `product_id` column, which serves as a common key between the two tables.
+- The query then groups the results by `customer_id`, aggregating the `total price` (SUM(m.price)) for each customer.
 - The SUM() function calculates the total amount spent by each customer across all their purchases.
 - Finally, the results are sorted in descending order (DESC) based on the total_spent value, so customers who spent the most appear at the top.
 
@@ -122,11 +122,11 @@ ORDER BY visits_amount ASC;
 
 ***description:***
 
-The SQL query retrieves the customer_id and calculates the total number of unique visit dates (visits_amount) for each customer at the restaurant.
+The SQL query retrieves the `customer_id` and calculates the total number of unique visit dates (visits_amount) for each customer at the restaurant.
 
-- It uses the COUNT(DISTINCT order_date) function to count the number of unique dates each customer visited the restaurant, ensuring duplicate dates are not counted.
+- It uses the `COUNT(DISTINCT order_date)` function to count the number of unique dates each customer visited the restaurant, ensuring duplicate dates are not counted.
 - The query groups the results by customer_id, so the count of unique dates is calculated for each individual customer.
-- The results are then sorted in ascending order (ASC) based on visits_amount, so customers with the fewest visits appear first.
+- The results are then sorted in ascending order (ASC) based on `visits_amount`, so customers with the fewest visits appear first.
 
 ***answer:***
 | customer_id | visits_amount |
@@ -160,17 +160,17 @@ ORDER BY fp.customer_id;
 
 ***description:***
 
-The SQL query retrieves the customer_id and identifies the first menu item (product_name) purchased by each customer based on their earliest order date.
+The SQL query retrieves the `customer_id` and identifies the first menu item (product_name) purchased by each customer based on their earliest order date.
 
-- It uses a Common Table Expression (CTE) named first_purchases to calculate the first order date (first_order_date) for each customer.
-- Within the CTE, the MIN(order_date) function is applied to find the earliest purchase date for each customer_id, and the results are grouped by customer to ensure accuracy.
-- The main query joins the result of the CTE (first_purchases) with the sales table on both customer_id and order_date to retrieve all rows corresponding to the first purchase date for each customer.
-- It then joins the sales table with the menu table on product_id to extract the product name (product_name) of the items purchased on that date.
-- The final result is sorted by customer_id to provide an organized output.
+- It uses a Common Table Expression (CTE) named `first_purchases` to calculate the first order date (first_order_date) for each customer.
+- Within the CTE, the `MIN(order_date)` function is applied to find the earliest purchase date for each customer_id, and the results are grouped by customer to ensure accuracy.
+- The main query joins the result of the CTE (first_purchases) with the `sales` table on both `customer_id` and `order_date` to retrieve all rows corresponding to the first purchase date for each customer.
+- It then joins the sales table with the menu table on `product_id` to extract the product name (product_name) of the items purchased on that date.
+- The final result is sorted by `customer_id` to provide an organized output.
 
 This query focuses on identifying items purchased on the first recorded date for each customer. It assumes that all purchases on the same date are part of a single order and doesn't account for the sequence of purchases within the day, as the dataset lacks time information.
 
-While the DENSE_RANK() function could also be used to identify the first purchase, this approach was chosen for its simplicity and clarity, given the dataset's structure.
+While the `DENSE_RANK()` function could also be used to identify the first purchase, this approach was chosen for its simplicity and clarity, given the dataset's structure.
 
 ***answer:***
 | customer_id | product_name |
@@ -205,9 +205,9 @@ WHERE total_purchases = (SELECT MAX(total_purchases) FROM product_counts);
 
 The SQL query retrieves the most popular menu item(s) based on the total number of purchases (total_purchases).
 
-- It uses a Common Table Expression (CTE) named product_counts to calculate the total number of purchases for each product. The COUNT(*) function counts all purchases, while the results are grouped by product_name using the GROUP BY clause.
-- The sales table is joined with the menu table on product_id to link sales records with their corresponding product names.
-- The main query selects the product_name (renamed as most_popular) and total_purchases from the CTE.
+- It uses a Common Table Expression (CTE) named `product_counts` to calculate the total number of purchases for each product. The `COUNT(*)` function counts all purchases, while the results are grouped by product_name using the GROUP BY clause.
+- The sales table is joined with the menu table on `product_id` to link sales records with their corresponding product names.
+- The main query selects the `product_name` (renamed as most_popular) and `total_purchases` from the CTE.
 - It includes a subquery to find the maximum value of total_purchases using the MAX() function. Only products with a purchase count equal to this maximum value are returned.
 - This ensures that all products with the highest number of purchases are included, even if multiple products share the same maximum value.
 
@@ -240,12 +240,12 @@ ORDER BY customer_id;
 
 ***description:***
 
-The SQL query uses a Common Table Expression (CTE) named sold_per_customer to generate a temporary result set that calculates the popularity of items purchased by each customer.
+The SQL query uses a Common Table Expression (CTE) named `sold_per_customer` to generate a temporary result set that calculates the popularity of items purchased by each customer.
 
-- Within the CTE, it selects the customer_id, product_id, and calculates the number of times each product was purchased by the customer (items_sold) using the COUNT(product_id) function.
-- The results are grouped by customer_id and product_id using the GROUP BY clause, ensuring that the purchase count is calculated for each product of every customer.
-- The DENSE_RANK() function assigns a rank to each row within the partition of each customer_id, ordered by the purchase count (items_sold) in descending order. The most popular product(s) for each customer receive a rank of 1.
-- Next, the main query retrieves the customer_id, the purchase count (items_sold), and the product name (product_name) by joining the CTE with the menu table on the product_id field.
+- Within the CTE, it selects the `customer_id`, `product_id`, and calculates the number of times each product was purchased by the customer (items_sold) using the `COUNT(product_id)` function.
+- The results are grouped by `customer_id` and `product_id` using the GROUP BY clause, ensuring that the purchase count is calculated for each product of every customer.
+- The `DENSE_RANK()` function assigns a rank to each row within the partition of each `customer_id`, ordered by the purchase count (items_sold) in descending order. The most popular product(s) for each customer receive a rank of 1.
+- Next, the main query retrieves the `customer_id`, the `purchase count` (items_sold), and the product name (product_name) by joining the CTE with the menu table on the product_id field.
 It filters the results to include only the rows where the rank (rank_value) is equal to 1, which corresponds to the most purchased product(s) for each customer.
 - Finally, the results are sorted by customer_id, returning each customer's ID, their most popular product, and the number of times it was purchased. This query accounts for cases where multiple products are tied as the most popular for a single customer by including all such products in the result.
 
