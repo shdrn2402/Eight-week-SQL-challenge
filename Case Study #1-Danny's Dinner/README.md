@@ -181,7 +181,45 @@ While the DENSE_RANK() function could also be used to identify the first purchas
 | C           | ramen        |
 | C           | ramen        |
 
-4. What is the most purchased item on the menu and how many times was it purchased by all customers?
+4. **What is the most purchased item on the menu and how many times was it purchased by all customers?**
+
+***query:***
+```SQL
+WITH product_counts AS (
+  SELECT 
+    m.product_name, 
+    COUNT(*) AS total_purchases
+  FROM sales s
+  JOIN menu m
+    ON m.product_id = s.product_id
+  GROUP BY m.product_name
+)
+SELECT 
+  product_name as most_popular, 
+  total_purchases
+FROM product_counts
+WHERE total_purchases = (SELECT MAX(total_purchases) FROM product_counts);
+```
+
+***description:***
+
+The SQL query retrieves the most popular menu item(s) based on the total number of purchases (total_purchases).
+
+- It uses a Common Table Expression (CTE) named product_counts to calculate the total number of purchases for each product. The COUNT(*) function counts all purchases, while the results are grouped by product_name using the GROUP BY clause.
+- The sales table is joined with the menu table on product_id to link sales records with their corresponding product names.
+- The main query selects the product_name (renamed as most_popular) and total_purchases from the CTE.
+- It includes a subquery to find the maximum value of total_purchases using the MAX() function. Only products with a purchase count equal to this maximum value are returned.
+- This ensures that all products with the highest number of purchases are included, even if multiple products share the same maximum value.
+
+The final result displays the name of the most popular product(s) and their total purchase count, accurately reflecting the most frequently ordered items.
+
+***answer:***
+| most_popular | total_purchases |
+| ------------ | --------------- |
+| ramen        | 8               |
+
+
+5. **Which item was the most popular for each customer?**
 
 ***query:***
 
@@ -189,7 +227,7 @@ While the DENSE_RANK() function could also be used to identify the first purchas
 
 ***answer:***
 
-5. Which item was the most popular for each customer?
+6. **Which item was purchased first by the customer after they became a member?**
 
 ***query:***
 
@@ -197,7 +235,7 @@ While the DENSE_RANK() function could also be used to identify the first purchas
 
 ***answer:***
 
-6. Which item was purchased first by the customer after they became a member?
+7. **Which item was purchased just before the customer became a member?**
 
 ***query:***
 
@@ -205,7 +243,7 @@ While the DENSE_RANK() function could also be used to identify the first purchas
 
 ***answer:***
 
-7. Which item was purchased just before the customer became a member?
+8. **What is the total items and amount spent for each member before they became a member?**
 
 ***query:***
 
@@ -213,7 +251,7 @@ While the DENSE_RANK() function could also be used to identify the first purchas
 
 ***answer:***
 
-8. What is the total items and amount spent for each member before they became a member?
+9. **If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?**
 
 ***query:***
 
@@ -221,15 +259,7 @@ While the DENSE_RANK() function could also be used to identify the first purchas
 
 ***answer:***
 
-9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
-
-***query:***
-
-***description:***
-
-***answer:***
-
-10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
+10. **In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?**
 
 ***query:***
 
