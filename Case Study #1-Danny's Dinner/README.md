@@ -135,7 +135,7 @@ The SQL query retrieves the `customer_id` and calculates the total number of uni
 | A           | 4             |
 | B           | 6             |
 
-3. **What was the first item from the menu purchased by each customer?**
+### 3. What was the first item from the menu purchased by each customer?
 
 ***query:***
 ```SQL
@@ -181,7 +181,7 @@ While the `DENSE_RANK()` function could also be used to identify the first purch
 | C           | ramen        |
 | C           | ramen        |
 
-4. **What is the most purchased item on the menu and how many times was it purchased by all customers?**
+### 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
 
 ***query:***
 ```SQL
@@ -218,7 +218,7 @@ The final result displays the name of the most popular product(s) and their tota
 | ------------ | --------------- |
 | ramen        | 8               |
 
-5. **Which item was the most popular for each customer?**
+### 5. Which item was the most popular for each customer?
 
 ***query:***
 ```SQL
@@ -260,7 +260,7 @@ The JOIN between the sold_per_customer CTE and the menu table is performed in th
 | B           | ramen        | 2          |
 | C           | ramen        | 3          |
 
-6. **Which item was purchased first by the customer after they became a member?**
+### 6. Which item was purchased first by the customer after they became a member?
 
 ***query:***
 ```SQL
@@ -303,7 +303,7 @@ This query efficiently determines the first product purchased by each customer a
 | A           | curry        | 2021-01-07 |
 | B           | sushi        | 2021-01-11 |
 
-7. **Which item was purchased just before the customer became a member?**
+### 7. Which item was purchased just before the customer became a member?
 
 ***query:***
 ```SQL
@@ -346,7 +346,7 @@ This query efficiently determines the last product purchased by each customer be
 | A           | curry        | 2021-01-01 |
 | B           | sushi        | 2021-01-04 |
 
-8. **What is the total items and amount spent for each member before they became a member?**
+### 8. What is the total items and amount spent for each member before they became a member?
 
 ***query:***
 
@@ -354,7 +354,7 @@ This query efficiently determines the last product purchased by each customer be
 
 ***answer:***
 
-9. **If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?**
+### 9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
 
 ***query:***
 
@@ -362,7 +362,7 @@ This query efficiently determines the last product purchased by each customer be
 
 ***answer:***
 
-10. **In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?**
+### 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
 
 ***query:***
 
