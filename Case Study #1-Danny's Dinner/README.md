@@ -306,10 +306,45 @@ This query efficiently determines the first product purchased by each customer a
 7. **Which item was purchased just before the customer became a member?**
 
 ***query:***
+```SQL
+WITH last_purchase_before_membership AS (
+  SELECT
+    s.customer_id,
+    MAX(s.order_date) AS last_order_date
+  FROM sales s
+  JOIN members mmbr ON s.customer_id = mmbr.customer_id
+  WHERE s.order_date < mmbr.join_date
+  GROUP BY s.customer_id
+)
+SELECT
+    s.customer_id,
+    m.product_name,
+    s.order_date
+FROM sales s
+JOIN last_purchase_before_membership lpbm ON s.customer_id = lpbm.customer_id AND s.order_date = lpbm.last_order_date
+JOIN menu m ON s.product_id = m.product_id
+ORDER BY s.customer_id, s.order_date;
+```
 
 ***description:***
 
+The SQL query retrieves the last product purchased by each customer before they joined the loyalty program.
+
+- It uses a Common Table Expression (CTE) named `last_purchase_before_membership` to calculate the last available order date (`last_order_date`) for each customer before their membership date.
+- Within the CTE, the `MAX(s.order_date)` function is used to identify the most recent order date for each customer before their membership, and the results are grouped by `customer_id` to ensure the calculation is specific to each individual.
+- The main query joins the `sales` table with the CTE on `customer_id` and `last_order_date`, selecting only the orders that match the last date for each customer.
+- The query also joins the `sales` table with the `menu` table on `product_id`, enabling the retrieval of the product name (`product_name`) for the identified orders.
+- The `WHERE` clause in the CTE filters the results to include only orders made before the customer's `join_date`, ensuring that purchases on or after membership are excluded.
+- The `ORDER BY s.customer_id, s.order_date` clause ensures the results are sorted by customer and by the date of the order for clear organization.
+
+This query efficiently determines the last product purchased by each customer before joining, including all products purchased on the same last date.
+
 ***answer:***
+| customer_id | product_name | order_date |
+| ----------- | ------------ | ---------- |
+| A           | sushi        | 2021-01-01 |
+| A           | curry        | 2021-01-01 |
+| B           | sushi        | 2021-01-04 |
 
 8. **What is the total items and amount spent for each member before they became a member?**
 
