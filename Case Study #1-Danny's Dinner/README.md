@@ -469,7 +469,7 @@ This query accurately calculates the total points earned by customers A and B, a
 
 ### Join All The Things
 
-**query**
+***query***
 ```SQL
 SELECT
     s.customer_id,
@@ -499,7 +499,7 @@ The SQL query recreates the requested table output by combining information from
 
 This query provides a combined view of the order details, product information, and membership status for each customer, ensuring accurate and organized results.
 
-**answer**
+***answer***
 | customer_id | order_date | product_name | price | member |
 | ----------- | ---------- | ------------ | ----- | ------ |
 | A           | 2021-01-01 | curry        | 15    | N      |
@@ -520,7 +520,7 @@ This query provides a combined view of the order details, product information, a
 
 ### Rank All The Things
 
-**query**
+***query***
 ```SQL
 SELECT
     s.customer_id,
@@ -560,7 +560,7 @@ The SQL query calculates the ranking of products purchased by customers, but onl
 
 This query accurately calculates rankings for loyalty program members while leaving non-member purchases unranked, reflecting the desired behavior.
 
-**answer**
+***answer***
 | customer_id | order_date | product_name | price | member | ranking |
 | ----------- | ---------- | ------------ | ----- | ------ | ------- |
 | A           | 2021-01-01 | curry        | 15    | N      | null    |
