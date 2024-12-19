@@ -349,27 +349,232 @@ This query efficiently determines the last product purchased by each customer be
 ### 8. What is the total items and amount spent for each member before they became a member?
 
 ***query:***
+```SQL
+SELECT
+    s.customer_id,
+    COUNT(s.product_id) AS total_items,
+    SUM(m.price) AS total_amount
+FROM sales s
+JOIN members mmbr ON s.customer_id = mmbr.customer_id
+JOIN menu m ON s.product_id = m.product_id
+WHERE s.order_date < mmbr.join_date
+GROUP BY s.customer_id
+ORDER BY s.customer_id;
+```
 
 ***description:***
 
+The SQL query retrieves the `customer_id` along with the total count of items ordered (`total_items`) and the total amount spent (`total_amount`) by each customer before they became a member.
+
+- It retrieves data from the `sales` table and joins it with the `menu` table based on matching `product_id`.
+- It also joins the `sales` table with the `members` table based on matching `customer_id`.
+- The results are filtered based on the condition that the `order_date` in the `sales` table is less than the `join_date` of the customer in the `members` table.
+- The `COUNT(s.product_id)` function calculates the number of occurrences of each `product_id` in the `sales` table, giving the total number of items ordered by each customer.
+- The `SUM(m.price)` function calculates the sum of the price from the `menu` table, providing the total amount spent by each customer.
+- Results are grouped by `customer_id` to get the totals for each customer.
+- The query then presents the `customer_id`, `total_items`, and `total_amount` for each customer who placed orders before joining as a member.
+- Finally, the results are sorted in ascending order based on the `customer_id`.
+
 ***answer:***
+| customer_id | total_items | total_amount |
+| ----------- | ----------- | ------------ |
+| A           | 2           | 25           |
+| B           | 3           | 40           |
 
 ### 9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
 
 ***query:***
+```SQL
+SELECT
+    s.customer_id,
+    SUM(
+        CASE
+            WHEN m.product_name = 'sushi' THEN m.price * 20
+            ELSE m.price * 10
+        END
+    ) AS total_points
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+GROUP BY s.customer_id
+ORDER BY s.customer_id;
+***description:***
+```
 
 ***description:***
 
+The SQL query calculates the total loyalty points earned by each customer based on their purchases, with a 2x multiplier applied for sushi.
+
+- It retrieves data from the `sales` table and joins it with the `menu` table based on matching `product_id`.
+- The `CASE` statement is used to apply the points calculation:
+  - For products with `product_name` equal to `'sushi'`, the points are calculated as `m.price * 20` (since $1 spent equals 10 points, and sushi has a 2x multiplier).
+  - For all other products, the points are calculated as `m.price * 10`.
+- The `SUM()` function aggregates the total points earned across all purchases for each customer.
+- The query groups the results by `customer_id` to calculate the total points for each customer individually.
+- The results are ordered by `customer_id` in ascending order to provide a clear, organized output.
+
+This query effectively calculates the total loyalty points, taking into account the special multiplier for sushi.
+
 ***answer:***
+| customer_id | total_points |
+| ----------- | ------------ |
+| A           | 860          |
+| B           | 940          |
+| C           | 360          |
 
 ### 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
 
 ***query:***
+```SQL
+SELECT
+    s.customer_id,
+    SUM(
+        CASE
+            WHEN s.order_date BETWEEN mmbr.join_date AND mmbr.join_date + INTERVAL '6 days'
+                 THEN m.price * 20
+            ELSE m.price * 10
+        END
+    ) AS total_points
+FROM sales s
+JOIN members mmbr ON s.customer_id = mmbr.customer_id
+JOIN menu m ON s.product_id = m.product_id
+WHERE s.order_date <= '2021-01-31'
+GROUP BY s.customer_id
+ORDER BY s.customer_id;
+```
 
 ***description:***
 
+The SQL query calculates the total loyalty points earned by each customer by the end of January 2021, with a 2x multiplier applied to all items purchased during the first week after joining the loyalty program.
+
+- It retrieves data from the `sales` table and joins it with the `menu` table on matching `product_id` to fetch product prices.
+- It also joins the `sales` table with the `members` table on matching `customer_id` to determine the `join_date` for each customer.
+- The `CASE` statement is used to apply the points calculation:
+  - For purchases made between `join_date` and `join_date + INTERVAL '6 days'` (the first week of membership), points are calculated as `m.price * 20` (2x multiplier for all items).
+  - For all other purchases, points are calculated as `m.price * 10`.
+- The `WHERE` clause filters the results to include only orders made on or before `'2021-01-31'`, ensuring that only January purchases are considered.
+- The `SUM()` function aggregates the total points earned across all purchases for each customer.
+- The query groups the results by `customer_id` to calculate the total points for each customer individually.
+- The results are sorted by `customer_id` in ascending order to provide a clear, organized output.
+
+This query accurately calculates the total points earned by customers A and B, accounting for the 2x multiplier during the first week after joining and regular points for other purchases.
+
 ***answer:***
+| customer_id | total_points |
+| ----------- | ------------ |
+| A           | 1270         |
+| B           | 720          |
+
 
 ## Bonus Questions & Solutions
-...
-## Key Insights
+
+### Join All The Things
+
+**query**
+```SQL
+SELECT
+    s.customer_id,
+    s.order_date,
+    m.product_name,
+    m.price,
+    CASE
+      WHEN s.order_date >= mmbr.join_date THEN 'Y'
+        ELSE 'N'
+      END AS member
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+LEFT JOIN members mmbr ON s.customer_id = mmbr.customer_id
+ORDER BY s.customer_id, s.order_date, m.product_name;
+```
+
+***description:***
+
+The SQL query recreates the requested table output by combining information from the `sales`, `menu`, and `members` tables.
+
+- It retrieves data from the `sales` table and joins it with the `menu` table on matching `product_id` to include the product name (`product_name`) and price (`price`) for each order.
+- A `LEFT JOIN` is used to connect the `sales` table with the `members` table on `customer_id`, allowing access to the `join_date` for each customer while including non-member customers.
+- A `CASE` statement is used to determine the membership status (`member`) for each order:
+  - Returns `'Y'` if the `order_date` is greater than or equal to the `join_date`.
+  - Returns `'N'` if the `order_date` is before the `join_date` or the customer is not a member.
+- The query results are ordered by `customer_id`, `order_date`, and `product_name` to match the desired output structure.
+
+This query provides a combined view of the order details, product information, and membership status for each customer, ensuring accurate and organized results.
+
+**answer**
+| customer_id | order_date | product_name | price | member |
+| ----------- | ---------- | ------------ | ----- | ------ |
+| A           | 2021-01-01 | curry        | 15    | N      |
+| A           | 2021-01-01 | sushi        | 10    | N      |
+| A           | 2021-01-07 | curry        | 15    | Y      |
+| A           | 2021-01-10 | ramen        | 12    | Y      |
+| A           | 2021-01-11 | ramen        | 12    | Y      |
+| A           | 2021-01-11 | ramen        | 12    | Y      |
+| B           | 2021-01-01 | curry        | 15    | N      |
+| B           | 2021-01-02 | curry        | 15    | N      |
+| B           | 2021-01-04 | sushi        | 10    | N      |
+| B           | 2021-01-11 | sushi        | 10    | Y      |
+| B           | 2021-01-16 | ramen        | 12    | Y      |
+| B           | 2021-02-01 | ramen        | 12    | Y      |
+| C           | 2021-01-01 | ramen        | 12    | N      |
+| C           | 2021-01-01 | ramen        | 12    | N      |
+| C           | 2021-01-07 | ramen        | 12    | N      |
+
+### Rank All The Things
+
+**query**
+```SQL
+SELECT
+    s.customer_id,
+    s.order_date,
+    m.product_name,
+    m.price,
+    CASE
+        WHEN s.order_date >= mmbr.join_date THEN 'Y'
+        ELSE 'N'
+    END AS member,
+    CASE
+        WHEN s.order_date >= mmbr.join_date THEN RANK() OVER (
+            PARTITION BY s.customer_id
+            ORDER BY s.order_date
+        )
+        ELSE NULL
+    END AS ranking
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+LEFT JOIN members mmbr ON s.customer_id = mmbr.customer_id
+ORDER BY s.customer_id, s.order_date, m.product_name;
+```
+
+***description:***
+
+The SQL query calculates the ranking of products purchased by customers, but only for purchases made after they joined the loyalty program, leaving non-member purchases unranked (`NULL`).
+
+- It retrieves data from the `sales` table and joins it with the `menu` table on matching `product_id` to include `product_name` and `price`.
+- A `LEFT JOIN` is used to connect the `sales` table with the `members` table on `customer_id`, enabling access to the `join_date` for each customer.
+- A `CASE` statement determines the membership status (`member`):
+  - Returns `'Y'` if the `order_date` is greater than or equal to the `join_date`.
+  - Returns `'N'` otherwise.
+- Another `CASE` statement applies the ranking logic:
+  - If the `order_date` is on or after the `join_date`, the `RANK()` function is applied, partitioning by `customer_id` and ordering by `order_date` to assign sequential ranks for purchases.
+  - If the `order_date` is before the `join_date`, the ranking is set to `NULL`.
+- The query groups the results by `customer_id` and `order_date`, while the `ORDER BY` clause sorts the output by `customer_id`, `order_date`, and `product_name` for clear organization.
+
+This query accurately calculates rankings for loyalty program members while leaving non-member purchases unranked, reflecting the desired behavior.
+
+**answer**
+| customer_id | order_date | product_name | price | member | ranking |
+| ----------- | ---------- | ------------ | ----- | ------ | ------- |
+| A           | 2021-01-01 | curry        | 15    | N      |         |
+| A           | 2021-01-01 | sushi        | 10    | N      |         |
+| A           | 2021-01-07 | curry        | 15    | Y      | 3       |
+| A           | 2021-01-10 | ramen        | 12    | Y      | 4       |
+| A           | 2021-01-11 | ramen        | 12    | Y      | 5       |
+| A           | 2021-01-11 | ramen        | 12    | Y      | 5       |
+| B           | 2021-01-01 | curry        | 15    | N      |         |
+| B           | 2021-01-02 | curry        | 15    | N      |         |
+| B           | 2021-01-04 | sushi        | 10    | N      |         |
+| B           | 2021-01-11 | sushi        | 10    | Y      | 4       |
+| B           | 2021-01-16 | ramen        | 12    | Y      | 5       |
+| B           | 2021-02-01 | ramen        | 12    | Y      | 6       |
+| C           | 2021-01-01 | ramen        | 12    | N      |         |
+| C           | 2021-01-01 | ramen        | 12    | N      |         |
+| C           | 2021-01-07 | ramen        | 12    | N      |         |
