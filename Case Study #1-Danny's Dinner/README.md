@@ -1,6 +1,6 @@
 ![Project Logo](../images/case1_logo.png)
 
-# Contents:
+## Contents:
 - [Introduction](#introduction)
 - [Problem Statement](#problem-statment) 
 - [Entity Relationship Diagram](#entity-relationship-diagram)
@@ -466,7 +466,7 @@ This query accurately calculates the total points earned by customers A and B, a
 
 ## Bonus Questions & Solutions
 
-### Join All The Things
+### 1. Join All The Things
 
 ***query:***
 ```SQL
@@ -517,7 +517,7 @@ This query provides a combined view of the order details, product information, a
 | C           | 2021-01-01 | ramen        | 12    | N      |
 | C           | 2021-01-07 | ramen        | 12    | N      |
 
-### Rank All The Things
+### 2. Rank All The Things
 
 ***query:***
 ```SQL
