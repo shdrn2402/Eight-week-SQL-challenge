@@ -1,4 +1,4 @@
-![Project Logo](project_images/logo.png)
+![Project Logo](../images/case1_logo.png)
 
 # Contents:
 - [Introduction](#introduction)
@@ -79,7 +79,7 @@ VALUES
 ```
 </details>
 
-![Project Logo](project_images/entity_relationship_diagram.png)
+![Project Logo](../images/case1_diagram.png)
 
 ## Case Study Questions & Solutions
 ### 1. What is the total amount each customer spent at the restaurant?

@@ -1,4 +1,4 @@
-![Project Logo](project_images/logo.png)
+![Project Logo](../images/case2_logo.png)
 
 # Contents:
 - [Introduction](#introduction)
@@ -133,7 +133,7 @@ VALUES
 ```
 </details>
 
-![Project Logo](project_images/entity_relationship_diagram.png)
+![Project Logo](../images/case2_diagram.png)
 
 ## Case Study Questions & Solutions
 
