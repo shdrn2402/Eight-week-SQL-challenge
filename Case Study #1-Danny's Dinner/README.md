@@ -1,4 +1,20 @@
-![Project Logo](../images/case1_logo.png)
+<!-- ![Project Logo](../images/case1_logo.png) -->
+
+<table style="border-collapse: collapse; width: 100%;">
+  <tr>
+    <td style="width: 150px; vertical-align: top; padding-right: 10px;">
+      <img src="../images/case1_logo.png" alt="Project Logo" style="width: 100%; max-width: 150px;">
+    </td>
+    <td style="vertical-align: top;">
+      <h2>Introduction</h2>
+      <p>
+        Danny is a big fan of Japanese cuisine, and at the start of 2021, he took a bold step by 
+        opening a small, charming restaurant specializing in his three favorite dishes: sushi, curry, and ramen.
+      </p>
+    </td>
+  </tr>
+</table>
+
 
 # Contents:
 - [Introduction](#introduction)
@@ -7,8 +23,8 @@
 - [Case Study Questions & Solutions](#case-study-questions--solutions)
 - [Bonus Questions & Solutions](#bonus-questions--solutions)
   
-## Introduction
-Danny is a big fan of Japanese cuisine, and at the start of 2021, he took a bold step by opening a small, charming restaurant specializing in his three favorite dishes: sushi, curry, and ramen.
+<!-- ## Introduction
+Danny is a big fan of Japanese cuisine, and at the start of 2021, he took a bold step by opening a small, charming restaurant specializing in his three favorite dishes: sushi, curry, and ramen. -->
 
 Now, Danny’s Diner needs your help to keep the business thriving. The restaurant has collected some basic data from its first months of operation but lacks the expertise to analyze and utilize this information effectively for better decision-making.
 
