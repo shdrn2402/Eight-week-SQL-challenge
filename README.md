@@ -10,3 +10,4 @@ Tools Used 🛠️: PostgreSQL
 
 ## Contents:
 - [Case Study #1 - Denny's Diner](https://github.com/shdrn2402/Eight-week-SQL-challenge/tree/main/Case%20Study%20%231-Danny's%20Dinner)
+- [Case Study #2 - Pizza Runner](https://github.com/shdrn2402/Eight-week-SQL-challenge/tree/main/Case%20Study%20%232-Pizza%20Runner)
