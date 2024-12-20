@@ -6,7 +6,6 @@
 - [Entity Relationship Diagram](#entity-relationship-diagram)
 - [Case Study Questions & Solutions](#case-study-questions--solutions)
 - [Bonus Questions & Solutions](#bonus-questions--solutions)
-- [Key Insights](#key-insights)
   
 ## Introduction
 Danny is a big fan of Japanese cuisine, and at the start of 2021, he took a bold step by opening a small, charming restaurant specializing in his three favorite dishes: sushi, curry, and ramen.
