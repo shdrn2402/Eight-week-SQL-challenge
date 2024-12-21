@@ -105,11 +105,13 @@ ORDER BY total_spent DESC;
 
 <details>
   <summary><em><strong>answer:</strong></em></summary>
+
 | customer_id | total_spent |
 | ----------- | ----------- |
 | A           | 76          |
 | B           | 74          |
 | C           | 36          |
+
 </details>
 
 ### 2. How many days has each customer visited the restaurant?
