@@ -104,7 +104,7 @@ ORDER BY total_spent DESC;
 </details>
 
 <details>
-  <summary><em><strong>answer:</strong></em></summary>
+  <summary><em><strong>show answer</strong></em></summary>
 
 | customer_id | total_spent |
 | ----------- | ----------- |
@@ -136,11 +136,13 @@ ORDER BY visits_amount ASC;
 
 <details>
   <summary><em><strong>show answer</strong></em></summary>
+
 | customer_id | visits_amount |
 | ----------- | ------------- |
 | C           | 2             |
 | A           | 4             |
 | B           | 6             |
+
 </details>
 
 ### 3. What was the first item from the menu purchased by each customer?
@@ -182,6 +184,7 @@ ORDER BY fp.customer_id;
 
 <details>
   <summary><em><strong>show answer</strong></em></summary>
+
 | customer_id | product_name |
 | ----------- | ------------ |
 | A           | sushi        |
@@ -189,6 +192,7 @@ ORDER BY fp.customer_id;
 | B           | curry        |
 | C           | ramen        |
 | C           | ramen        |
+
 </details>
 
 ### 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
@@ -225,9 +229,11 @@ WHERE total_purchases = (SELECT MAX(total_purchases) FROM product_counts);
 
 <details>
   <summary><em><strong>show answer</strong></em></summary>
+
 | most_popular | total_purchases |
 | ------------ | --------------- |
 | ramen        | 8               |
+
 </details>
 
 ### 5. Which item was the most popular for each customer?
@@ -265,6 +271,7 @@ ORDER BY customer_id;
 
 <details>
   <summary><em><strong>show answer</strong></em></summary>
+
 | customer_id | product_name | items_sold |
 | ----------- | ------------ | ---------- |
 | A           | ramen        | 3          |
@@ -272,6 +279,7 @@ ORDER BY customer_id;
 | B           | curry        | 2          |
 | B           | ramen        | 2          |
 | C           | ramen        | 3          |
+
 </details>
 
 ### 6. Which item was purchased first by the customer after they became a member?
@@ -312,10 +320,12 @@ ORDER BY s.customer_id, s.order_date;
 
 <details>
   <summary><em><strong>show answer</strong></em></summary>
+
 | customer_id | product_name | order_date |
 | ----------- | ------------ | ---------- |
 | A           | curry        | 2021-01-07 |
 | B           | sushi        | 2021-01-11 |
+
 </details>
 
 ### 7. Which item was purchased just before the customer became a member?
@@ -356,11 +366,13 @@ ORDER BY s.customer_id, s.order_date;
 
 <details>
   <summary><em><strong>show answer</strong></em></summary>
+
 | customer_id | product_name | order_date |
 | ----------- | ------------ | ---------- |
 | A           | sushi        | 2021-01-01 |
 | A           | curry        | 2021-01-01 |
 | B           | sushi        | 2021-01-04 |
+
 </details>
 
 ### 8. What is the total items and amount spent for each member before they became a member?
@@ -395,10 +407,12 @@ ORDER BY s.customer_id;
 
 <details>
   <summary><em><strong>show answer</strong></em></summary>
+
 | customer_id | total_items | total_amount |
 | ----------- | ----------- | ------------ |
 | A           | 2           | 25           |
 | B           | 3           | 40           |
+
 </details>
 
 ### 9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
@@ -437,11 +451,13 @@ ORDER BY s.customer_id;
 
 <details>
   <summary><em><strong>show answer</strong></em></summary>
+
 | customer_id | total_points |
 | ----------- | ------------ |
 | A           | 860          |
 | B           | 940          |
 | C           | 360          |
+
 </details>
 
 ### 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
@@ -485,10 +501,12 @@ ORDER BY s.customer_id;
 
 <details>
   <summary><em><strong>answer</strong></em></summary>
+
 | customer_id | total_points |
 | ----------- | ------------ |
 | A           | 1270         |
 | B           | 720          |
+
 </details>
 
 ## Bonus Questions & Solutions
@@ -529,6 +547,7 @@ ORDER BY s.customer_id, s.order_date, m.product_name;
 
 <details>
   <summary><em><strong>show answer</strong></em></summary>
+
 | customer_id | order_date | product_name | price | member |
 | ----------- | ---------- | ------------ | ----- | ------ |
 | A           | 2021-01-01 | curry        | 15    | N      |
@@ -546,6 +565,7 @@ ORDER BY s.customer_id, s.order_date, m.product_name;
 | C           | 2021-01-01 | ramen        | 12    | N      |
 | C           | 2021-01-01 | ramen        | 12    | N      |
 | C           | 2021-01-07 | ramen        | 12    | N      |
+
 </details>
 
 ### 2. Rank All The Things
@@ -596,6 +616,7 @@ ORDER BY s.customer_id, s.order_date, m.product_name;
 
 <details>
   <summary><em><strong>show answer</strong></em></summary>
+
 | customer_id | order_date | product_name | price | member | ranking |
 | ----------- | ---------- | ------------ | ----- | ------ | ------- |
 | A           | 2021-01-01 | curry        | 15    | N      | null    |
@@ -613,4 +634,5 @@ ORDER BY s.customer_id, s.order_date, m.product_name;
 | C           | 2021-01-01 | ramen        | 12    | N      | null    |
 | C           | 2021-01-01 | ramen        | 12    | N      | null    |
 | C           | 2021-01-07 | ramen        | 12    | N      | null    |
+
 </details>
