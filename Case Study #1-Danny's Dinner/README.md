@@ -92,6 +92,14 @@ JOIN menu m ON s.product_id = m.product_id
 GROUP BY s.customer_id
 ORDER BY total_spent DESC;
 ```
+
+***answer:***
+| customer_id | total_spent |
+| ----------- | ----------- |
+| A           | 76          |
+| B           | 74          |
+| C           | 36          |
+
 <details>
   <summary><em><strong>show description</strong></em></summary>
   <p>The SQL query retrieves the `customer_id` and calculates the `total amount spent` (total_spent) by each customer at the restaurant.</p>
@@ -103,13 +111,6 @@ ORDER BY total_spent DESC;
   </ul>
 </details>
 
-***answer:***
-| customer_id | total_spent |
-| ----------- | ----------- |
-| A           | 76          |
-| B           | 74          |
-| C           | 36          |
-
 ### 2. How many days has each customer visited the restaurant?
 
 ***query:***
@@ -120,6 +121,13 @@ GROUP BY customer_id
 ORDER BY visits_amount ASC;
 ```
 
+***answer:***
+| customer_id | visits_amount |
+| ----------- | ------------- |
+| C           | 2             |
+| A           | 4             |
+| B           | 6             |
+
 <details>
   <summary><em><strong>show description</strong></em></summary>
   <p>The SQL query retrieves the `customer_id` and calculates the total number of unique visit dates (visits_amount) for each customer at the restaurant.</p>
@@ -129,13 +137,6 @@ ORDER BY visits_amount ASC;
     <li>The results are then sorted in ascending order (ASC) based on `visits_amount`, so customers with the fewest visits appear first.</li>
   </ul>
 </details>
-
-***answer:***
-| customer_id | visits_amount |
-| ----------- | ------------- |
-| C           | 2             |
-| A           | 4             |
-| B           | 6             |
 
 ### 3. What was the first item from the menu purchased by each customer?
 
@@ -160,6 +161,15 @@ JOIN menu m
 ORDER BY fp.customer_id;
 ```
 
+***answer:***
+| customer_id | product_name |
+| ----------- | ------------ |
+| A           | sushi        |
+| A           | curry        |
+| B           | curry        |
+| C           | ramen        |
+| C           | ramen        |
+
 <details>
   <summary><em><strong>show description</strong></em></summary>
   <p>The SQL query retrieves the `customer_id` and identifies the first menu item (product_name) purchased by each customer based on their earliest order date.</p>
@@ -173,15 +183,6 @@ ORDER BY fp.customer_id;
   <p>This query focuses on identifying items purchased on the first recorded date for each customer. It assumes that all purchases on the same date are part of a single order and doesn't account for the sequence of purchases within the day, as the dataset lacks time information.</p>
   <p>While the `DENSE_RANK()` function could also be used to identify the first purchase, this approach was chosen for its simplicity and clarity, given the dataset's structure.</p>
 </details>
-
-***answer:***
-| customer_id | product_name |
-| ----------- | ------------ |
-| A           | sushi        |
-| A           | curry        |
-| B           | curry        |
-| C           | ramen        |
-| C           | ramen        |
 
 ### 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
 
@@ -202,6 +203,12 @@ SELECT
 FROM product_counts
 WHERE total_purchases = (SELECT MAX(total_purchases) FROM product_counts);
 ```
+
+***answer:***
+| most_popular | total_purchases |
+| ------------ | --------------- |
+| ramen        | 8               |
+
 <details>
   <summary><em><strong>show description</strong></em></summary>
   <p>The SQL query retrieves the most popular menu item(s) based on the total number of purchases (total_purchases).</p>
@@ -213,11 +220,6 @@ WHERE total_purchases = (SELECT MAX(total_purchases) FROM product_counts);
     <li>This ensures that all products with the highest number of purchases are included, even if multiple products share the same maximum value.</li>
   </ui>
 </details>
-
-***answer:***
-| most_popular | total_purchases |
-| ------------ | --------------- |
-| ramen        | 8               |
 
 ### 5. Which item was the most popular for each customer?
 
@@ -238,6 +240,16 @@ JOIN menu m ON sold_per_customer.product_id = m.product_id
 WHERE rank_value = 1
 ORDER BY customer_id;
 ```
+
+***answer:***
+| customer_id | product_name | items_sold |
+| ----------- | ------------ | ---------- |
+| A           | ramen        | 3          |
+| B           | sushi        | 2          |
+| B           | curry        | 2          |
+| B           | ramen        | 2          |
+| C           | ramen        | 3          |
+
 <details>
   <summary><em><strong>show description</strong></em></summary>
   <p>The SQL query uses a Common Table Expression (CTE) named `sold_per_customer` to generate a temporary result set that calculates the popularity of items purchased by each customer.</p>
@@ -250,15 +262,6 @@ ORDER BY customer_id;
   </ui>
   <p>The JOIN between the sold_per_customer CTE and the menu table is performed in the main query rather than inside the CTE. This approach ensures that the grouping, ranking, and filtering are applied to a smaller subset of data (only the sales table), which can improve performance when the menu table is large. By deferring the JOIN to the main query, the data processing is streamlined, focusing on only the necessary rows with rank_value = 1.</p>
 </details>
-
-***answer:***
-| customer_id | product_name | items_sold |
-| ----------- | ------------ | ---------- |
-| A           | ramen        | 3          |
-| B           | sushi        | 2          |
-| B           | curry        | 2          |
-| B           | ramen        | 2          |
-| C           | ramen        | 3          |
 
 ### 6. Which item was purchased first by the customer after they became a member?
 
@@ -282,6 +285,13 @@ JOIN first_purchase_date fpd ON s.customer_id = fpd.customer_id AND s.order_date
 JOIN menu m ON s.product_id = m.product_id
 ORDER BY s.customer_id, s.order_date;
 ```
+
+***answer:***
+| customer_id | product_name | order_date |
+| ----------- | ------------ | ---------- |
+| A           | curry        | 2021-01-07 |
+| B           | sushi        | 2021-01-11 |
+
 <details>
   <summary><em><strong>show description</strong></em></summary>
   <p>The SQL query retrieves the first product purchased by each customer after they joined the loyalty program.</p>
@@ -294,12 +304,6 @@ ORDER BY s.customer_id, s.order_date;
     <li>The `ORDER BY s.customer_id, s.order_date` clause ensures the results are sorted by customer and by the date of the order for clear organization.</li>
   </ui>
 </details>
-
-***answer:***
-| customer_id | product_name | order_date |
-| ----------- | ------------ | ---------- |
-| A           | curry        | 2021-01-07 |
-| B           | sushi        | 2021-01-11 |
 
 ### 7. Which item was purchased just before the customer became a member?
 
@@ -323,6 +327,14 @@ JOIN last_purchase_before_membership lpbm ON s.customer_id = lpbm.customer_id AN
 JOIN menu m ON s.product_id = m.product_id
 ORDER BY s.customer_id, s.order_date;
 ```
+
+***answer:***
+| customer_id | product_name | order_date |
+| ----------- | ------------ | ---------- |
+| A           | sushi        | 2021-01-01 |
+| A           | curry        | 2021-01-01 |
+| B           | sushi        | 2021-01-04 |
+
 <details>
   <summary><em><strong>show description</strong></em></summary>
   <p>The SQL query retrieves the last product purchased by each customer before they joined the loyalty program.</p>
@@ -335,13 +347,6 @@ ORDER BY s.customer_id, s.order_date;
     <li>The `ORDER BY s.customer_id, s.order_date` clause ensures the results are sorted by customer and by the date of the order for clear organization.</li>
   </ui>
 </details>
-
-***answer:***
-| customer_id | product_name | order_date |
-| ----------- | ------------ | ---------- |
-| A           | sushi        | 2021-01-01 |
-| A           | curry        | 2021-01-01 |
-| B           | sushi        | 2021-01-04 |
 
 ### 8. What is the total items and amount spent for each member before they became a member?
 
@@ -396,6 +401,14 @@ JOIN menu m ON s.product_id = m.product_id
 GROUP BY s.customer_id
 ORDER BY s.customer_id;
 ```
+
+***answer:***
+| customer_id | total_points |
+| ----------- | ------------ |
+| A           | 860          |
+| B           | 940          |
+| C           | 360          |
+
 <details>
   <summary><em><strong>show description</strong></em></summary>
   <p>The SQL query calculates the total loyalty points earned by each customer based on their purchases, with a 2x multiplier applied for sushi.</p>
@@ -411,13 +424,6 @@ ORDER BY s.customer_id;
     <li>The results are ordered by `customer_id` in ascending order to provide a clear, organized output.</li>
   </ui>
 </details>
-
-***answer:***
-| customer_id | total_points |
-| ----------- | ------------ |
-| A           | 860          |
-| B           | 940          |
-| C           | 360          |
 
 ### 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
 
@@ -439,6 +445,13 @@ WHERE s.order_date <= '2021-01-31'
 GROUP BY s.customer_id
 ORDER BY s.customer_id;
 ```
+
+***answer:***
+| customer_id | total_points |
+| ----------- | ------------ |
+| A           | 1270         |
+| B           | 720          |
+
 <details>
   <summary><em><strong>show description</strong></em></summary>
   <p>The SQL query calculates the total loyalty points earned by each customer by the end of January 2021, with a 2x multiplier applied to all items purchased during the first week after joining the loyalty program.</p>
@@ -456,13 +469,6 @@ ORDER BY s.customer_id;
     <li>The results are sorted by `customer_id` in ascending order to provide a clear, organized output.</li>
   </ui>
 </details>
-
-***answer:***
-| customer_id | total_points |
-| ----------- | ------------ |
-| A           | 1270         |
-| B           | 720          |
-
 
 ## Bonus Questions & Solutions
 
@@ -484,20 +490,6 @@ JOIN menu m ON s.product_id = m.product_id
 LEFT JOIN members mmbr ON s.customer_id = mmbr.customer_id
 ORDER BY s.customer_id, s.order_date, m.product_name;
 ```
-<details>
-  <summary><em><strong>show description</strong></em></summary>
-  <p>The SQL query recreates the requested table output by combining information from the `sales`, `menu`, and `members` tables.</p>
-  <ui>
-    <li>It retrieves data from the `sales` table and joins it with the `menu` table on matching `product_id` to include the product name (`product_name`) and price (`price`) for each order.</li>
-    <li>A `LEFT JOIN` is used to connect the `sales` table with the `members` table on `customer_id`, allowing access to the `join_date` for each customer while including non-member customers.</li>
-    <li>A `CASE` statement is used to determine the membership status (`member`) for each order:</li>
-    <ui>
-        <li>Returns `'Y'` if the `order_date` is greater than or equal to the `join_date`.</li>
-        <li>Returns `'N'` if the `order_date` is before the `join_date` or the customer is not a member.</li>
-    </ui>
-    <li>The query results are ordered by `customer_id`, `order_date`, and `product_name` to match the desired output structure.</li>
-  </ui>
-</details>
 
 ***answer:***
 | customer_id | order_date | product_name | price | member |
@@ -517,6 +509,21 @@ ORDER BY s.customer_id, s.order_date, m.product_name;
 | C           | 2021-01-01 | ramen        | 12    | N      |
 | C           | 2021-01-01 | ramen        | 12    | N      |
 | C           | 2021-01-07 | ramen        | 12    | N      |
+
+<details>
+  <summary><em><strong>show description</strong></em></summary>
+  <p>The SQL query recreates the requested table output by combining information from the `sales`, `menu`, and `members` tables.</p>
+  <ui>
+    <li>It retrieves data from the `sales` table and joins it with the `menu` table on matching `product_id` to include the product name (`product_name`) and price (`price`) for each order.</li>
+    <li>A `LEFT JOIN` is used to connect the `sales` table with the `members` table on `customer_id`, allowing access to the `join_date` for each customer while including non-member customers.</li>
+    <li>A `CASE` statement is used to determine the membership status (`member`) for each order:</li>
+    <ui>
+        <li>Returns `'Y'` if the `order_date` is greater than or equal to the `join_date`.</li>
+        <li>Returns `'N'` if the `order_date` is before the `join_date` or the customer is not a member.</li>
+    </ui>
+    <li>The query results are ordered by `customer_id`, `order_date`, and `product_name` to match the desired output structure.</li>
+  </ui>
+</details>
 
 ### 2. Rank All The Things
 
@@ -543,25 +550,6 @@ JOIN menu m ON s.product_id = m.product_id
 LEFT JOIN members mmbr ON s.customer_id = mmbr.customer_id
 ORDER BY s.customer_id, s.order_date, m.product_name;
 ```
-<details>
-  <summary><em><strong>show description</strong></em></summary>
-  <p>The SQL query calculates the ranking of products purchased by customers, but only for purchases made after they joined the loyalty program, leaving non-member purchases unranked (`NULL`).</p>
-  <ui>
-    <li>It retrieves data from the `sales` table and joins it with the `menu` table on matching `product_id` to include `product_name` and `price`.</li>
-    <li>A `LEFT JOIN` is used to connect the `sales` table with the `members` table on `customer_id`, enabling access to the `join_date` for each customer.</li>
-    <li>A `CASE` statement determines the membership status (`member`):</li>
-    <ui>
-        <li>Returns `'Y'` if the `order_date` is greater than or equal to the `join_date`.</li>
-        <li>Returns `'N'` otherwise.</li>
-    </ui>
-    <li>Another `CASE` statement applies the ranking logic:</li>
-        <ui>
-        <li>If the `order_date` is on or after the `join_date`, the `RANK()` function is applied, partitioning by `customer_id` and ordering by `order_date` to assign sequential ranks for purchases.</li>
-        <li>If the `order_date` is before the `join_date`, the ranking is set to `NULL`.</li>
-    </ui>
-    <li>The query groups the results by `customer_id` and `order_date`, while the `ORDER BY` clause sorts the output by `customer_id`, `order_date`, and `product_name` for clear organization.</li>
-  </ui>
-</details>
 
 ***answer:***
 | customer_id | order_date | product_name | price | member | ranking |
@@ -581,3 +569,23 @@ ORDER BY s.customer_id, s.order_date, m.product_name;
 | C           | 2021-01-01 | ramen        | 12    | N      | null    |
 | C           | 2021-01-01 | ramen        | 12    | N      | null    |
 | C           | 2021-01-07 | ramen        | 12    | N      | null    |
+
+<details>
+  <summary><em><strong>show description</strong></em></summary>
+  <p>The SQL query calculates the ranking of products purchased by customers, but only for purchases made after they joined the loyalty program, leaving non-member purchases unranked (`NULL`).</p>
+  <ui>
+    <li>It retrieves data from the `sales` table and joins it with the `menu` table on matching `product_id` to include `product_name` and `price`.</li>
+    <li>A `LEFT JOIN` is used to connect the `sales` table with the `members` table on `customer_id`, enabling access to the `join_date` for each customer.</li>
+    <li>A `CASE` statement determines the membership status (`member`):</li>
+    <ui>
+        <li>Returns `'Y'` if the `order_date` is greater than or equal to the `join_date`.</li>
+        <li>Returns `'N'` otherwise.</li>
+    </ui>
+    <li>Another `CASE` statement applies the ranking logic:</li>
+        <ui>
+        <li>If the `order_date` is on or after the `join_date`, the `RANK()` function is applied, partitioning by `customer_id` and ordering by `order_date` to assign sequential ranks for purchases.</li>
+        <li>If the `order_date` is before the `join_date`, the ranking is set to `NULL`.</li>
+    </ui>
+    <li>The query groups the results by `customer_id` and `order_date`, while the `ORDER BY` clause sorts the output by `customer_id`, `order_date`, and `product_name` for clear organization.</li>
+  </ui>
+</details>
