@@ -152,7 +152,7 @@ VALUES
 | 1        | 101         | 1        |            |        | 2020-01-01 18:05:02 |
 | 2        | 101         | 1        |            |        | 2020-01-01 19:00:52 |
 | 3        | 102         | 1        |            |        | 2020-01-02 23:51:23 |
-| 3        | 102         | 2        |            |        | 2020-01-02 23:51:23 |
+| 3        | 102         | 2        |            | NaN    | 2020-01-02 23:51:23 |
 | 4        | 103         | 1        | 4          |        | 2020-01-04 13:23:46 |
 | 4        | 103         | 1        | 4          |        | 2020-01-04 13:23:46 |
 | 4        | 103         | 2        | 4          |        | 2020-01-04 13:23:46 |
@@ -164,6 +164,22 @@ VALUES
 | 10       | 104         | 1        | null       | null   | 2020-01-11 18:34:49 |
 | 10       | 104         | 1        | 2, 6       | 1, 4   | 2020-01-11 18:34:49 |
 
+</details>
+
+<details>
+  <summary><strong>show original table description</strong></summary>
+
+As seen in the [database schema](#entity-relationship-diagram), the exclusions and extras columns in the `customer_orders` table contain missing values represented in various forms:
+- empty strings ('')
+- the string 'null'
+- the data type NULL
+
+These values indicate that no actions were taken by the customer: no ingredients were excluded, and no extras were added. To simplify data analysis and ensure consistency, all missing values will be standardized to the `NULL` data type. This approach will:
+- enable proper handling of missing data in SQL (e.g., using IS NULL)
+- reduce errors in data analysis and processing
+
+Standardizing these values to `NULL` will improve the accuracy of future queries and ensure a clearer logic for data analysis.
+  
 </details>
 
 ## Case Study Questions & Solutions
