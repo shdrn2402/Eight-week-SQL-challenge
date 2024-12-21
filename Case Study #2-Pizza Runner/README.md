@@ -17,7 +17,7 @@ Danny began by recruiting a team of runners to deliver freshly made pizzas direc
 
 ## Entity Relationship Diagram
 <details>
-  <summary><strong>show database schema</strong></summary>
+  <summary><em><strong>show database schema</strong></em></summary>
 
 ```SQL
 CREATE SCHEMA pizza_runner;
@@ -145,7 +145,7 @@ VALUES
 ### 1. Cleaning Missing Data in `customer_orders` Table
 
 <details>
-  <summary><strong>show original table</strong></summary>
+  <summary><em><strong>show original table</strong></em></summary>
 
 | order_id | customer_id | pizza_id | exclusions | extras | order_time          |
 | -------- | ----------- | -------- | ---------- | ------ | ------------------- |
@@ -196,7 +196,7 @@ SET
 ;
 ```
 <details>
-  <summary><strong>show table after data cleaning</strong></summary>
+  <summary><em><strong>show table after data cleaning</strong></em></summary>
 
 | order_id | customer_id | pizza_id | exclusions | extras | order_time          |
 | -------- | ----------- | -------- | ---------- | ------ | ------------------- |
