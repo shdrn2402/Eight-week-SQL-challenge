@@ -2,7 +2,7 @@
 
 ## Contents:
 - [Introduction](#introduction)
-- [Problem Statement](#problem-statment) 
+- [Problem Statement](#problem-statement) 
 - [Entity Relationship Diagram](#entity-relationship-diagram)
 - [Case Study Questions & Solutions](#case-study-questions--solutions)
 - [Bonus Questions & Solutions](#bonus-questions--solutions)
@@ -92,15 +92,16 @@ JOIN menu m ON s.product_id = m.product_id
 GROUP BY s.customer_id
 ORDER BY total_spent DESC;
 ```
-
-***description:***
-
-The SQL query retrieves the `customer_id` and calculates the `total amount spent` (total_spent) by each customer at the restaurant.
-
-- It joins the sales table (s) and the menu table (m) using the `product_id` column, which serves as a common key between the two tables.
-- The query then groups the results by `customer_id`, aggregating the `total price` (SUM(m.price)) for each customer.
-- The SUM() function calculates the total amount spent by each customer across all their purchases.
-- Finally, the results are sorted in descending order (DESC) based on the total_spent value, so customers who spent the most appear at the top.
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+  <p>The SQL query retrieves the `customer_id` and calculates the `total amount spent` (total_spent) by each customer at the restaurant.</p>
+  <ul>
+    <li>It joins the sales table (s) and the menu table (m) using the `product_id` column, which serves as a common key between the two tables.</li>
+    <li>The query then groups the results by `customer_id`, aggregating the `total price` (SUM(m.price)) for each customer.</li>
+    <li>The SUM() function calculates the total amount spent by each customer across all their purchases.</li>
+    <li>Finally, the results are sorted in descending order (DESC) based on the total_spent value, so customers who spent the most appear at the top.</li>
+  </ul>
+</details>
 
 ***answer:***
 | customer_id | total_spent |
