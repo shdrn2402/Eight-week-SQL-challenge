@@ -185,14 +185,14 @@ Standardizing these values to `NULL` will improve the accuracy of future queries
 ```SQL
 UPDATE customer_orders
 SET 
-    exclusions = CASE 
-                 	WHEN exclusions IS NULL OR exclusions = 'null' OR exclusions = '' THEN NULL
-                 	ELSE exclusions
-              	 END,
-    extras = CASE 
-                 WHEN extras IS NULL OR extras = 'null' OR extras = '' THEN NULL
-                 ELSE extras
-              END
+  exclusions = CASE 
+    WHEN exclusions IS NULL OR exclusions = 'null' OR exclusions = '' THEN NULL
+    ELSE exclusions
+    END,
+  extras = CASE 
+    WHEN extras IS NULL OR extras = 'null' OR extras = '' THEN NULL
+    ELSE extras
+    END
 ;
 ```
 <details>
