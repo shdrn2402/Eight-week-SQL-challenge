@@ -3,12 +3,17 @@
 ## Contents:
 - [Introduction](#introduction)
 - [Entity Relationship Diagram](#entity-relationship-diagram)
+- [Data Cleaning & Data Transformation](#data-cleaning--data-transformation)
 - [Case Study Questions & Solutions](#case-study-questions--solutions)
 - [Bonus Questions & Solutions](#bonus-questions--solutions)
   
 ## Introduction
 
-...
+Did you know that over 115 million kilograms of pizza are consumed worldwide every day? (Well, at least according to Wikipedia!)
+
+While scrolling through Instagram, Danny stumbled upon an intriguing trend: “80s Retro Styling and Pizza Is The Future!” Inspired by this idea, he realized that pizza alone wouldn’t be enough to attract seed funding for his ambitious vision of a Pizza Empire. That’s when Danny had his next big breakthrough – he decided to Uberize the experience. And so, Pizza Runner was born!
+
+Danny began by recruiting a team of runners to deliver freshly made pizzas directly from Pizza Runner Headquarters (aka Danny’s house). To bring his idea to life, he maxed out his credit card to hire freelance developers to create a mobile app for taking customer orders.
 
 ## Entity Relationship Diagram
 <details>
@@ -134,6 +139,32 @@ VALUES
 </details>
 
 ![Project Logo](../images/case2_diagram.png)
+
+## Data Cleaning & Data Transformation
+
+### 1. Cleaning Missing Data in `customer_orders` Table
+
+<details>
+  <summary><strong>show original table</strong></summary>
+
+| order_id | customer_id | pizza_id | exclusions | extras | order_time          |
+| -------- | ----------- | -------- | ---------- | ------ | ------------------- |
+| 1        | 101         | 1        |            |        | 2020-01-01 18:05:02 |
+| 2        | 101         | 1        |            |        | 2020-01-01 19:00:52 |
+| 3        | 102         | 1        |            |        | 2020-01-02 23:51:23 |
+| 3        | 102         | 2        |            |        | 2020-01-02 23:51:23 |
+| 4        | 103         | 1        | 4          |        | 2020-01-04 13:23:46 |
+| 4        | 103         | 1        | 4          |        | 2020-01-04 13:23:46 |
+| 4        | 103         | 2        | 4          |        | 2020-01-04 13:23:46 |
+| 5        | 104         | 1        | null       | 1      | 2020-01-08 21:00:29 |
+| 6        | 101         | 2        | null       | null   | 2020-01-08 21:03:13 |
+| 7        | 105         | 2        | null       | 1      | 2020-01-08 21:20:29 |
+| 8        | 102         | 1        | null       | null   | 2020-01-09 23:54:33 |
+| 9        | 103         | 1        | 4          | 1, 5   | 2020-01-10 11:22:59 |
+| 10       | 104         | 1        | null       | null   | 2020-01-11 18:34:49 |
+| 10       | 104         | 1        | 2, 6       | 1, 4   | 2020-01-11 18:34:49 |
+
+</details>
 
 ## Case Study Questions & Solutions
 
