@@ -166,10 +166,9 @@ VALUES
 
 </details>
 
-<details>
-  <summary><strong>show original table description</strong></summary>
+***description:***
 
-As seen in the [database schema](#entity-relationship-diagram), the exclusions and extras columns in the `customer_orders` table contain missing values represented in various forms:
+As seen in the [database schema](#entity-relationship-diagram), the `exclusions` and `extras` columns in the `customer_orders` table contain missing values represented in various forms:
 - empty strings ('')
 - the string 'null'
 - the data type NULL
