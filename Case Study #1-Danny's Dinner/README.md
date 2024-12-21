@@ -93,7 +93,7 @@ GROUP BY s.customer_id
 ORDER BY total_spent DESC;
 ```
 <details>
-  <summary><em><strong>show description</strong></em></summary>
+  <summary><em><strong>description:</strong></em></summary>
   <p>The SQL query retrieves the `customer_id` and calculates the `total amount spent` (total_spent) by each customer at the restaurant.</p>
   <ul>
     <li>It joins the sales table (s) and the menu table (m) using the `product_id` column, which serves as a common key between the two tables.</li>
@@ -104,7 +104,7 @@ ORDER BY total_spent DESC;
 </details>
 
 <details>
-  <summary><em><strong>show answer</strong></em></summary>
+  <summary><em><strong>answer:</strong></em></summary>
 
 | customer_id | total_spent |
 | ----------- | ----------- |
