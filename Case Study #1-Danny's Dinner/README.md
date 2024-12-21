@@ -92,14 +92,6 @@ JOIN menu m ON s.product_id = m.product_id
 GROUP BY s.customer_id
 ORDER BY total_spent DESC;
 ```
-
-***answer:***
-| customer_id | total_spent |
-| ----------- | ----------- |
-| A           | 76          |
-| B           | 74          |
-| C           | 36          |
-
 <details>
   <summary><em><strong>show description</strong></em></summary>
   <p>The SQL query retrieves the `customer_id` and calculates the `total amount spent` (total_spent) by each customer at the restaurant.</p>
@@ -109,6 +101,16 @@ ORDER BY total_spent DESC;
     <li>The SUM() function calculates the total amount spent by each customer across all their purchases.</li>
     <li>Finally, the results are sorted in descending order (DESC) based on the total_spent value, so customers who spent the most appear at the top.</li>
   </ul>
+</details>
+
+<details>
+  <summary><em><strong>show answer</strong></em></summary>
+
+| customer_id | total_spent |
+| ----------- | ----------- |
+| A           | 76          |
+| B           | 74          |
+| C           | 36          |
 </details>
 
 ### 2. How many days has each customer visited the restaurant?
