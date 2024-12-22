@@ -168,18 +168,16 @@ VALUES
 
 ***description:***
 
-As seen in the [database schema](#entity-relationship-diagram), the `exclusions` and `extras` columns in the `customer_orders` table contain missing values represented in various forms:
-- empty strings ('')
-- the string 'null'
-- the data type NULL
+As seen in the [database schema](#entity-relationship-diagram), the **`exclusions`** and **`extras`** columns in the **`customer_orders`** table contain missing values represented in various forms:
+- empty strings `('')`
+- the string `'null'`
+- the data type `NULL`
 
 These values indicate that no actions were taken by the customer: no ingredients were excluded, and no extras were added. To simplify data analysis and ensure consistency, all missing values will be standardized to the `NULL` data type. This approach will:
 - enable proper handling of missing data in SQL (e.g., using IS NULL)
 - reduce errors in data analysis and processing
 
 Standardizing these values to `NULL` will improve the accuracy of future queries and ensure a clearer logic for data analysis.
-  
-</details>
 
 ***query:***
 ```SQL
@@ -217,10 +215,93 @@ SET
 
 </details>
 
+### 2. Cleaning Missing Data in `runner_orders` Table
+
+<details>
+  <summary><em><strong>show original table</strong></em></summary>
+
+| order_id | runner_id | pickup_time         | distance | duration   | cancellation            |
+| -------- | --------- | ------------------- | -------- | ---------- | ----------------------- |
+| 1        | 1         | 2020-01-01 18:15:34 | 20km     | 32 minutes |                         |
+| 2        | 1         | 2020-01-01 19:10:54 | 20km     | 27 minutes |                         |
+| 3        | 1         | 2020-01-03 00:12:37 | 13.4km   | 20 mins    | NaN                     |
+| 4        | 2         | 2020-01-04 13:53:03 | 23.4     | 40         | NaN                     |
+| 5        | 3         | 2020-01-08 21:10:57 | 10       | 15         | NaN                     |
+| 6        | 3         | null                | null     | null       | Restaurant Cancellation |
+| 7        | 2         | 2020-01-08 21:30:45 | 25km     | 25mins     | null                    |
+| 8        | 2         | 2020-01-10 00:15:02 | 23.4 km  | 15 minute  | null                    |
+| 9        | 2         | null                | null     | null       | Customer Cancellation   |
+| 10       | 1         | 2020-01-11 18:50:20 | 10km     | 10minutes  | null                    |
+
+</details>
+
+***description:***
+
+As seen in the [database schema](#entity-relationship-diagram), the `runner_orders` table contains inconsistencies in several columns, such as `pickup_time`, `distance`, `duration`, and `cancellation`:
+
+- **`pickup_time`**: Missing values are represented as `NULL`, the string `'null'`, or empty strings (`''`).
+- **`distance`**: Contains various formats for numeric values, such as `'20km'`, `'13.4km'`, or `'null'`.
+- **`duration`**: Similar to `distance`, it uses inconsistent formats, including `'32 minutes'`, `'20 mins'`, and `'null'`.
+- **`cancellation`**: Missing values are represented as `NULL`, the string `'null'`, or empty strings (`''`).
+
+To standardize the data and prepare it for accurate analysis:
+
+1. **Missing Values**: All missing values in `pickup_time`, `distance`, `duration`, and `cancellation` will be converted to the `NULL` data type to enable consistent handling in SQL queries.
+2. **Data Normalization**: 
+   - The `distance` and `duration` columns will have non-numeric characters removed to ensure only numeric values remain.
+   - The `pickup_time` column will be converted to the `TIMESTAMP` data type for accurate date and time analysis.
+   - The `duration` column will be converted to the `INTEGER` data type, representing the duration in minutes.
+   - The `distance` column will be converted to the `NUMERIC` data type to support precision in distance calculations.
+
+These transformations will ensure data consistency, simplify future analysis, and reduce the risk of errors when running SQL queries.
+
+***query:***
+```SQL
+UPDATE runner_orders
+SET 
+  distance = CASE 
+    WHEN distance IS NULL OR distance = 'null' OR distance = '' THEN NULL
+    ELSE REGEXP_REPLACE(distance, '[^0-9.]', '', 'g')
+    END,
+  duration = CASE 
+    WHEN duration IS NULL OR duration = 'null' OR duration = '' THEN NULL
+    ELSE REGEXP_REPLACE(duration, '[^0-9.]', '', 'g')
+    END,
+  pickup_time = CASE
+    WHEN pickup_time IS NULL OR pickup_time = 'null' OR pickup_time = '' THEN NULL
+    ELSE pickup_time
+    END,
+  cancellation = CASE 
+    WHEN cancellation IS NULL OR cancellation = 'null' OR cancellation = '' THEN NULL
+    ELSE cancellation
+    END;
+
+ALTER TABLE runner_orders
+ALTER COLUMN distance TYPE NUMERIC USING distance::NUMERIC,
+ALTER COLUMN duration TYPE INTEGER USING duration::INTEGER,
+ALTER COLUMN pickup_time TYPE TIMESTAMP USING pickup_time::TIMESTAMP;
+```
+
+<details>
+  <summary><em><strong>show table after data cleaning</strong></em></summary>
+
+| order_id | runner_id | pickup_time         | distance | duration | cancellation            |
+| -------- | --------- | ------------------- | -------- | -------- | ----------------------- |
+| 1        | 1         | 2020-01-01 18:15:34 | 20       | 32       |                         |
+| 2        | 1         | 2020-01-01 19:10:54 | 20       | 27       |                         |
+| 3        | 1         | 2020-01-03 00:12:37 | 13.4     | 20       |                         |
+| 4        | 2         | 2020-01-04 13:53:03 | 23.4     | 40       |                         |
+| 5        | 3         | 2020-01-08 21:10:57 | 10       | 15       |                         |
+| 6        | 3         |                     |          |          | Restaurant Cancellation |
+| 7        | 2         | 2020-01-08 21:30:45 | 25       | 25       |                         |
+| 8        | 2         | 2020-01-10 00:15:02 | 23.4     | 15       |                         |
+| 9        | 2         |                     |          |          | Customer Cancellation   |
+| 10       | 1         | 2020-01-11 18:50:20 | 10       | 10       |                         |
+
+</details>
+
 ## Case Study Questions & Solutions
 
 ...
 
 ## Bonus Questions & Solutions
-
-...
