@@ -5,7 +5,11 @@
 - [Entity Relationship Diagram](#entity-relationship-diagram)
 - [Data Cleaning & Data Transformation](#data-cleaning--data-transformation)
 - [Case Study Questions & Solutions](#case-study-questions--solutions)
-- [Bonus Questions & Solutions](#bonus-questions--solutions)
+  - [A. Pizza Metrics](#a-pizza-metrics)
+  - [B. Runner and Customer Experience](#b-runner-and-customer-experience)
+  - [C. Ingredient Optimisation](#c-ingredient-optimisation)
+  - [D. Pricing and Ratings](#d-pricing-and-ratings)
+  - [E. Bonus Questions](#e-bonus-questions)
   
 ## Introduction
 
@@ -301,7 +305,13 @@ ALTER COLUMN pickup_time TYPE TIMESTAMP USING pickup_time::TIMESTAMP;
 </details>
 
 ## Case Study Questions & Solutions
-
-...
-
-## Bonus Questions & Solutions
+  ### A. Pizza Metrics
+  ...
+  ### B. Runner and Customer Experience
+  ...
+  ### C. Ingredient Optimisation
+  ...
+  ### D. Pricing and Ratings
+  ...
+  ### E. Bonus Questions
+  ...
