@@ -146,7 +146,7 @@ VALUES
 
 ### Data Cleaning & Data Transformation
 
-> #### Cleaning Missing Data in `customer_orders` Table
+#### Cleaning Missing Data in `customer_orders` Table
 
 <details>
   <summary><em><strong>show original table</strong></em></summary>
@@ -172,16 +172,16 @@ VALUES
 
 ***description:***
 
-As seen in the [database schema](#entity-relationship-diagram), the **`exclusions`** and **`extras`** columns in the **`customer_orders`** table contain missing values represented in various forms:
-- empty strings `('')`
-- the string `'null'`
-- the data type `NULL`
-
-These values indicate that no actions were taken by the customer: no ingredients were excluded, and no extras were added. To simplify data analysis and ensure consistency, all missing values will be standardized to the `NULL` data type. This approach will:
-- enable proper handling of missing data in SQL (e.g., using IS NULL)
-- reduce errors in data analysis and processing
-
-Standardizing these values to `NULL` will improve the accuracy of future queries and ensure a clearer logic for data analysis.
+> As seen in the [database schema](#entity-relationship-diagram), the **`exclusions`** and **`extras`** columns in the **`customer_orders`** table contain missing values represented in various forms:
+> - empty strings `('')`
+> - the string `'null'`
+> - the data type `NULL`
+>
+> These values indicate that no actions were taken by the customer: no ingredients were excluded, and no extras were added. To simplify data analysis and ensure consistency, all missing values will be standardized to the `NULL` data type. This approach will:
+> - enable proper handling of missing data in SQL (e.g., using IS NULL)
+> - reduce errors in data analysis and processing
+> 
+> Standardizing these values to `NULL` will improve the accuracy of future queries and ensure a clearer logic for data analysis.
 
 ***query:***
 ```SQL
@@ -219,7 +219,7 @@ SET
 
 </details>
 
-> #### Cleaning Missing Data in `runner_orders` Table
+#### Cleaning Missing Data in `runner_orders` Table
 
 <details>
   <summary><em><strong>show original table</strong></em></summary>
