@@ -13,11 +13,11 @@
   
 ### Introduction
 
-Did you know that over 115 million kilograms of pizza are consumed worldwide every day? (Well, at least according to Wikipedia!)
-
-While scrolling through Instagram, Danny stumbled upon an intriguing trend: “80s Retro Styling and Pizza Is The Future!” Inspired by this idea, he realized that pizza alone wouldn’t be enough to attract seed funding for his ambitious vision of a Pizza Empire. That’s when Danny had his next big breakthrough – he decided to Uberize the experience. And so, Pizza Runner was born!
-
-Danny began by recruiting a team of runners to deliver freshly made pizzas directly from Pizza Runner Headquarters (aka Danny’s house). To bring his idea to life, he maxed out his credit card to hire freelance developers to create a mobile app for taking customer orders.
+> Did you know that over 115 million kilograms of pizza are consumed worldwide every day? (Well, at least according to Wikipedia!)
+> 
+> While scrolling through Instagram, Danny stumbled upon an intriguing trend: “80s Retro Styling and Pizza Is The Future!” Inspired by this idea, he realized that pizza alone wouldn’t be enough to attract seed funding for his ambitious vision of a Pizza Empire. That’s when Danny had his next big breakthrough – he decided to Uberize the experience. And so, Pizza Runner was born!
+> 
+> Danny began by recruiting a team of runners to deliver freshly made pizzas directly from Pizza Runner Headquarters (aka Danny’s house). To bring his idea to life, he maxed out his credit card to hire freelance developers to create a mobile app for taking customer orders.
 
 ### Entity Relationship Diagram
 <details>
@@ -146,7 +146,7 @@ VALUES
 
 ### Data Cleaning & Data Transformation
 
-#### Cleaning Missing Data in `customer_orders` Table
+#### A. Cleaning Missing Data in `customer_orders` Table
 
 <details>
   <summary><em><strong>show original table</strong></em></summary>
@@ -219,7 +219,7 @@ SET
 
 </details>
 
-#### Cleaning Missing Data in `runner_orders` Table
+#### B. Cleaning Missing Data in `runner_orders` Table
 
 <details>
   <summary><em><strong>show original table</strong></em></summary>
@@ -241,23 +241,23 @@ SET
 
 ***description:***
 
-As seen in the [database schema](#entity-relationship-diagram), the `runner_orders` table contains inconsistencies in several columns, such as `pickup_time`, `distance`, `duration`, and `cancellation`:
-
-- **`pickup_time`**: Missing values are represented as `NULL`, the string `'null'`, or empty strings (`''`).
-- **`distance`**: Contains various formats for numeric values, such as `'20km'`, `'13.4km'`, or `'null'`.
-- **`duration`**: Similar to `distance`, it uses inconsistent formats, including `'32 minutes'`, `'20 mins'`, and `'null'`.
-- **`cancellation`**: Missing values are represented as `NULL`, the string `'null'`, or empty strings (`''`).
-
-To standardize the data and prepare it for accurate analysis:
-
-1. **Missing Values**: All missing values in `pickup_time`, `distance`, `duration`, and `cancellation` will be converted to the `NULL` data type to enable consistent handling in SQL queries.
-2. **Data Normalization**: 
-   - The `distance` and `duration` columns will have non-numeric characters removed to ensure only numeric values remain.
-   - The `pickup_time` column will be converted to the `TIMESTAMP` data type for accurate date and time analysis.
-   - The `duration` column will be converted to the `INTEGER` data type, representing the duration in minutes.
-   - The `distance` column will be converted to the `NUMERIC` data type to support precision in distance calculations.
-
-These transformations will ensure data consistency, simplify future analysis, and reduce the risk of errors when running SQL queries.
+> As seen in the [database schema](#entity-relationship-diagram), the `runner_orders` table contains inconsistencies in several columns, such as > `pickup_time`, `distance`, `duration`, and `cancellation`:
+> 
+> - **`pickup_time`**: Missing values are represented as `NULL`, the string `'null'`, or empty strings (`''`).
+> - **`distance`**: Contains various formats for numeric values, such as `'20km'`, `'13.4km'`, or `'null'`.
+> - **`duration`**: Similar to `distance`, it uses inconsistent formats, including `'32 minutes'`, `'20 mins'`, and `'null'`.
+> - **`cancellation`**: Missing values are represented as `NULL`, the string `'null'`, or empty strings (`''`).
+> 
+> To standardize the data and prepare it for accurate analysis:
+> 
+> 1. **Missing Values**: All missing values in `pickup_time`, `distance`, `duration`, and `cancellation` will be converted to the `NULL` data type to enable consistent handling in SQL queries.
+> 2. **Data Normalization**: 
+>    - The `distance` and `duration` columns will have non-numeric characters removed to ensure only numeric values remain.
+>    - The `pickup_time` column will be converted to the `TIMESTAMP` data type for accurate date and time analysis.
+>    - The `duration` column will be converted to the `INTEGER` data type, representing the duration in minutes.
+>    - The `distance` column will be converted to the `NUMERIC` data type to support precision in distance calculations.
+> 
+> These transformations will ensure data consistency, simplify future analysis, and reduce the risk of errors when running SQL queries.
 
 ***query:***
 ```SQL
