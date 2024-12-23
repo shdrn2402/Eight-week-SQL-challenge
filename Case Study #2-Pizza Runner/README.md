@@ -146,7 +146,7 @@ VALUES
 
 ### Data Cleaning & Data Transformation
 
-#### 1. Cleaning Missing Data in `customer_orders` Table
+> #### Cleaning Missing Data in `customer_orders` Table
 
 <details>
   <summary><em><strong>show original table</strong></em></summary>
@@ -219,7 +219,7 @@ SET
 
 </details>
 
-#### 2. Cleaning Missing Data in `runner_orders` Table
+> #### Cleaning Missing Data in `runner_orders` Table
 
 <details>
   <summary><em><strong>show original table</strong></em></summary>
