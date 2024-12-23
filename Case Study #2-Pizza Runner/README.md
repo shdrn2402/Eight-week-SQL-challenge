@@ -1,6 +1,6 @@
 ![Project Logo](../images/case2_logo.png)
 
-## Contents:
+### Contents:
 - [Introduction](#introduction)
 - [Entity Relationship Diagram](#entity-relationship-diagram)
 - [Data Cleaning & Data Transformation](#data-cleaning--data-transformation)
@@ -11,7 +11,7 @@
   - [D. Pricing and Ratings](#d-pricing-and-ratings)
   - [E. Bonus Questions](#e-bonus-questions)
   
-## Introduction
+### Introduction
 
 Did you know that over 115 million kilograms of pizza are consumed worldwide every day? (Well, at least according to Wikipedia!)
 
@@ -19,7 +19,7 @@ While scrolling through Instagram, Danny stumbled upon an intriguing trend: “8
 
 Danny began by recruiting a team of runners to deliver freshly made pizzas directly from Pizza Runner Headquarters (aka Danny’s house). To bring his idea to life, he maxed out his credit card to hire freelance developers to create a mobile app for taking customer orders.
 
-## Entity Relationship Diagram
+### Entity Relationship Diagram
 <details>
   <summary><em><strong>show database schema</strong></em></summary>
 
@@ -144,9 +144,9 @@ VALUES
 
 ![Project Logo](../images/case2_diagram.png)
 
-## Data Cleaning & Data Transformation
+### Data Cleaning & Data Transformation
 
-### 1. Cleaning Missing Data in `customer_orders` Table
+#### 1. Cleaning Missing Data in `customer_orders` Table
 
 <details>
   <summary><em><strong>show original table</strong></em></summary>
@@ -219,7 +219,7 @@ SET
 
 </details>
 
-### 2. Cleaning Missing Data in `runner_orders` Table
+#### 2. Cleaning Missing Data in `runner_orders` Table
 
 <details>
   <summary><em><strong>show original table</strong></em></summary>
@@ -304,14 +304,14 @@ ALTER COLUMN pickup_time TYPE TIMESTAMP USING pickup_time::TIMESTAMP;
 
 </details>
 
-## Case Study Questions & Solutions
-  ### A. Pizza Metrics
+### Case Study Questions & Solutions
+  #### A. Pizza Metrics
   ...
-  ### B. Runner and Customer Experience
+  #### B. Runner and Customer Experience
   ...
-  ### C. Ingredient Optimisation
+  #### C. Ingredient Optimisation
   ...
-  ### D. Pricing and Ratings
+  #### D. Pricing and Ratings
   ...
-  ### E. Bonus Questions
+  #### E. Bonus Questions
   ...

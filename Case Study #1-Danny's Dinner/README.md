@@ -1,18 +1,18 @@
 ![Project Logo](../images/case1_logo.png)
 
-## Contents:
+### Contents:
 - [Introduction](#introduction)
 - [Problem Statement](#problem-statement) 
 - [Entity Relationship Diagram](#entity-relationship-diagram)
 - [Case Study Questions & Solutions](#case-study-questions--solutions)
 - [Bonus Questions & Solutions](#bonus-questions--solutions)
   
-## Introduction
+### Introduction
 Danny is a big fan of Japanese cuisine, and at the start of 2021, he took a bold step by opening a small, charming restaurant specializing in his three favorite dishes: sushi, curry, and ramen.
 
 Now, Danny’s Diner needs your help to keep the business thriving. The restaurant has collected some basic data from its first months of operation but lacks the expertise to analyze and utilize this information effectively for better decision-making. 
 
-## Problem Statement
+### Problem Statement
 Danny wants to analyze his customer data to understand their visiting habits, spending patterns, and favorite menu items. These insights will help him improve customer experience and decide whether to expand the loyalty program.
 
 He also needs simple, pre-generated datasets for his team to inspect without using SQL. Due to privacy concerns, Danny has provided a sample of customer data, which includes three key datasets:
@@ -20,9 +20,10 @@ He also needs simple, pre-generated datasets for his team to inspect without usi
 - sales
 - menu
 - members
-## Entity Relationship Diagram
+
+### Entity Relationship Diagram
 <details>
-  <summary><strong>show database schema</strong></summary>
+  <summary><em><strong>show database schema</strong></em></summary>
 
 ```SQL
 CREATE SCHEMA dannys_diner;
@@ -81,8 +82,8 @@ VALUES
 
 ![Project Logo](../images/case1_diagram.png)
 
-## Case Study Questions & Solutions
-### 1. What is the total amount each customer spent at the restaurant?
+### Case Study Questions & Solutions
+#### 1. What is the total amount each customer spent at the restaurant?
 
 ***query:***
 ```SQL
@@ -114,7 +115,7 @@ ORDER BY total_spent DESC;
 
 </details>
 
-### 2. How many days has each customer visited the restaurant?
+#### 2. How many days has each customer visited the restaurant?
 
 ***query:***
 ```SQL
@@ -145,7 +146,7 @@ ORDER BY visits_amount ASC;
 
 </details>
 
-### 3. What was the first item from the menu purchased by each customer?
+#### 3. What was the first item from the menu purchased by each customer?
 
 ***query:***
 ```SQL
@@ -195,7 +196,7 @@ ORDER BY fp.customer_id;
 
 </details>
 
-### 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
+#### 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
 
 ***query:***
 ```SQL
@@ -236,7 +237,7 @@ WHERE total_purchases = (SELECT MAX(total_purchases) FROM product_counts);
 
 </details>
 
-### 5. Which item was the most popular for each customer?
+#### 5. Which item was the most popular for each customer?
 
 ***query:***
 ```SQL
@@ -282,7 +283,7 @@ ORDER BY customer_id;
 
 </details>
 
-### 6. Which item was purchased first by the customer after they became a member?
+#### 6. Which item was purchased first by the customer after they became a member?
 
 ***query:***
 ```SQL
@@ -328,7 +329,7 @@ ORDER BY s.customer_id, s.order_date;
 
 </details>
 
-### 7. Which item was purchased just before the customer became a member?
+#### 7. Which item was purchased just before the customer became a member?
 
 ***query:***
 ```SQL
@@ -375,7 +376,7 @@ ORDER BY s.customer_id, s.order_date;
 
 </details>
 
-### 8. What is the total items and amount spent for each member before they became a member?
+#### 8. What is the total items and amount spent for each member before they became a member?
 
 ***query:***
 ```SQL
@@ -415,7 +416,7 @@ ORDER BY s.customer_id;
 
 </details>
 
-### 9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
+#### 9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
 
 ***query:***
 ```SQL
@@ -460,7 +461,7 @@ ORDER BY s.customer_id;
 
 </details>
 
-### 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
+#### 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
 
 ***query:***
 ```SQL
@@ -509,9 +510,9 @@ ORDER BY s.customer_id;
 
 </details>
 
-## Bonus Questions & Solutions
+### Bonus Questions & Solutions
 
-### 1. Join All The Things
+#### 1. Join All The Things
 
 ***query:***
 ```SQL
@@ -568,7 +569,7 @@ ORDER BY s.customer_id, s.order_date, m.product_name;
 
 </details>
 
-### 2. Rank All The Things
+#### 2. Rank All The Things
 
 ***query:***
 ```SQL
