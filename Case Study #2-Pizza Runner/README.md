@@ -400,16 +400,33 @@ The SQL query retrieves the number of successful orders delivered by each runner
   
 ***query:***
 ```SQL
-
+SELECT pizza_name, COUNT(*) AS orders_delivered
+FROM customer_orders C
+JOIN runner_orders R ON C.order_id=R.order_id
+JOIN pizza_names PN ON C.pizza_id=PN.pizza_id
+WHERE cancellation IS NULL
+GROUP BY pizza_name;
 ```
 <details>
   <summary><em><strong>show description</strong></em></summary>
+The SQL query retrieves the number of each type of pizza that was successfully delivered.
 
+- It selects the `pizza_name` and calculates the count of successful deliveries (`orders_delivered`) using the `COUNT(*)` function.
+- The `customer_orders` table (`C`) is joined with the `runner_orders` table (`R`) on the `order_id` column to link pizza orders with their delivery information.
+- The `customer_orders` table (`C`) is also joined with the `pizza_names` table (`PN`) on the `pizza_id` column to map the pizza types to their names.
+- The `WHERE cancellation IS NULL` clause filters out any canceled deliveries, ensuring only completed deliveries are included in the results.
+- The `GROUP BY pizza_name` groups the results by each pizza type to calculate the total successful deliveries for each pizza.
 </details>
 
 
 <details>
 <summary><em><strong>show answer</strong></em></summary>
+
+| pizza_name     | orders_delivered |
+| -------------- | ---------------- |
+| Meatlovers     | 9                |
+| Vegetarian     | 4                |
+
 
 </details>
 
