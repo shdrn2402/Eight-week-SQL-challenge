@@ -306,24 +306,24 @@ ALTER COLUMN pickup_time TYPE TIMESTAMP USING pickup_time::TIMESTAMP;
 
 ## Case Study Questions & Solutions
 ### A. Pizza Metrics
-#### 1. How many pizzas were ordered
-
-***query:***
-
+> #### 1. How many pizzas were ordered
+> 
+> ***query:***
+> 
 ```SQL
 SELECT COUNT(*) AS pizzas_ordered
 FROM customer_orders;
 ```
-<details>
-  <summary><em><strong>show description</strong></em></summary>
-The SQL query calculates the total number of pizzas ordered across all entries in the `customer_orders` table.
-
-- The `COUNT(*)` function is used to count all rows in the `customer_orders` table, with each row representing an individual pizza order.
-- The result is labeled as `pizzas_ordered` for clarity.
-
-This query provides a simple and accurate total count of pizzas ordered, regardless of any additional details such as exclusions or extras.
-
-</details>
+> <details>
+>   <summary><em><strong>show description</strong></em></summary>
+> The SQL query calculates the total number of pizzas ordered across all entries in the `customer_orders` table.
+> 
+> - The `COUNT(*)` function is used to count all rows in the `customer_orders` table, with each row representing an individual pizza order.
+> - The result is labeled as `pizzas_ordered` for clarity.
+> 
+> This query provides a simple and accurate total count of pizzas ordered, regardless of any additional details such as exclusions or extras.
+> 
+> </details>
 
 
 <details>
