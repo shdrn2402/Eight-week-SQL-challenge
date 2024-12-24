@@ -306,7 +306,7 @@ ALTER COLUMN pickup_time TYPE TIMESTAMP USING pickup_time::TIMESTAMP;
 
 ## Case Study Questions & Solutions
 ### A. Pizza Metrics
-  1. How many pizzas were ordered
+#### 1. How many pizzas were ordered
 
 ***query:***
 
@@ -329,9 +329,13 @@ This query provides a simple and accurate total count of pizzas ordered, regardl
 <details>
 <summary><em><strong>show answer</strong></em></summary>
 
+| pizzas_ordered |
+| -------------- |
+| 14             |
+
 </details>
 
-  2. How many unique customer orders were made?
+#### 2. How many unique customer orders were made?
 
 ***query:***
 ```SQL
@@ -348,7 +352,7 @@ This query provides a simple and accurate total count of pizzas ordered, regardl
 
 </details>
 
-  3. How many successful orders were delivered by each runner?
+#### 3. How many successful orders were delivered by each runner?
 
 ***query:***
 ```SQL
@@ -365,7 +369,7 @@ This query provides a simple and accurate total count of pizzas ordered, regardl
 
 </details>
 
-  4. How many of each type of pizza was delivered?
+#### 4. How many of each type of pizza was delivered?
   
 ***query:***
 ```SQL
@@ -382,7 +386,7 @@ This query provides a simple and accurate total count of pizzas ordered, regardl
 
 </details>
 
-  5. How many Vegetarian and Meatlovers were ordered by each customer?
+#### 5. How many Vegetarian and Meatlovers were ordered by each customer?
   
 ***query:***
 ```SQL
@@ -399,7 +403,7 @@ This query provides a simple and accurate total count of pizzas ordered, regardl
 
 </details>
 
-  6. What was the maximum number of pizzas delivered in a single order?
+#### 6. What was the maximum number of pizzas delivered in a single order?
   
 ***query:***
 ```SQL
@@ -416,7 +420,7 @@ This query provides a simple and accurate total count of pizzas ordered, regardl
 
 </details>
 
-  7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
+#### 7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
   
 ***query:***
 ```SQL
@@ -433,7 +437,7 @@ This query provides a simple and accurate total count of pizzas ordered, regardl
 
 </details>
 
-  8. How many pizzas were delivered that had both exclusions and extras?
+#### 8. How many pizzas were delivered that had both exclusions and extras?
   
 ***query:***
 ```SQL
@@ -450,7 +454,7 @@ This query provides a simple and accurate total count of pizzas ordered, regardl
 
 </details>
 
-  9. What was the total volume of pizzas ordered for each hour of the day?
+#### 9. What was the total volume of pizzas ordered for each hour of the day?
   
 ***query:***
 ```SQL
@@ -467,7 +471,7 @@ This query provides a simple and accurate total count of pizzas ordered, regardl
 
 </details>
 
-  10. What was the volume of orders for each day of the week?
+#### 10. What was the volume of orders for each day of the week?
   
 ***query:***
 ```SQL
@@ -485,11 +489,11 @@ This query provides a simple and accurate total count of pizzas ordered, regardl
 </details>
 
 
-  ### B. Runner and Customer Experience
+### B. Runner and Customer Experience
   ...
-  ### C. Ingredient Optimisation
+### C. Ingredient Optimisation
   ...
-  ### D. Pricing and Ratings
+### D. Pricing and Ratings
   ...
-  ### E. Bonus Questions
+### E. Bonus Questions
   ...
