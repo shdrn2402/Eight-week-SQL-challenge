@@ -317,12 +317,14 @@ FROM customer_orders;
 
 <details>
   <summary><em><strong>show description</strong></em></summary>
+
 The SQL query calculates the total number of pizzas ordered across all entries in the `customer_orders` table.
 
 - The `COUNT(*)` function is used to count all rows in the `customer_orders` table, with each row representing an individual pizza order.
 - The result is labeled as `pizzas_ordered` for clarity.
 
 This query provides a simple and accurate total count of pizzas ordered, regardless of any additional details such as exclusions or extras.
+
 </details>
 
 <details>
@@ -344,9 +346,11 @@ FROM customer_orders;
 ```
 <details>
   <summary><em><strong>show description</strong></em></summary>
+
 The SQL query calculates the total number of unique customer orders made in the customer_orders table.
 
 - The DISTINCT(order_id) function ensures that only unique order_id values are considered in the count, effectively ignoring duplicate entries
+
 </details>
 
 <details>
@@ -362,16 +366,33 @@ The SQL query calculates the total number of unique customer orders made in the 
 
 ***query:***
 ```SQL
-
+SELECT runner_id, COUNT(*) AS orders_delivered
+FROM runner_orders
+WHERE cancellation IS NULL
+GROUP BY runner_id
+ORDER BY orders_delivered DESC;
 ```
 <details>
   <summary><em><strong>show description</strong></em></summary>
+
+The SQL query retrieves the number of successful orders delivered by each runner.
+
+- It selects the `runner_id` and calculates the count of successful deliveries (`orders_delivered`) using the `COUNT(*)` function.
+- The `WHERE cancellation IS NULL` clause filters out any canceled orders, ensuring only completed deliveries are included in the results.
+- The `GROUP BY runner_id` groups the data by each `runner_id` to calculate the total successful orders for each runner.
+- The `ORDER BY orders_delivered DESC` clause sorts the results in descending order of the number of successful deliveries, with the most active runners appearing first.
 
 </details>
 
 
 <details>
 <summary><em><strong>show answer</strong></em></summary>
+
+| runner_id | orders_delivered |
+| --------- | ---------------- |
+| 1         | 4                |
+| 2         | 3                |
+| 3         | 1                |
 
 </details>
 
