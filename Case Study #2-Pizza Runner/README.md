@@ -305,8 +305,186 @@ ALTER COLUMN pickup_time TYPE TIMESTAMP USING pickup_time::TIMESTAMP;
 </details>
 
 ## Case Study Questions & Solutions
-  ### A. Pizza Metrics
-  ...
+### A. Pizza Metrics
+  1. How many pizzas were ordered
+
+***query:***
+
+```SQL
+SELECT COUNT(*) AS pizzas_ordered
+FROM customer_orders;
+```
+<details>
+  <summary><em><strong>show description</strong></em></summary>
+The SQL query calculates the total number of pizzas ordered across all entries in the `customer_orders` table.
+
+- The `COUNT(*)` function is used to count all rows in the `customer_orders` table, with each row representing an individual pizza order.
+- The result is labeled as `pizzas_ordered` for clarity.
+
+This query provides a simple and accurate total count of pizzas ordered, regardless of any additional details such as exclusions or extras.
+
+</details>
+
+
+<details>
+<summary><em><strong>show answer</strong></em></summary>
+
+</details>
+
+  2. How many unique customer orders were made?
+
+***query:***
+```SQL
+
+```
+<details>
+  <summary><em><strong>show description</strong></em></summary>
+
+</details>
+
+
+<details>
+<summary><em><strong>show answer</strong></em></summary>
+
+</details>
+
+  3. How many successful orders were delivered by each runner?
+
+***query:***
+```SQL
+
+```
+<details>
+  <summary><em><strong>show description</strong></em></summary>
+
+</details>
+
+
+<details>
+<summary><em><strong>show answer</strong></em></summary>
+
+</details>
+
+  4. How many of each type of pizza was delivered?
+  
+***query:***
+```SQL
+
+```
+<details>
+  <summary><em><strong>show description</strong></em></summary>
+
+</details>
+
+
+<details>
+<summary><em><strong>show answer</strong></em></summary>
+
+</details>
+
+  5. How many Vegetarian and Meatlovers were ordered by each customer?
+  
+***query:***
+```SQL
+
+```
+<details>
+  <summary><em><strong>show description</strong></em></summary>
+
+</details>
+
+
+<details>
+<summary><em><strong>show answer</strong></em></summary>
+
+</details>
+
+  6. What was the maximum number of pizzas delivered in a single order?
+  
+***query:***
+```SQL
+
+```
+<details>
+  <summary><em><strong>show description</strong></em></summary>
+
+</details>
+
+
+<details>
+<summary><em><strong>show answer</strong></em></summary>
+
+</details>
+
+  7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
+  
+***query:***
+```SQL
+
+```
+<details>
+  <summary><em><strong>show description</strong></em></summary>
+
+</details>
+
+
+<details>
+<summary><em><strong>show answer</strong></em></summary>
+
+</details>
+
+  8. How many pizzas were delivered that had both exclusions and extras?
+  
+***query:***
+```SQL
+
+```
+<details>
+  <summary><em><strong>show description</strong></em></summary>
+
+</details>
+
+
+<details>
+<summary><em><strong>show answer</strong></em></summary>
+
+</details>
+
+  9. What was the total volume of pizzas ordered for each hour of the day?
+  
+***query:***
+```SQL
+
+```
+<details>
+  <summary><em><strong>show description</strong></em></summary>
+
+</details>
+
+
+<details>
+<summary><em><strong>show answer</strong></em></summary>
+
+</details>
+
+  10. What was the volume of orders for each day of the week?
+  
+***query:***
+```SQL
+
+```
+<details>
+  <summary><em><strong>show description</strong></em></summary>
+
+</details>
+
+
+<details>
+<summary><em><strong>show answer</strong></em></summary>
+
+</details>
+
+
   ### B. Runner and Customer Experience
   ...
   ### C. Ingredient Optimisation
