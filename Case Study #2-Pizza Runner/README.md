@@ -306,25 +306,24 @@ ALTER COLUMN pickup_time TYPE TIMESTAMP USING pickup_time::TIMESTAMP;
 
 ## Case Study Questions & Solutions
 ### A. Pizza Metrics
-> #### 1. How many pizzas were ordered
-> 
-> ***query:***
-> 
+#### 1. How many pizzas were ordered?
+
+***query:***
+
 ```SQL
 SELECT COUNT(*) AS pizzas_ordered
 FROM customer_orders;
 ```
-> <details>
->   <summary><em><strong>show description</strong></em></summary>
-> The SQL query calculates the total number of pizzas ordered across all entries in the `customer_orders` table.
-> 
-> - The `COUNT(*)` function is used to count all rows in the `customer_orders` table, with each row representing an individual pizza order.
-> - The result is labeled as `pizzas_ordered` for clarity.
-> 
-> This query provides a simple and accurate total count of pizzas ordered, regardless of any additional details such as exclusions or extras.
-> 
-> </details>
 
+<details>
+  <summary><em><strong>show description</strong></em></summary>
+The SQL query calculates the total number of pizzas ordered across all entries in the `customer_orders` table.
+
+- The `COUNT(*)` function is used to count all rows in the `customer_orders` table, with each row representing an individual pizza order.
+- The result is labeled as `pizzas_ordered` for clarity.
+
+This query provides a simple and accurate total count of pizzas ordered, regardless of any additional details such as exclusions or extras.
+</details>
 
 <details>
 <summary><em><strong>show answer</strong></em></summary>
@@ -338,17 +337,24 @@ FROM customer_orders;
 #### 2. How many unique customer orders were made?
 
 ***query:***
-```SQL
 
+```SQL
+SELECT COUNT(DISTINCT(order_id)) as unique_pizza_orders
+FROM customer_orders;
 ```
 <details>
   <summary><em><strong>show description</strong></em></summary>
+The SQL query calculates the total number of unique customer orders made in the customer_orders table.
 
+- The DISTINCT(order_id) function ensures that only unique order_id values are considered in the count, effectively ignoring duplicate entries
 </details>
-
 
 <details>
 <summary><em><strong>show answer</strong></em></summary>
+
+| unique_pizza_orders |
+| ------------------- |
+| 10                  |
 
 </details>
 
