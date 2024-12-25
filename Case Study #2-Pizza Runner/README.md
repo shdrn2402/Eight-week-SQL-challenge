@@ -436,16 +436,41 @@ The SQL query retrieves the number of each type of pizza that was successfully d
   
 ***query:***
 ```SQL
-
+SELECT C.customer_id, PN.pizza_name, COUNT(*) AS orders_amount
+FROM customer_orders C
+JOIN pizza_names PN ON C.pizza_id=PN.pizza_id
+GROUP BY C.customer_id, PN.pizza_name
+ORDER BY C.customer_id
 ```
+
 <details>
   <summary><em><strong>show description</strong></em></summary>
+
+The SQL query calculates how many `Vegetarian` and `Meatlovers` pizzas were ordered by each customer.
+
+- It retrieves data from the `customer_orders` table and joins it with the `pizza_names` table using the `pizza_id` column.
+- The `GROUP BY` clause is used to group the results by `customer_id` and `pizza_name`, ensuring separate counts for each type of pizza for every customer.
+- The `COUNT(*)` function calculates the total number of pizzas of each type ordered by each customer.
+- The results are sorted by `customer_id` in ascending order for clarity.
+
+This query correctly determines the number of orders for both `Vegetarian` and `Meatlovers` pizzas placed by each customer, providing a detailed breakdown.
 
 </details>
 
 
 <details>
 <summary><em><strong>show answer</strong></em></summary>
+
+| customer_id | pizza_name | orders_amount |
+| ----------- | ---------- | ------------- |
+| 101         | Meatlovers | 2             |
+| 101         | Vegetarian | 1             |
+| 102         | Meatlovers | 2             |
+| 102         | Vegetarian | 1             |
+| 103         | Meatlovers | 3             |
+| 103         | Vegetarian | 1             |
+| 104         | Meatlovers | 3             |
+| 105         | Vegetarian | 1             |
 
 </details>
 
