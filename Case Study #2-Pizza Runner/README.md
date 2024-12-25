@@ -362,7 +362,7 @@ The SQL query calculates the total number of unique customer orders made in the 
 
 </details>
 
-**3. How many successful orders were delivered by each runner?
+**3. How many successful orders were delivered by each runner?**
 
 *query:*
 ```SQL
