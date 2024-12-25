@@ -1,6 +1,6 @@
 ![Project Logo](../images/case2_logo.png)
 
-## Contents:
+### Contents:
 - [Introduction](#introduction)
 - [Entity Relationship Diagram](#entity-relationship-diagram)
 - [Data Cleaning & Data Transformation](#data-cleaning--data-transformation)
@@ -11,7 +11,7 @@
   - [D. Pricing and Ratings](#d-pricing-and-ratings)
   - [E. Bonus Questions](#e-bonus-questions)
   
-## Introduction
+### Introduction
 
 > Did you know that over 115 million kilograms of pizza are consumed worldwide every day? (Well, at least according to Wikipedia!)
 > 
@@ -19,9 +19,9 @@
 > 
 > Danny began by recruiting a team of runners to deliver freshly made pizzas directly from Pizza Runner Headquarters (aka Danny’s house). To bring his idea to life, he maxed out his credit card to hire freelance developers to create a mobile app for taking customer orders.
 
-## Entity Relationship Diagram
+### Entity Relationship Diagram
 <details>
-  <summary><em><strong>show database schema</strong></em></summary>
+  <summary><em>show database schema</em></summary>
 
 ```SQL
 CREATE SCHEMA pizza_runner;
@@ -144,12 +144,12 @@ VALUES
 
 ![Project Logo](../images/case2_diagram.png)
 
-## Data Cleaning & Data Transformation
+### Data Cleaning & Data Transformation
 
-### A. Cleaning Missing Data in `customer_orders` Table
+#### A. Cleaning Missing Data in `customer_orders` Table
 
 <details>
-  <summary><em><strong>show original table</strong></em></summary>
+  <summary><em>show original table</em></summary>
 
 | order_id | customer_id | pizza_id | exclusions | extras | order_time          |
 | -------- | ----------- | -------- | ---------- | ------ | ------------------- |
@@ -183,7 +183,7 @@ VALUES
 > 
 > Standardizing these values to `NULL` will improve the accuracy of future queries and ensure a clearer logic for data analysis.
 
-***query:***
+*query:*
 ```SQL
 UPDATE customer_orders
 SET 
@@ -198,7 +198,7 @@ SET
 ;
 ```
 <details>
-  <summary><em><strong>show table after data cleaning</strong></em></summary>
+  <summary><em>show table after data cleaning</em></summary>
 
 | order_id | customer_id | pizza_id | exclusions | extras | order_time          |
 | -------- | ----------- | -------- | ---------- | ------ | ------------------- |
@@ -219,10 +219,10 @@ SET
 
 </details>
 
-### B. Cleaning Missing Data in `runner_orders` Table
+#### B. Cleaning Missing Data in `runner_orders` Table
 
 <details>
-  <summary><em><strong>show original table</strong></em></summary>
+  <summary><em>show original table</em></summary>
 
 | order_id | runner_id | pickup_time         | distance | duration   | cancellation            |
 | -------- | --------- | ------------------- | -------- | ---------- | ----------------------- |
@@ -259,7 +259,7 @@ SET
 > 
 > These transformations will ensure data consistency, simplify future analysis, and reduce the risk of errors when running SQL queries.
 
-***query:***
+*query:*
 ```SQL
 UPDATE runner_orders
 SET 
@@ -287,7 +287,7 @@ ALTER COLUMN pickup_time TYPE TIMESTAMP USING pickup_time::TIMESTAMP;
 ```
 
 <details>
-  <summary><em><strong>show table after data cleaning</strong></em></summary>
+  <summary><em>show table after data cleaning</em></summary>
 
 | order_id | runner_id | pickup_time         | distance | duration | cancellation            |
 | -------- | --------- | ------------------- | -------- | -------- | ----------------------- |
@@ -304,11 +304,11 @@ ALTER COLUMN pickup_time TYPE TIMESTAMP USING pickup_time::TIMESTAMP;
 
 </details>
 
-## Case Study Questions & Solutions
-### A. Pizza Metrics
-#### 1. How many pizzas were ordered?
+### Case Study Questions & Solutions
+#### A. Pizza Metrics
+**1. How many pizzas were ordered?**
 
-***query:***
+*query:*
 
 ```SQL
 SELECT COUNT(*) AS pizzas_ordered
@@ -316,7 +316,7 @@ FROM customer_orders;
 ```
 
 <details>
-  <summary><em><strong>show description</strong></em></summary>
+  <summary><em>show description</em></summary>
 
 The SQL query calculates the total number of pizzas ordered across all entries in the `customer_orders` table.
 
@@ -328,7 +328,7 @@ This query provides a simple and accurate total count of pizzas ordered, regardl
 </details>
 
 <details>
-<summary><em><strong>show answer</strong></em></summary>
+<summary><em>show answer</em></summary>
 
 | pizzas_ordered |
 | -------------- |
@@ -336,16 +336,16 @@ This query provides a simple and accurate total count of pizzas ordered, regardl
 
 </details>
 
-#### 2. How many unique customer orders were made?
+**2. How many unique customer orders were made?**
 
-***query:***
+*query:*
 
 ```SQL
 SELECT COUNT(DISTINCT(order_id)) as unique_pizza_orders
 FROM customer_orders;
 ```
 <details>
-  <summary><em><strong>show description</strong></em></summary>
+  <summary><em>show description</em></summary>
 
 The SQL query calculates the total number of unique customer orders made in the customer_orders table.
 
@@ -354,7 +354,7 @@ The SQL query calculates the total number of unique customer orders made in the 
 </details>
 
 <details>
-<summary><em><strong>show answer</strong></em></summary>
+<summary><em>show answer</em></summary>
 
 | unique_pizza_orders |
 | ------------------- |
@@ -362,9 +362,9 @@ The SQL query calculates the total number of unique customer orders made in the 
 
 </details>
 
-#### 3. How many successful orders were delivered by each runner?
+**3. How many successful orders were delivered by each runner?
 
-***query:***
+*query:*
 ```SQL
 SELECT runner_id, COUNT(*) AS orders_delivered
 FROM runner_orders
@@ -373,7 +373,7 @@ GROUP BY runner_id
 ORDER BY orders_delivered DESC;
 ```
 <details>
-  <summary><em><strong>show description</strong></em></summary>
+  <summary><em>show description</em></summary>
 
 The SQL query retrieves the number of successful orders delivered by each runner.
 
@@ -386,7 +386,7 @@ The SQL query retrieves the number of successful orders delivered by each runner
 
 
 <details>
-<summary><em><strong>show answer</strong></em></summary>
+<summary><em>show answer</em></summary>
 
 | runner_id | orders_delivered |
 | --------- | ---------------- |
@@ -396,9 +396,9 @@ The SQL query retrieves the number of successful orders delivered by each runner
 
 </details>
 
-#### 4. How many of each type of pizza was delivered?
+**4. How many of each type of pizza was delivered?**
   
-***query:***
+*query:*
 ```SQL
 SELECT pizza_name, COUNT(*) AS orders_delivered
 FROM customer_orders C
@@ -408,7 +408,7 @@ WHERE cancellation IS NULL
 GROUP BY pizza_name;
 ```
 <details>
-  <summary><em><strong>show description</strong></em></summary>
+  <summary><em>show description</em></summary>
 
 The SQL query retrieves the number of each type of pizza that was successfully delivered.
 
@@ -422,7 +422,7 @@ The SQL query retrieves the number of each type of pizza that was successfully d
 
 
 <details>
-<summary><em><strong>show answer</strong></em></summary>
+<summary><em>show answer</em></summary>
 
 | pizza_name     | orders_delivered |
 | -------------- | ---------------- |
@@ -432,9 +432,9 @@ The SQL query retrieves the number of each type of pizza that was successfully d
 
 </details>
 
-#### 5. How many Vegetarian and Meatlovers were ordered by each customer?
+**5. How many Vegetarian and Meatlovers were ordered by each customer?**
   
-***query:***
+*query:*
 ```SQL
 SELECT C.customer_id, PN.pizza_name, COUNT(*) AS orders_amount
 FROM customer_orders C
@@ -444,7 +444,7 @@ ORDER BY C.customer_id
 ```
 
 <details>
-  <summary><em><strong>show description</strong></em></summary>
+  <summary><em>show description</em></summary>
 
 The SQL query calculates how many `Vegetarian` and `Meatlovers` pizzas were ordered by each customer.
 
@@ -459,7 +459,7 @@ This query correctly determines the number of orders for both `Vegetarian` and `
 
 
 <details>
-<summary><em><strong>show answer</strong></em></summary>
+<summary><em>show answer</em></summary>
 
 | customer_id | pizza_name | orders_amount |
 | ----------- | ---------- | ------------- |
@@ -474,9 +474,9 @@ This query correctly determines the number of orders for both `Vegetarian` and `
 
 </details>
 
-#### 6. What was the maximum number of pizzas delivered in a single order?
+**6. What was the maximum number of pizzas delivered in a single order?**
   
-***query:***
+*query:*
 
 ```SQL
 SELECT MAX(order_count) AS max_pizzas_delivered
@@ -491,7 +491,7 @@ FROM (
 ```
 
 <details>
-  <summary><em><strong>show description</strong></em></summary>
+  <summary><em>show description</em></summary>
 
 The SQL query calculates the maximum number of pizzas delivered in a single order.
 
@@ -507,7 +507,7 @@ This query efficiently identifies the single order with the highest number of pi
 
 
 <details>
-<summary><em><strong>show answer</strong></em></summary>
+<summary><em>show answer</em></summary>
 
 | max_pizzas_delivered |
 | -------------------- |
@@ -515,9 +515,9 @@ This query efficiently identifies the single order with the highest number of pi
 
 </details>
 
-#### 7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
+**7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?**
   
-***query:***
+*query:*
 ```SQL
 SELECT 
 C.customer_id,
@@ -530,7 +530,7 @@ GROUP BY C.customer_id
 ORDER BY C.customer_id;
 ```
 <details>
-  <summary><em><strong>show description</strong></em></summary>
+  <summary><em>show description</em></summary>
 
 The SQL query calculates, for each customer, the number of delivered pizzas with at least one change (exclusions or extras) and those with no changes, accounting for data that has already been cleaned.
 
@@ -551,7 +551,7 @@ This query leverages the cleaned data to accurately determine the count of pizza
 
 
 <details>
-<summary><em><strong>show answer</strong></em></summary>
+<summary><em>show answer</em></summary>
 
 | customer_id | pizzas_with_changes | pizzas_without_changes |
 | ----------- | ------------------- | ---------------------- |
@@ -563,9 +563,9 @@ This query leverages the cleaned data to accurately determine the count of pizza
 
 </details>
 
-#### 8. How many pizzas were delivered that had both exclusions and extras?
+**8. How many pizzas were delivered that had both exclusions and extras?**
   
-***query:***
+*query:*
 ```SQL
 SELECT 
   COUNT(*) AS pizzas_with_both_changes
@@ -576,7 +576,7 @@ WHERE R.cancellation IS NULL
   AND C.extras IS NOT NULL
 ```
 <details>
-  <summary><em><strong>show description</strong></em></summary>
+  <summary><em>show description</em></summary>
 
 The SQL query calculates the total number of pizzas that were delivered with both exclusions and extras.
 
@@ -593,7 +593,7 @@ This query provides the count of pizzas that had both exclusions and extras and 
 
 
 <details>
-<summary><em><strong>show answer</strong></em></summary>
+<summary><em>show answer</em></summary>
 
 | pizzas_with_both_changes |
 | ------------------------ |
@@ -601,9 +601,9 @@ This query provides the count of pizzas that had both exclusions and extras and 
 
 </details>
 
-#### 9. What was the total volume of pizzas ordered for each hour of the day?
+**9. What was the total volume of pizzas ordered for each hour of the day?**
   
-***query:***
+*query:*
 ```SQL
 SELECT 
   EXTRACT(HOUR FROM order_time) AS order_hour,
@@ -613,7 +613,7 @@ GROUP BY order_hour
 ORDER BY order_hour;
 ```
 <details>
-  <summary><em><strong>show description</strong></em></summary>
+  <summary><em>show description</em></summary>
 
 The SQL query calculates the total number of pizzas ordered for each hour of the day.
 
@@ -627,7 +627,7 @@ This query provides the total number of pizzas ordered for each hour of the day 
 </details>
 
 <details>
-<summary><em><strong>show answer</strong></em></summary>
+<summary><em>show answer</em></summary>
 
 | order_hour | total_pizzas_ordered |
 | ---------- | -------------------- |
@@ -640,9 +640,9 @@ This query provides the total number of pizzas ordered for each hour of the day 
 
 </details>
 
-#### 10. What was the volume of orders for each day of the week?
+**10. What was the volume of orders for each day of the week?**
   
-***query:***
+*query:*
 ```SQL
 SELECT TO_CHAR(order_time, 'Day')AS order_day, COUNT(*) AS total_orders
 FROM customer_orders
@@ -650,7 +650,7 @@ GROUP BY order_day
 ORDER BY total_orders DESC;
 ```
 <details>
-  <summary><em><strong>show description</strong></em></summary>
+  <summary><em>show description</em></summary>
 
 The SQL query retrieves the total number of pizza orders (`total_orders`) for each day of the week (`order_day`) and sorts the results in descending order of the total orders.
 
@@ -665,7 +665,7 @@ This query provides insights into which days of the week had the most pizza orde
 
 
 <details>
-<summary><em><strong>show answer</strong></em></summary>
+<summary><em>show answer</em></summary>
 
 | order_day | total_orders |
 | --------- | ------------ |
@@ -677,11 +677,11 @@ This query provides insights into which days of the week had the most pizza orde
 </details>
 
 
-### B. Runner and Customer Experience
+#### B. Runner and Customer Experience
   ...
-### C. Ingredient Optimisation
+#### C. Ingredient Optimisation
   ...
-### D. Pricing and Ratings
+#### D. Pricing and Ratings
   ...
-### E. Bonus Questions
+#### E. Bonus Questions
   ...
