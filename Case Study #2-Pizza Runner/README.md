@@ -519,16 +519,47 @@ This query efficiently identifies the single order with the highest number of pi
   
 ***query:***
 ```SQL
-
+SELECT 
+C.customer_id,
+  SUM(CASE WHEN C.exclusions IS NOT NULL OR C.extras IS NOT NULL THEN 1 ELSE 0 END) AS pizzas_with_changes,
+  SUM(CASE WHEN C.exclusions IS NULL AND C.extras IS NULL THEN 1 ELSE 0 END) AS pizzas_without_changes
+FROM customer_orders C
+JOIN runner_orders R ON C.order_id = R.order_id
+WHERE R.cancellation IS NULL
+GROUP BY C.customer_id
+ORDER BY C.customer_id;
 ```
 <details>
   <summary><em><strong>show description</strong></em></summary>
+
+The SQL query calculates, for each customer, the number of delivered pizzas with at least one change (exclusions or extras) and those with no changes, accounting for data that has already been cleaned.
+
+- The `JOIN` clause connects the `customer_orders` table (`C`) with the `runner_orders` table (`R`) using the `order_id` column to include only valid deliveries, determined by the condition `R.cancellation IS NULL`.
+- Two `SUM(CASE ... END)` expressions are used:
+  - The first expression checks for pizzas with changes:
+    - A pizza is considered "with changes" if either the `exclusions` or `extras` column is not `NULL`.
+    - A value of `1` is added to the sum for such pizzas; otherwise, `0` is added.
+  - The second expression checks for pizzas without changes:
+    - A pizza is considered "without changes" if both the `exclusions` and `extras` columns are `NULL`.
+    - A value of `1` is added to the sum for such pizzas; otherwise, `0` is added.
+- The results are grouped by `customer_id` to calculate totals for each customer.
+- The `ORDER BY C.customer_id` clause sorts the results in ascending order of `customer_id`.
+
+This query leverages the cleaned data to accurately determine the count of pizzas with and without changes for each customer.
 
 </details>
 
 
 <details>
 <summary><em><strong>show answer</strong></em></summary>
+
+| customer_id | pizzas_with_changes | pizzas_without_changes |
+| ----------- | ------------------- | ---------------------- |
+| 101         | 0                   | 2                      |
+| 102         | 0                   | 3                      |
+| 103         | 3                   | 0                      |
+| 104         | 2                   | 1                      |
+| 105         | 1                   | 0                      |
 
 </details>
 
