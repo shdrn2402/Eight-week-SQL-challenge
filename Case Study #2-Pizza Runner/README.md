@@ -170,7 +170,7 @@ VALUES
 
 </details>
 
-***description:***
+*description:*
 
 > As seen in the [database schema](#entity-relationship-diagram), the **`exclusions`** and **`extras`** columns in the **`customer_orders`** table contain missing values represented in various forms:
 > - empty strings `('')`
@@ -239,7 +239,7 @@ SET
 
 </details>
 
-***description:***
+*description:*
 
 > As seen in the [database schema](#entity-relationship-diagram), the `runner_orders` table contains inconsistencies in several columns, such as > `pickup_time`, `distance`, `duration`, and `cancellation`:
 > 
