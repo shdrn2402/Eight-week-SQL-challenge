@@ -477,17 +477,41 @@ This query correctly determines the number of orders for both `Vegetarian` and `
 #### 6. What was the maximum number of pizzas delivered in a single order?
   
 ***query:***
+
 ```SQL
+SELECT MAX(order_count) AS max_pizzas_delivered
+FROM (
+  SELECT C.order_id, COUNT(*) AS order_count
+  FROM customer_orders C
+  JOIN runner_orders R ON C.order_id = R.order_id
+  WHERE R.cancellation IS NULL
+  GROUP BY C.order_id
+) subquery;
 
 ```
+
 <details>
   <summary><em><strong>show description</strong></em></summary>
+
+The SQL query calculates the maximum number of pizzas delivered in a single order.
+
+- A subquery is used to determine the total number of pizzas (`order_count`) associated with each `order_id` in the `customer_orders` table.
+- The `JOIN` clause connects the `customer_orders` table with the `runner_orders` table on the `order_id` column to filter only valid, delivered orders. This is ensured by the condition `R.cancellation IS NULL`.
+- The `COUNT(*)` function within the subquery counts the number of rows (pizzas) for each `order_id`.
+- The `GROUP BY` clause groups the results by `order_id`, calculating the pizza count for each individual order.
+- The outer query applies the `MAX()` function to identify the largest pizza count (`order_count`) among all grouped results.
+
+This query efficiently identifies the single order with the highest number of pizzas delivered.
 
 </details>
 
 
 <details>
 <summary><em><strong>show answer</strong></em></summary>
+
+| max_pizzas_delivered |
+| -------------------- |
+| 3                    |
 
 </details>
 
