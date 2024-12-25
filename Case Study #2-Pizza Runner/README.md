@@ -567,16 +567,37 @@ This query leverages the cleaned data to accurately determine the count of pizza
   
 ***query:***
 ```SQL
-
+SELECT 
+  COUNT(*) AS pizzas_with_both_changes
+FROM customer_orders C
+JOIN runner_orders R ON C.order_id = R.order_id
+WHERE R.cancellation IS NULL
+  AND C.exclusions IS NOT NULL
+  AND C.extras IS NOT NULL
 ```
 <details>
   <summary><em><strong>show description</strong></em></summary>
+
+The SQL query calculates the total number of pizzas that were delivered with both exclusions and extras.
+
+- The `JOIN` clause connects the `customer_orders` table (`C`) with the `runner_orders` table (`R`) using the `order_id` column to include only valid deliveries.
+- The `WHERE` clause includes three conditions:
+  - `R.cancellation IS NULL` ensures only successfully delivered pizzas are considered.
+  - `C.exclusions IS NOT NULL` checks that exclusions were specified for the pizza.
+  - `C.extras IS NOT NULL` checks that extras were specified for the pizza.
+- The `COUNT(*)` function counts the total number of rows that satisfy all the conditions.
+
+This query provides the count of pizzas that had both exclusions and extras and were successfully delivered.
 
 </details>
 
 
 <details>
 <summary><em><strong>show answer</strong></em></summary>
+
+| pizzas_with_both_changes |
+| ------------------------ |
+| 1                        |
 
 </details>
 
