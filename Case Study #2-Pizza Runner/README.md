@@ -605,16 +605,38 @@ This query provides the count of pizzas that had both exclusions and extras and 
   
 ***query:***
 ```SQL
-
+SELECT 
+  EXTRACT(HOUR FROM order_time) AS order_hour,
+  COUNT(*) AS total_pizzas_ordered
+FROM customer_orders
+GROUP BY order_hour
+ORDER BY order_hour;
 ```
 <details>
   <summary><em><strong>show description</strong></em></summary>
 
-</details>
+The SQL query calculates the total number of pizzas ordered for each hour of the day.
 
+- The `EXTRACT(HOUR FROM order_time)` function extracts the hour from the `order_time` column, grouping orders by the hour they were placed.
+- The `COUNT(*)` function counts the total number of pizzas ordered within each hour.
+- The `GROUP BY order_hour` groups the results by each unique hour value to calculate the totals for each hour.
+- The `ORDER BY order_hour` sorts the results in ascending order of the hour for clear representation.
+
+This query provides the total number of pizzas ordered for each hour of the day based on the `order_time` column.
+
+</details>
 
 <details>
 <summary><em><strong>show answer</strong></em></summary>
+
+| order_hour | total_pizzas_ordered |
+| ---------- | -------------------- |
+| 11         | 1                    |
+| 13         | 3                    |
+| 18         | 3                    |
+| 19         | 1                    |
+| 21         | 3                    |
+| 23         | 3                    |
 
 </details>
 
@@ -622,16 +644,35 @@ This query provides the count of pizzas that had both exclusions and extras and 
   
 ***query:***
 ```SQL
-
+SELECT TO_CHAR(order_time, 'Day')AS order_day, COUNT(*) AS total_orders
+FROM customer_orders
+GROUP BY order_day
+ORDER BY total_orders DESC;
 ```
 <details>
   <summary><em><strong>show description</strong></em></summary>
+
+The SQL query retrieves the total number of pizza orders (`total_orders`) for each day of the week (`order_day`) and sorts the results in descending order of the total orders.
+
+- The `TO_CHAR(order_time, 'Day')` function extracts the day of the week from the `order_time` column, formatting it with the first letter capitalized and adding spaces for alignment.
+- The `COUNT(*)` function calculates the total number of orders for each day of the week.
+- The `GROUP BY order_day` clause groups the results by the day of the week (`order_day`), ensuring that the count of orders is aggregated for each unique day.
+- The `ORDER BY total_orders DESC` clause sorts the results by the `total_orders` column in descending order, showing the days with the highest number of orders first.
+
+This query provides insights into which days of the week had the most pizza orders while maintaining a readable day format.
 
 </details>
 
 
 <details>
 <summary><em><strong>show answer</strong></em></summary>
+
+| order_day | total_orders |
+| --------- | ------------ |
+| Friday    | 1            |
+| Thursday  | 3            |
+| Saturday  | 5            |
+| Wednesday | 5            |
 
 </details>
 
