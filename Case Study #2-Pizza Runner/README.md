@@ -146,7 +146,7 @@ VALUES
 
 ### Data Cleaning & Data Transformation
 
-#### A. Cleaning Missing Data in `customer_orders` Table
+==#### A. Cleaning Missing Data in `customer_orders` Table==
 
 <details>
   <summary><em>show original table</em></summary>
