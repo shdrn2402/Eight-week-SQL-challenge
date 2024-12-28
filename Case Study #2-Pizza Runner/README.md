@@ -727,7 +727,8 @@ SELECT
 FROM runner_orders
 JOIN customer_orders USING(order_id)
 WHERE pickup_time IS NOT NULL AND cancellation IS NULL
-GROUP BY runner_id;
+GROUP BY runner_id
+ORDER BY avg_pickup_time_minutes;
 ```
 
 <details>
@@ -742,7 +743,7 @@ The SQL query calculates the average time (in minutes) it took for each runner t
 - The query joins the `runner_orders` table with the `customer_orders` table using the `order_id` field to match orders with their pickup times.
 - The `WHERE` clause filters out rows where `pickup_time` is NULL or the order was canceled (`cancellation IS NULL`).
 - **`GROUP BY runner_id`**: Groups the results by `runner_id` to calculate the average pickup time for each runner.
-- The query outputs the `runner_id` and the calculated average pickup time in minutes as `avg_pickup_time_minutes`.
+- **`ORDER BY avg_pickup_time_minutes`**: Sorts the results in ascending order based on the average pickup time in minutes.
 
 This query ensures accurate computation of the average pickup times for runners, providing insight into the efficiency of each runner.
 
@@ -754,8 +755,8 @@ This query ensures accurate computation of the average pickup times for runners,
 
 | runner_id | avg_pickup_time_minutes |
 | --------- | ----------------------- |
-| 1         | 15.68                   |
 | 3         | 10.47                   |
+| 1         | 15.68                   |
 | 2         | 23.72                   |
 
 </details>
