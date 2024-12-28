@@ -678,7 +678,172 @@ This query provides insights into which days of the week had the most pizza orde
 
 
 #### B. Runner and Customer Experience
-  ...
+**1. How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01)**
+
+*query:*
+
+```SQL
+SELECT 
+  DATE_TRUNC('week', registration_date) AS week_start,
+  COUNT(runner_id) AS runners_signed_up
+FROM runners
+GROUP BY week_start
+ORDER BY week_start;
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+The SQL query calculates the number of runners who signed up during each one-week period starting from `2021-01-01`.
+
+- The `DATE_TRUNC('week', registration_date)` function truncates the `registration_date` to the beginning of the week, aligning all dates within the same week to the same starting date.
+- The `COUNT(*)` function counts the number of runners who signed up within each week.
+- The `GROUP BY` clause groups the results by the truncated `registration_date`, effectively grouping by week.
+- The `ORDER BY` clause ensures the results are sorted by the starting date of each week in ascending order.
+
+This query helps identify how many runners signed up during each week, providing insight into recruitment trends over time.
+
+</details>
+
+<details>
+<summary><em>show answer</em></summary>
+
+| week_start             | runners_signed_up |
+| ---------------------- | ----------------- |
+| 2020-12-28 00:00:00+00 | 2                 |
+| 2021-01-04 00:00:00+00 | 1                 |
+| 2021-01-11 00:00:00+00 | 1                 |
+
+</details>
+
+**2. What was the average time in minutes it took for each runner to arrive at the Pizza Runner HQ to pickup the order?**
+
+*query:*
+
+```SQL
+SELECT 
+  runner_id,
+  AVG(duration) AS avg_pickup_time
+FROM runner_orders
+WHERE duration IS NOT NULL AND cancellation IS NULL
+GROUP BY runner_id
+ORDER BY runner_id;
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+The query calculates the average pickup time (`avg_pickup_time`) for each runner in minutes.
+
+- It considers only the non-canceled orders (`cancellation IS NULL`) and excludes rows where the pickup time (`duration`) is missing (`IS NOT NULL`).
+- The average is computed for each runner (`runner_id`) using the `AVG(duration)` function.
+- The results are grouped by `runner_id` to calculate the average time for each runner individually.
+- The query ensures the results reflect accurate average times by filtering out incomplete or irrelevant data.
+
+</details>
+
+<details>
+
+<summary><em>show answer</em></summary>
+
+| runner_id | avg_pickup_time |
+| --------- | --------------- |
+| 1         | 22.25           |
+| 2         | 26.66           |
+| 3         | 15.00           |
+
+</details>
+
+**3. Is there any relationship between the number of pizzas and how long the order takes to prepare?**
+
+*query:*
+
+```SQL
+
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+</details>
+
+<details>
+<summary><em>show answer</em></summary>
+
+</details>
+
+**4. What was the average distance travelled for each customer?**
+
+*query:*
+
+```SQL
+
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+</details>
+
+<details>
+<summary><em>show answer</em></summary>
+
+</details>
+
+**5. What was the difference between the longest and shortest delivery times for all orders?**
+
+*query:*
+
+```SQL
+
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+</details>
+
+<details>
+<summary><em>show answer</em></summary>
+
+</details>
+
+**6. What was the average speed for each runner for each delivery and do you notice any trend for these values?**
+
+*query:*
+
+```SQL
+
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+</details>
+
+<details>
+<summary><em>show answer</em></summary>
+
+</details>
+
+**7. What is the successful delivery percentage for each runner?**
+
+*query:*
+
+```SQL
+
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+</details>
+
+<details>
+<summary><em>show answer</em></summary>
+
+</details>
+
 #### C. Ingredient Optimisation
   ...
 #### D. Pricing and Ratings
