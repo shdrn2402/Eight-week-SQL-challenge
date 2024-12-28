@@ -726,7 +726,7 @@ SELECT
     ROUND(AVG(EXTRACT(EPOCH FROM (pickup_time - order_time)) / 60)::NUMERIC, 2) AS avg_pickup_time_minutes
 FROM runner_orders
 JOIN customer_orders USING(order_id)
-WHERE pickup_time IS NOT NULL AND cancellation IS NULL
+WHERE pickup_time IS NOT NULL
 GROUP BY runner_id
 ORDER BY avg_pickup_time_minutes;
 ```
@@ -741,7 +741,7 @@ The SQL query calculates the average time (in minutes) it took for each runner t
 - **`AVG(...)`**: Computes the average time in minutes for each runner.
 - **`ROUND(..., 2)`**: Rounds the resulting average to two decimal places for clarity and precision.
 - The query joins the `runner_orders` table with the `customer_orders` table using the `order_id` field to match orders with their pickup times.
-- The `WHERE` clause filters out rows where `pickup_time` is NULL or the order was canceled (`cancellation IS NULL`).
+- The `WHERE` clause filters out rows where `pickup_time` is NULL.
 - **`GROUP BY runner_id`**: Groups the results by `runner_id` to calculate the average pickup time for each runner.
 - **`ORDER BY avg_pickup_time_minutes`**: Sorts the results in ascending order based on the average pickup time in minutes.
 
