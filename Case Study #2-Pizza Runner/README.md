@@ -722,23 +722,29 @@ This query helps identify how many runners signed up during each week, providing
 
 ```SQL
 SELECT 
-  runner_id,
-  AVG(duration) AS avg_pickup_time
+    runner_id,
+    ROUND(AVG(EXTRACT(EPOCH FROM (pickup_time - order_time)) / 60)::NUMERIC, 2) AS avg_pickup_time_minutes
 FROM runner_orders
-WHERE duration IS NOT NULL AND cancellation IS NULL
-GROUP BY runner_id
-ORDER BY runner_id;
+JOIN customer_orders USING(order_id)
+WHERE pickup_time IS NOT NULL AND cancellation IS NULL
+GROUP BY runner_id;
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
-The query calculates the average pickup time (`avg_pickup_time`) for each runner in minutes.
+The SQL query calculates the average time (in minutes) it took for each runner to arrive at the Pizza Runner HQ to pick up orders, rounded to two decimal places.
 
-- It considers only the non-canceled orders (`cancellation IS NULL`) and excludes rows where the pickup time (`duration`) is missing (`IS NOT NULL`).
-- The average is computed for each runner (`runner_id`) using the `AVG(duration)` function.
-- The results are grouped by `runner_id` to calculate the average time for each runner individually.
-- The query ensures the results reflect accurate average times by filtering out incomplete or irrelevant data.
+- **`EXTRACT(EPOCH FROM (pickup_time - order_time))`**: This expression calculates the difference between the `pickup_time` and `order_time` in seconds by extracting the epoch time (total seconds).
+- **`/ 60`**: Converts the time difference from seconds to minutes.
+- **`AVG(...)`**: Computes the average time in minutes for each runner.
+- **`ROUND(..., 2)`**: Rounds the resulting average to two decimal places for clarity and precision.
+- The query joins the `runner_orders` table with the `customer_orders` table using the `order_id` field to match orders with their pickup times.
+- The `WHERE` clause filters out rows where `pickup_time` is NULL or the order was canceled (`cancellation IS NULL`).
+- **`GROUP BY runner_id`**: Groups the results by `runner_id` to calculate the average pickup time for each runner.
+- The query outputs the `runner_id` and the calculated average pickup time in minutes as `avg_pickup_time_minutes`.
+
+This query ensures accurate computation of the average pickup times for runners, providing insight into the efficiency of each runner.
 
 </details>
 
@@ -746,11 +752,11 @@ The query calculates the average pickup time (`avg_pickup_time`) for each runner
 
 <summary><em>show answer</em></summary>
 
-| runner_id | avg_pickup_time |
-| --------- | --------------- |
-| 1         | 22.25           |
-| 2         | 26.66           |
-| 3         | 15.00           |
+| runner_id | avg_pickup_time_minutes |
+| --------- | ----------------------- |
+| 1         | 15.68                   |
+| 3         | 10.47                   |
+| 2         | 23.72                   |
 
 </details>
 
