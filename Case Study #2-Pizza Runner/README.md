@@ -766,16 +766,50 @@ This query ensures accurate computation of the average pickup times for runners,
 *query:*
 
 ```SQL
-
+WITH pizza_count_per_order AS (
+    SELECT 
+        order_id,
+        COUNT(pizza_id) AS pizzas_ordered
+    FROM customer_orders
+    GROUP BY order_id
+)
+SELECT 
+    pco.pizzas_ordered,
+    ROUND(AVG(EXTRACT(EPOCH FROM (ro.pickup_time - co.order_time)) / 60)::NUMERIC, 2) AS avg_preparation_time_minutes
+FROM runner_orders ro
+JOIN customer_orders co USING(order_id)
+JOIN pizza_count_per_order pco ON co.order_id = pco.order_id
+WHERE ro.pickup_time IS NOT NULL
+GROUP BY pco.pizzas_ordered
+ORDER BY pco.pizzas_ordered;
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
+The SQL query determines if there is a relationship between the number of pizzas in an order (`pizzas_ordered`) and the average preparation time (`avg_preparation_time_minutes`) required for the order.
+
+- A Common Table Expression (CTE) named `pizza_count_per_order` is used to calculate the total number of pizzas (`pizzas_ordered`) for each order (`order_id`).
+  - The `COUNT(pizza_id)` function counts the number of pizzas in each order, and the results are grouped by `order_id`.
+- The main query joins the `runner_orders` table with the `customer_orders` table using the `order_id` column. It also joins with the CTE `pizza_count_per_order` to include the number of pizzas for each order.
+- The `WHERE` clause ensures that only orders with a valid `pickup_time` (non-NULL) are considered.
+- The `AVG(EXTRACT(EPOCH FROM (ro.pickup_time - co.order_time)) / 60)` function calculates the average preparation time in minutes for each group of orders with the same number of pizzas.
+- The `ROUND` function rounds the calculated average preparation time to two decimal places for clarity.
+- The query groups the results by `pizzas_ordered` to calculate the average preparation time for each group.
+- The results are ordered by `pizzas_ordered` in ascending order to display the relationship clearly.
+
+This query provides insight into whether the number of pizzas in an order affects the preparation time.
+
 </details>
 
 <details>
 <summary><em>show answer</em></summary>
+
+| pizzas_ordered | avg_preparation_time_minutes |
+| -------------- | ---------------------------- |
+| 1              | 12.36                        |
+| 2              | 18.38                        |
+| 3              | 29.28                        |
 
 </details>
 
@@ -784,16 +818,40 @@ This query ensures accurate computation of the average pickup times for runners,
 *query:*
 
 ```SQL
-
+SELECT 
+    customer_id,
+    ROUND(AVG(distance), 2) AS avg_distance
+FROM runner_orders
+JOIN customer_orders USING(order_id)
+WHERE distance IS NOT NULL
+GROUP BY customer_id
+ORDER BY avg_distance;
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
+The SQL query calculates the average distance (`avg_distance`) traveled for each customer (`customer_id`) and orders the results by customer ID.
+
+- The `JOIN` clause combines the `runner_orders` table with the `customer_orders` table using the `order_id` column to link corresponding orders.
+- The `WHERE distance IS NOT NULL` clause ensures that only rows with valid distance values are included in the calculation.
+- The `AVG(distance)` function calculates the average distance traveled for each customer.
+- The `ROUND(..., 2)` function rounds the average distance to two decimal places for better readability.
+- The `GROUP BY customer_id` clause groups the results by customer ID, ensuring that the average is calculated individually for each customer.
+- The `ORDER BY customer_id` clause sorts the results by customer ID in ascending order for organized output.
+
 </details>
 
 <details>
 <summary><em>show answer</em></summary>
+
+| customer_id | avg_distance |
+| ----------- | ------------ |
+| 104         | 10.00        |
+| 102         | 16.73        |
+| 101         | 20.00        |
+| 103         | 23.40        |
+| 105         | 25.00        |
 
 </details>
 
