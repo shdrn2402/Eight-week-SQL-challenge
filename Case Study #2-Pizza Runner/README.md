@@ -860,16 +860,31 @@ The SQL query calculates the average distance in kilometers (`avg_distance_km`) 
 *query:*
 
 ```SQL
-
+SELECT 
+    MAX(duration) - MIN(duration) AS max_delivery_time_difference
+FROM runner_orders;
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
+The SQL query calculates the difference between the longest (`MAX(duration)`) and shortest (`MIN(duration)`) delivery times for all orders in the `runner_orders` table.
+
+- The `MAX(duration)` function retrieves the longest delivery time from the `duration` column.
+- The `MIN(duration)` function retrieves the shortest delivery time from the same column.
+- The query subtracts the shortest delivery time from the longest to calculate the difference.
+- The result is returned as a single value in the column `max_delivery_time_difference`.
+
+This query provides a straightforward measure of the range of delivery times, helping to understand the variability in order deliveries.
+
 </details>
 
 <details>
 <summary><em>show answer</em></summary>
+
+| max_delivery_time_difference |
+| ---------------------------- |
+| 30                           |
 
 </details>
 
