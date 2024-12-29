@@ -820,18 +820,18 @@ This query provides insight into whether the number of pizzas in an order affect
 ```SQL
 SELECT 
     customer_id,
-    ROUND(AVG(distance), 2) AS avg_distance
+    ROUND(AVG(distance), 2) AS avg_distance_km
 FROM runner_orders
 JOIN customer_orders USING(order_id)
 WHERE distance IS NOT NULL
 GROUP BY customer_id
-ORDER BY avg_distance;
+ORDER BY avg_distance_km;
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
-The SQL query calculates the average distance (`avg_distance`) traveled for each customer (`customer_id`) and orders the results by customer ID.
+The SQL query calculates the average distance in kilometers (`avg_distance_km`) traveled for each customer (`customer_id`) and orders the results by customer ID.
 
 - The `JOIN` clause combines the `runner_orders` table with the `customer_orders` table using the `order_id` column to link corresponding orders.
 - The `WHERE distance IS NOT NULL` clause ensures that only rows with valid distance values are included in the calculation.
@@ -845,13 +845,13 @@ The SQL query calculates the average distance (`avg_distance`) traveled for each
 <details>
 <summary><em>show answer</em></summary>
 
-| customer_id | avg_distance |
-| ----------- | ------------ |
-| 104         | 10.00        |
-| 102         | 16.73        |
-| 101         | 20.00        |
-| 103         | 23.40        |
-| 105         | 25.00        |
+| customer_id | avg_distance_km |
+| ----------- | --------------- |
+| 104         | 10.00           |
+| 102         | 16.73           |
+| 101         | 20.00           |
+| 103         | 23.40           |
+| 105         | 25.00           |
 
 </details>
 
