@@ -327,14 +327,11 @@ This query provides a simple and accurate total count of pizzas ordered, regardl
 
 </details>
 
-<details>
-<summary><em>show answer</em></summary>
+*answer*
 
 | pizzas_ordered |
 | -------------- |
 | 14             |
-
-</details>
 
 **2. How many unique customer orders were made?**
 
@@ -353,14 +350,11 @@ The SQL query calculates the total number of unique customer orders made in the 
 
 </details>
 
-<details>
-<summary><em>show answer</em></summary>
+*answer*
 
 | unique_pizza_orders |
 | ------------------- |
 | 10                  |
-
-</details>
 
 **3. How many successful orders were delivered by each runner?**
 
@@ -384,17 +378,11 @@ The SQL query retrieves the number of successful orders delivered by each runner
 
 </details>
 
-
-<details>
-<summary><em>show answer</em></summary>
-
 | runner_id | orders_delivered |
 | --------- | ---------------- |
 | 1         | 4                |
 | 2         | 3                |
 | 3         | 1                |
-
-</details>
 
 **4. How many of each type of pizza was delivered?**
   
@@ -420,17 +408,12 @@ The SQL query retrieves the number of each type of pizza that was successfully d
 
 </details>
 
-
-<details>
-<summary><em>show answer</em></summary>
+*answer*
 
 | pizza_name     | orders_delivered |
 | -------------- | ---------------- |
 | Meatlovers     | 9                |
 | Vegetarian     | 4                |
-
-
-</details>
 
 **5. How many Vegetarian and Meatlovers were ordered by each customer?**
   
@@ -457,9 +440,7 @@ This query correctly determines the number of orders for both `Vegetarian` and `
 
 </details>
 
-
-<details>
-<summary><em>show answer</em></summary>
+*answer*
 
 | customer_id | pizza_name | orders_amount |
 | ----------- | ---------- | ------------- |
@@ -471,8 +452,6 @@ This query correctly determines the number of orders for both `Vegetarian` and `
 | 103         | Vegetarian | 1             |
 | 104         | Meatlovers | 3             |
 | 105         | Vegetarian | 1             |
-
-</details>
 
 **6. What was the maximum number of pizzas delivered in a single order?**
   
@@ -505,15 +484,11 @@ This query efficiently identifies the single order with the highest number of pi
 
 </details>
 
-
-<details>
-<summary><em>show answer</em></summary>
+*answer*
 
 | max_pizzas_delivered |
 | -------------------- |
 | 3                    |
-
-</details>
 
 **7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?**
   
@@ -549,9 +524,7 @@ This query leverages the cleaned data to accurately determine the count of pizza
 
 </details>
 
-
-<details>
-<summary><em>show answer</em></summary>
+*answer*
 
 | customer_id | pizzas_with_changes | pizzas_without_changes |
 | ----------- | ------------------- | ---------------------- |
@@ -560,8 +533,6 @@ This query leverages the cleaned data to accurately determine the count of pizza
 | 103         | 3                   | 0                      |
 | 104         | 2                   | 1                      |
 | 105         | 1                   | 0                      |
-
-</details>
 
 **8. How many pizzas were delivered that had both exclusions and extras?**
   
@@ -591,15 +562,9 @@ This query provides the count of pizzas that had both exclusions and extras and 
 
 </details>
 
-
-<details>
-<summary><em>show answer</em></summary>
-
 | pizzas_with_both_changes |
 | ------------------------ |
 | 1                        |
-
-</details>
 
 **9. What was the total volume of pizzas ordered for each hour of the day?**
   
@@ -626,8 +591,7 @@ This query provides the total number of pizzas ordered for each hour of the day 
 
 </details>
 
-<details>
-<summary><em>show answer</em></summary>
+*answer*
 
 | order_hour | total_pizzas_ordered |
 | ---------- | -------------------- |
@@ -637,8 +601,6 @@ This query provides the total number of pizzas ordered for each hour of the day 
 | 19         | 1                    |
 | 21         | 3                    |
 | 23         | 3                    |
-
-</details>
 
 **10. What was the volume of orders for each day of the week?**
   
@@ -663,9 +625,7 @@ This query provides insights into which days of the week had the most pizza orde
 
 </details>
 
-
-<details>
-<summary><em>show answer</em></summary>
+*answer*
 
 | order_day | total_orders |
 | --------- | ------------ |
@@ -673,9 +633,6 @@ This query provides insights into which days of the week had the most pizza orde
 | Thursday  | 3            |
 | Saturday  | 5            |
 | Wednesday | 5            |
-
-</details>
-
 
 #### B. Runner and Customer Experience
 **1. How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01)**
@@ -705,16 +662,11 @@ This query helps identify how many runners signed up during each week, providing
 
 </details>
 
-<details>
-<summary><em>show answer</em></summary>
-
 | week_start             | runners_signed_up |
 | ---------------------- | ----------------- |
 | 2020-12-28 00:00:00+00 | 2                 |
 | 2021-01-04 00:00:00+00 | 1                 |
 | 2021-01-11 00:00:00+00 | 1                 |
-
-</details>
 
 **2. What was the average time in minutes it took for each runner to arrive at the Pizza Runner HQ to pickup the order?**
 
@@ -749,17 +701,13 @@ This query ensures accurate computation of the average pickup times for runners,
 
 </details>
 
-<details>
-
-<summary><em>show answer</em></summary>
+*answer*
 
 | runner_id | avg_pickup_time_minutes |
 | --------- | ----------------------- |
 | 3         | 10.47                   |
 | 1         | 15.68                   |
 | 2         | 23.72                   |
-
-</details>
 
 **3. Is there any relationship between the number of pizzas and how long the order takes to prepare?**
 
@@ -802,16 +750,13 @@ This query provides insight into whether the number of pizzas in an order affect
 
 </details>
 
-<details>
-<summary><em>show answer</em></summary>
+*answer*
 
 | pizzas_ordered | avg_preparation_time_minutes |
 | -------------- | ---------------------------- |
 | 1              | 12.36                        |
 | 2              | 18.38                        |
 | 3              | 29.28                        |
-
-</details>
 
 **4. What was the average distance travelled for each customer?**
 
@@ -842,8 +787,7 @@ The SQL query calculates the average distance in kilometers (`avg_distance_km`) 
 
 </details>
 
-<details>
-<summary><em>show answer</em></summary>
+*answer*
 
 | customer_id | avg_distance_km |
 | ----------- | --------------- |
@@ -852,8 +796,6 @@ The SQL query calculates the average distance in kilometers (`avg_distance_km`) 
 | 101         | 20.00           |
 | 103         | 23.40           |
 | 105         | 25.00           |
-
-</details>
 
 **5. What was the difference between the longest and shortest delivery times for all orders?**
 
@@ -879,14 +821,11 @@ This query provides a straightforward measure of the range of delivery times, he
 
 </details>
 
-<details>
-<summary><em>show answer</em></summary>
+*answer*
 
 | max_delivery_time_difference |
 | ---------------------------- |
 | 30                           |
-
-</details>
 
 **6. What was the average speed for each runner for each delivery and do you notice any trend for these values?**
 
@@ -901,10 +840,7 @@ This query provides a straightforward measure of the range of delivery times, he
 
 </details>
 
-<details>
-<summary><em>show answer</em></summary>
-
-</details>
+*answer*
 
 **7. What is the successful delivery percentage for each runner?**
 
@@ -919,10 +855,7 @@ This query provides a straightforward measure of the range of delivery times, he
 
 </details>
 
-<details>
-<summary><em>show answer</em></summary>
-
-</details>
+*answer*
 
 #### C. Ingredient Optimisation
   ...
