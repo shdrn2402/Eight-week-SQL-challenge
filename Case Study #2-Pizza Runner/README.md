@@ -832,30 +832,96 @@ This query provides a straightforward measure of the range of delivery times, he
 *query:*
 
 ```SQL
-
+SELECT 
+  runner_id, 
+  distance, 
+  duration, 
+  ROUND((distance / duration) * 60, 2) AS speed_km_per_hr
+FROM runner_orders
+WHERE duration IS NOT NULL AND distance IS NOT NULL
+ORDER BY speed_km_per_hr DESC;
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
+The SQL query calculates the average speed (`speed_km_per_hr`) for each delivery made by runners, using the distance traveled and the delivery duration.
+
+- **`ROUND((distance / duration) * 60, 2) AS speed_km_per_hr`**:
+  - This formula calculates the speed in kilometers per hour by dividing the `distance` by `duration` (in minutes), multiplying the result by 60 to convert to hours, and rounding to two decimal places for clarity.
+- **`WHERE duration IS NOT NULL AND distance IS NOT NULL`**:
+  - Ensures only records with valid `distance` and `duration` values are included in the calculation.
+- **`ORDER BY speed_km_per_hr DESC`**:
+  - Sorts the results in descending order of speed, highlighting the fastest deliveries first.
+
+This query provides insights into the speed of each delivery for all runners and helps identify trends or anomalies in the data.
+
+Upon reviewing the results, the following trends and observations can be noted:
+
+- **Anomalous Speed**:
+   - The highest speed recorded (`93.60 km/h`) appears unrealistic for a pizza delivery scenario. This suggests potential data issues, such as incorrect distance or duration values for this delivery.
+
+- **General Trend**:
+   - As the delivery distance increases beyond a certain threshold (e.g., 20-25 km), the calculated average speed tends to decrease. This could be due to longer travel times for greater distances or potential traffic delays.
+
+- **Task Interpretation**:
+   - The question asks for the "average speed for each runner for each delivery."
+   Since each delivery involves a single distance and duration, the "average speed" for a single delivery is equivalent to the calculated speed for that delivery. 
+   Therefore, our query calculates the speed for each delivery individually, which aligns with the task.
+
 </details>
 
 *answer*
+
+| runner_id | distance | duration | speed_km_per_hr |
+| --------- | -------- | -------- | --------------- |
+| 2         | 23.4     | 15       | 93.60           |
+| 2         | 25       | 25       | 60.00           |
+| 1         | 10       | 10       | 60.00           |
+| 1         | 20       | 27       | 44.44           |
+| 1         | 13.4     | 20       | 40.20           |
+| 3         | 10       | 15       | 40.00           |
+| 1         | 20       | 32       | 37.50           |
+| 2         | 23.4     | 40       | 35.10           |
 
 **7. What is the successful delivery percentage for each runner?**
 
 *query:*
 
 ```SQL
-
+SELECT 
+    runner_id,
+    ROUND(
+        (COUNT(*) FILTER (WHERE cancellation IS NULL)::NUMERIC / COUNT(*)::NUMERIC) * 100, 2
+    ) AS successful_delivery_percentage
+FROM runner_orders
+GROUP BY runner_id
+ORDER BY runner_id;
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
+The SQL query calculates the percentage of successful deliveries for each runner.
+
+- **`COUNT(*)`**: Counts the total number of orders for each runner.
+- **`COUNT(*) FILTER (WHERE cancellation IS NULL)`**: Counts only the successful deliveries where `cancellation` is `NULL`.
+- **Division and Multiplication**: The ratio of successful deliveries to total deliveries is multiplied by 100 to get a percentage.
+- **`ROUND(..., 2)`**: Rounds the result to two decimal places for better readability.
+- **`GROUP BY runner_id`**: Groups the results by each runner (`runner_id`) to calculate the success rate individually.
+- **`ORDER BY runner_id`**: Ensures the output is sorted by runner ID in ascending order.
+
+This query provides an overview of how many deliveries each runner completed successfully as a percentage of their total assigned deliveries.
+
 </details>
 
 *answer*
+
+| runner_id | successful_delivery_percentage |
+| --------- | ------------------------------ |
+| 1         | 100.00                         |
+| 2         | 75.00                          |
+| 3         | 50.00                          |
 
 #### C. Ingredient Optimisation
   ...
