@@ -892,7 +892,7 @@ Upon reviewing the results, the following trends and observations can be noted:
 SELECT 
     runner_id,
     ROUND(
-        (COUNT(*) FILTER (WHERE cancellation IS NULL)::NUMERIC / COUNT(*)::NUMERIC) * 100, 2
+        (COUNT(*) FILTER (WHERE cancellation IS NULL) / COUNT(*)::NUMERIC) * 100, 2
     ) AS successful_delivery_percentage
 FROM runner_orders
 GROUP BY runner_id
