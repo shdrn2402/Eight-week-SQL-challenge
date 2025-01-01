@@ -924,7 +924,93 @@ This query provides an overview of how many deliveries each runner completed suc
 | 3         | 50.00                          |
 
 #### C. Ingredient Optimisation
-  ...
+**1. What are the standard ingredients for each pizza?**
+
+*query:*
+
+```SQL
+SELECT subquery.pizza_name,
+	   string_agg(PT.topping_name, ', ') AS toppings
+FROM
+	(SELECT PN.pizza_name,
+	 		string_to_table(toppings, ', ')::INT topping_id
+	 FROM pizza_recipes
+	 JOIN pizza_names PN USING(pizza_id)
+     ) subquery
+JOIN pizza_toppings PT USING (topping_id)
+GROUP BY pizza_name;
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+The SQL query retrieves the standard ingredients for each type of pizza by combining information from the `pizza_recipes`, `pizza_names`, and `pizza_toppings` tables.
+
+- **Subquery**:
+  - Selects the `pizza_name` from `pizza_names` and splits the `toppings` column in `pizza_recipes` into individual `topping_id` values using the `string_to_table` function.
+  - The result creates rows for each topping associated with a specific pizza.
+  
+- **Join**:
+  - Joins the subquery with the `pizza_toppings` table using the `topping_id` to retrieve the topping names corresponding to each `topping_id`.
+
+- **Grouping and Aggregation**:
+  - Groups the results by `pizza_name`.
+  - Uses `string_agg` to combine all the topping names into a single comma-separated string for each pizza.
+
+This query effectively lists the standard ingredients for each pizza type in a readable format, ensuring clarity and consistency.
+
+</details>
+
+*answer*
+
+| pizza_name | toppings                                                              |
+| ---------- | --------------------------------------------------------------------- |
+| Meatlovers | Bacon, BBQ Sauce, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami |
+| Vegetarian | Cheese, Mushrooms, Onions, Peppers, Tomatoes, Tomato Sauce            |
+
+**2.**
+
+*query:*
+
+```SQL
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+</details>
+
+*answer*
+
+**3**
+
+*query:*
+
+```SQL
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+</details>
+
+*answer*
+
+**4**
+
+*query:*
+
+```SQL
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+</details>
+
+*answer*
+
+
 #### D. Pricing and Ratings
   ...
 #### E. Bonus Questions
