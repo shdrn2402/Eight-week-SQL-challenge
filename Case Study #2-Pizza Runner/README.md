@@ -970,19 +970,55 @@ This query effectively lists the standard ingredients for each pizza type in a r
 | Meatlovers | Bacon, BBQ Sauce, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami |
 | Vegetarian | Cheese, Mushrooms, Onions, Peppers, Tomatoes, Tomato Sauce            |
 
-**2.**
+**2. What was the most commonly added extra?**
 
 *query:*
 
 ```SQL
+WITH toppings_counts AS (
+  SELECT
+    PT.topping_name,
+    COUNT(*) AS was_added_times
+  FROM
+    (SELECT
+      string_to_table(extras, ', ')::INT AS topping_id
+    FROM customer_orders
+    ) subquery
+  JOIN pizza_toppings PT USING(topping_id)
+  GROUP BY PT.topping_name
+)
+
+SELECT
+  topping_name,
+  was_added_times
+FROM toppings_counts
+WHERE was_added_times = (SELECT MAX(was_added_times) FROM toppings_counts);
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
+The SQL query identifies the most frequently added topping as an extra by leveraging a Common Table Expression (CTE) to calculate counts for each topping and then filtering for the maximum count.
+
+- **CTE (`toppings_counts`)**:
+  - Extracts toppings from the `extras` column using `string_to_table` and converts them to integers (`topping_id`).
+  - Joins the resulting `topping_id` values with the `pizza_toppings` table to retrieve topping names.
+  - Groups the results by `topping_name` and calculates the count of occurrences (`was_added_times`) for each topping.
+
+- **Main Query**:
+  - Selects rows from the `toppings_counts` CTE where the count (`was_added_times`) matches the maximum value.
+  - Uses a subquery with `MAX(was_added_times)` to determine the highest count among all toppings.
+  - Ensures all toppings tied for the maximum count are included.
+
+This query provides the name(s) of the topping(s) most frequently added as extras, including ties if multiple toppings share the maximum count.
+
 </details>
 
 *answer*
+
+| topping_name | was_added_times |
+| ------------ | --------------- |
+| Bacon        | 4               |
 
 **3**
 
