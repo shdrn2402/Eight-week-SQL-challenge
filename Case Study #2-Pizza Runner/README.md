@@ -1020,19 +1020,54 @@ This query provides the name(s) of the topping(s) most frequently added as extra
 | ------------ | --------------- |
 | Bacon        | 4               |
 
-**3**
+**3. What was the most common exclusion?**
 
 *query:*
 
 ```SQL
+WITH exclusions_counts AS (
+    SELECT
+        PT.topping_name,
+        COUNT(*) AS was_excluded_times
+    FROM
+        (SELECT
+            string_to_table(exclusions, ', ')::INT AS topping_id
+         FROM customer_orders
+        ) subquery
+    JOIN pizza_toppings PT USING(topping_id)
+    GROUP BY PT.topping_name
+)
+SELECT
+    topping_name,
+    was_excluded_times
+FROM exclusions_counts
+WHERE was_excluded_times = (SELECT MAX(was_excluded_times) FROM exclusions_counts);
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
+The SQL query determines the most frequently excluded topping by counting exclusions for each topping and identifying the one(s) with the highest count.
+
+- **CTE (`exclusions_counts`)**:
+  - Extracts toppings from the `exclusions` column using `string_to_table` and converts them to integers (`topping_id`).
+  - Joins the extracted `topping_id` values with the `pizza_toppings` table to retrieve topping names.
+  - Groups the results by `topping_name` and calculates the number of times each topping was excluded (`was_excluded_times`).
+
+- **Main Query**:
+  - Selects rows from the `exclusions_counts` CTE where the exclusion count (`was_excluded_times`) matches the maximum value.
+  - Uses a subquery with `MAX(was_excluded_times)` to find the highest exclusion count.
+  - Includes all toppings tied for the maximum count, if applicable.
+
+This query provides the name(s) of the topping(s) that were excluded the most frequently, ensuring ties are captured when multiple toppings share the maximum exclusion count.
+
 </details>
 
 *answer*
+
+| topping_name | was_excluded_times |
+| ------------ | ------------------ |
+| Cheese       | 4                  |
 
 **4**
 
