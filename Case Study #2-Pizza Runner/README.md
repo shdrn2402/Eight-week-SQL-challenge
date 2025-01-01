@@ -930,13 +930,13 @@ This query provides an overview of how many deliveries each runner completed suc
 
 ```SQL
 SELECT subquery.pizza_name,
-	   string_agg(PT.topping_name, ', ') AS toppings
+  string_agg(PT.topping_name, ', ') AS toppings
 FROM
-	(SELECT PN.pizza_name,
-	 		string_to_table(toppings, ', ')::INT topping_id
+  (SELECT PN.pizza_name,
+     string_to_table(toppings, ', ')::INT topping_id
 	 FROM pizza_recipes
 	 JOIN pizza_names PN USING(pizza_id)
-     ) subquery
+  ) subquery
 JOIN pizza_toppings PT USING (topping_id)
 GROUP BY pizza_name;
 ```
