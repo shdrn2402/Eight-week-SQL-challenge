@@ -1078,15 +1078,74 @@ This query provides the name(s) of the topping(s) that were excluded the most fr
 *query:*
 
 ```SQL
+SELECT
+    order_id,
+    pizza_name ||
+    CASE
+        WHEN exclusions IS NOT NULL THEN ' - Exclude ' || (
+            SELECT string_agg(topping_name, ', ')
+            FROM pizza_toppings
+            WHERE topping_id = ANY(string_to_array(exclusions, ',')::INT[])
+        )
+        ELSE ''
+    END ||
+    CASE
+        WHEN extras IS NOT NULL THEN ' - Extra ' || (
+            SELECT string_agg(topping_name, ', ')
+            FROM pizza_toppings
+            WHERE topping_id = ANY(string_to_array(extras, ',')::INT[])
+        )
+        ELSE ''
+    END AS order_items
+FROM customer_orders
+JOIN pizza_names USING (pizza_id)
+ORDER BY order_time;
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
+The SQL query generates a textual representation of pizza orders, including their exclusions and extras, for each order in the `customer_orders` table.
+
+- **`order_id`**: Retrieves the unique identifier for each order to include it in the output.
+- **`pizza_name`**: Joins the `pizza_names` table to fetch the name of the pizza associated with each order.
+- **`CASE WHEN exclusions IS NOT NULL THEN ...`**: 
+  - Checks if the `exclusions` column contains values.
+  - If exclusions exist, a subquery is executed to:
+    - Convert the `exclusions` string into an integer array using `string_to_array(exclusions, ',')::INT[]`.
+    - Fetch the corresponding topping names from the `pizza_toppings` table using the `topping_id` values.
+    - Combine the topping names into a single comma-separated string using `string_agg`.
+    - Append the string with the prefix ` - Exclude `.
+  - If no exclusions exist, returns an empty string.
+- **`CASE WHEN extras IS NOT NULL THEN ...`**:
+  - Similar to the exclusions logic, but for the `extras` column.
+  - Adds the prefix ` - Extra ` if extras exist.
+  - Returns an empty string otherwise.
+- **String Concatenation**: Combines the pizza name with the formatted exclusions and extras to form the final `order_items` value.
+- **`ORDER BY order_time`**: Ensures the results are sorted in ascending order by the `order_time` column.
+
+This query provides a comprehensive summary of each order, detailing its specific modifications (exclusions and extras) in a single text field while preserving the unique `order_id` for reference.
+
 </details>
 
 *answer*
 
+| order_id | order_items                                                     |
+| -------- | --------------------------------------------------------------- |
+| 1        | Meatlovers                                                      |
+| 2        | Meatlovers                                                      |
+| 3        | Meatlovers                                                      |
+| 3        | Vegetarian                                                      |
+| 4        | Vegetarian - Exclude Cheese                                     |
+| 4        | Meatlovers - Exclude Cheese                                     |
+| 4        | Meatlovers - Exclude Cheese                                     |
+| 5        | Meatlovers - Extra Bacon                                        |
+| 6        | Vegetarian                                                      |
+| 7        | Vegetarian - Extra Bacon                                        |
+| 8        | Meatlovers                                                      |
+| 9        | Meatlovers - Exclude Cheese - Extra Bacon, Chicken              |
+| 10       | Meatlovers - Exclude BBQ Sauce, Mushrooms - Extra Bacon, Cheese |
+| 10       | Meatlovers                                                      |
 
 #### D. Pricing and Ratings
   ...
