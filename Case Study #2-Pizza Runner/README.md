@@ -1079,6 +1079,7 @@ This query provides the name(s) of the topping(s) that were excluded the most fr
 
 ```SQL
 SELECT
+	ROW_NUMBER() OVER(ORDER BY order_time) AS id,
     order_id,
     pizza_name ||
     CASE
@@ -1099,53 +1100,44 @@ SELECT
     END AS order_items
 FROM customer_orders
 JOIN pizza_names USING (pizza_id)
-ORDER BY order_time;
+;
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
-The SQL query generates a textual representation of pizza orders, including their exclusions and extras, for each order in the `customer_orders` table.
+The SQL query generates a unique order item (`order_items`) for each record in the `customer_orders` table, formatted to include the pizza name and any exclusions or extras applied to the order. Additionally, the query assigns a unique row identifier (`id`) to each result, providing sequential numbering for the output.
 
-- **`order_id`**: Retrieves the unique identifier for each order to include it in the output.
-- **`pizza_name`**: Joins the `pizza_names` table to fetch the name of the pizza associated with each order.
-- **`CASE WHEN exclusions IS NOT NULL THEN ...`**: 
-  - Checks if the `exclusions` column contains values.
-  - If exclusions exist, a subquery is executed to:
-    - Convert the `exclusions` string into an integer array using `string_to_array(exclusions, ',')::INT[]`.
-    - Fetch the corresponding topping names from the `pizza_toppings` table using the `topping_id` values.
-    - Combine the topping names into a single comma-separated string using `string_agg`.
-    - Append the string with the prefix ` - Exclude `.
-  - If no exclusions exist, returns an empty string.
-- **`CASE WHEN extras IS NOT NULL THEN ...`**:
-  - Similar to the exclusions logic, but for the `extras` column.
-  - Adds the prefix ` - Extra ` if extras exist.
-  - Returns an empty string otherwise.
-- **String Concatenation**: Combines the pizza name with the formatted exclusions and extras to form the final `order_items` value.
-- **`ORDER BY order_time`**: Ensures the results are sorted in ascending order by the `order_time` column.
+- `ROW_NUMBER() OVER()` assigns a unique sequential number (`id`) to each row in the output, independent of the original `order_id`. This ensures that every record has a unique identifier.
+- `pizza_name` is concatenated with:
+  - **Exclusions**: If the `exclusions` column is not `NULL`, a subquery retrieves the ingredient names associated with the exclusions (from the `pizza_toppings` table) and concatenates them into a comma-separated list.
+  - **Extras**: If the `extras` column is not `NULL`, a similar subquery retrieves the ingredient names for extras and concatenates them into a list.
+- `CASE` statements ensure that exclusions and extras are only included in the formatted output if they exist.
+- `||` is used to concatenate strings, adding text such as " - Exclude " and " - Extra " to describe exclusions and extras.
+- The `JOIN` with `pizza_names` links each `pizza_id` to its corresponding pizza name.
 
-This query provides a comprehensive summary of each order, detailing its specific modifications (exclusions and extras) in a single text field while preserving the unique `order_id` for reference.
+This query outputs a formatted `order_items` string for each record in the `customer_orders` table while ensuring every row in the result has a unique identifier (`id`).
 
 </details>
 
 *answer*
 
-| order_id | order_items                                                     |
-| -------- | --------------------------------------------------------------- |
-| 1        | Meatlovers                                                      |
-| 2        | Meatlovers                                                      |
-| 3        | Meatlovers                                                      |
-| 3        | Vegetarian                                                      |
-| 4        | Vegetarian - Exclude Cheese                                     |
-| 4        | Meatlovers - Exclude Cheese                                     |
-| 4        | Meatlovers - Exclude Cheese                                     |
-| 5        | Meatlovers - Extra Bacon                                        |
-| 6        | Vegetarian                                                      |
-| 7        | Vegetarian - Extra Bacon                                        |
-| 8        | Meatlovers                                                      |
-| 9        | Meatlovers - Exclude Cheese - Extra Bacon, Chicken              |
-| 10       | Meatlovers - Exclude BBQ Sauce, Mushrooms - Extra Bacon, Cheese |
-| 10       | Meatlovers                                                      |
+| id  | order_id | order_items                                                     |
+| --- | -------- | --------------------------------------------------------------- |
+| 1   | 1        | Meatlovers                                                      |
+| 2   | 2        | Meatlovers                                                      |
+| 3   | 3        | Meatlovers                                                      |
+| 4   | 3        | Vegetarian                                                      |
+| 5   | 4        | Vegetarian - Exclude Cheese                                     |
+| 6   | 4        | Meatlovers - Exclude Cheese                                     |
+| 7   | 4        | Meatlovers - Exclude Cheese                                     |
+| 8   | 5        | Meatlovers - Extra Bacon                                        |
+| 9   | 6        | Vegetarian                                                      |
+| 10  | 7        | Vegetarian - Extra Bacon                                        |
+| 11  | 8        | Meatlovers                                                      |
+| 12  | 9        | Meatlovers - Exclude Cheese - Extra Bacon, Chicken              |
+| 13  | 10       | Meatlovers - Exclude BBQ Sauce, Mushrooms - Extra Bacon, Cheese |
+| 14  | 10       | Meatlovers                                                      |
 
 #### D. Pricing and Ratings
   ...
