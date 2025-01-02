@@ -1140,7 +1140,7 @@ This query outputs a formatted `order_items` string for each record in the `cust
 | 14  | 10       | Meatlovers                                                      |
 
 
-**Generate an alphabetically ordered comma separated ingredient list for each pizza order from the customer_orders table and add a 2x in front of any relevant ingredients**
+**5. Generate an alphabetically ordered comma separated ingredient list for each pizza order from the customer_orders table and add a 2x in front of any relevant ingredients**
 - For example: "Meat Lovers: 2xBacon, Beef, ... , Salami"
 
 *query:*
@@ -1209,6 +1209,94 @@ This query provides a detailed and well-structured list of ingredients for each 
 | 12  | 9        | Meatlovers: BBQ Sauce, 2xBacon, Beef, 2xChicken, Mushrooms, Pepperoni, Salami       |
 | 13  | 10       | Meatlovers: 2xBacon, Beef, 2xCheese, Chicken, Pepperoni, Salami                     |
 | 14  | 10       | Meatlovers: BBQ Sauce, Bacon, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami   |
+
+**6.What is the total quantity of each ingredient used in all delivered pizzas sorted by most frequent first?**
+
+*query:*
+
+```SQL
+WITH delivered AS (
+  SELECT 
+    CO.order_id, 
+    CO.pizza_id, 
+    CO.exclusions, 
+    CO.extras, 
+    PR.toppings
+  FROM runner_orders RO
+  JOIN customer_orders CO USING(order_id)
+  JOIN pizza_recipes PR USING(pizza_id)
+  WHERE RO.cancellation IS NULL
+),
+final_toppings_calculated AS (
+  SELECT 
+    order_id,
+    pizza_id,
+    exclusions,
+    extras,
+    toppings,
+    ARRAY(
+      SELECT UNNEST(string_to_array(toppings, ',')::INT[])
+      EXCEPT SELECT UNNEST(string_to_array(exclusions, ',')::INT[])
+      UNION ALL SELECT UNNEST(string_to_array(extras, ',')::INT[])
+      ORDER BY 1
+      ) AS final_toppings
+  FROM delivered
+),
+ingredient_totals AS (
+  SELECT 
+    UNNEST(final_toppings) AS topping_id
+  FROM final_toppings_calculated
+)
+
+SELECT 
+  pt.topping_name,
+  COUNT(*) AS total_count
+FROM ingredient_totals it
+JOIN pizza_toppings pt ON it.topping_id = pt.topping_id
+GROUP BY pt.topping_name
+ORDER BY total_count DESC, pt.topping_name;
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+The SQL query calculates the total quantity of each ingredient used in all delivered pizzas, sorted by most frequent first.
+
+- **Delivered Pizzas**:
+  - Filters only delivered pizzas (`cancellation IS NULL`) and extracts the relevant details (`order_id`, `pizza_id`, `exclusions`, `extras`) along with the standard recipe (`toppings`) from related tables.
+
+- **Final Toppings Calculation**:
+  - Computes the final list of toppings for each order:
+    - Removes excluded toppings using `EXCEPT`.
+    - Adds extra toppings using `UNION ALL`.
+    - Ensures the resulting list is sorted to maintain consistency.
+
+- **Ingredient Aggregation**:
+  - Converts the list of toppings into individual ingredient IDs using `UNNEST`.
+  - Joins with the `pizza_toppings` table to map `topping_id` to `topping_name`.
+  - Groups the results by `topping_name` to calculate the total count of each ingredient.
+  - Sorts the output by the total count of ingredients in descending order and alphabetically by name.
+
+This query provides a precise count of each topping used in all delivered pizzas, fully accounting for any exclusions and additions.
+
+</details>
+
+*answer*
+
+| topping_name | total_count |
+| ------------ | ----------- |
+| Bacon        | 12          |
+| Mushrooms    | 11          |
+| Cheese       | 10          |
+| Beef         | 9           |
+| Chicken      | 9           |
+| Pepperoni    | 9           |
+| Salami       | 9           |
+| BBQ Sauce    | 8           |
+| Onions       | 3           |
+| Peppers      | 3           |
+| Tomato Sauce | 3           |
+| Tomatoes     | 3           |
 
 #### D. Pricing and Ratings
   ...
