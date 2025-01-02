@@ -1139,6 +1139,77 @@ This query outputs a formatted `order_items` string for each record in the `cust
 | 13  | 10       | Meatlovers - Exclude BBQ Sauce, Mushrooms - Extra Bacon, Cheese |
 | 14  | 10       | Meatlovers                                                      |
 
+
+**Generate an alphabetically ordered comma separated ingredient list for each pizza order from the customer_orders table and add a 2x in front of any relevant ingredients**
+- For example: "Meat Lovers: 2xBacon, Beef, ... , Salami"
+
+*query:*
+
+```SQL
+SELECT
+    ROW_NUMBER() OVER(ORDER BY order_time) AS id,
+    order_id,
+    pizza_name || ': ' ||
+    (
+      SELECT
+      string_agg(
+        CASE
+        WHEN topping_id = ANY(string_to_array(extras, ',')::INT[]) THEN '2x' || topping_name
+        ELSE topping_name
+        END, ', ' ORDER BY topping_name
+            )
+      FROM pizza_toppings
+      WHERE topping_id = ANY(
+        array(
+          SELECT unnest(string_to_array(pr.toppings, ',')::INT[]) 
+          EXCEPT 
+          SELECT unnest(string_to_array(exclusions, ',')::INT[])
+          )
+          ) OR topping_id = ANY(string_to_array(extras, ',')::INT[])
+    ) AS order_items
+FROM customer_orders
+JOIN pizza_names USING (pizza_id)
+JOIN pizza_recipes pr USING (pizza_id)
+ORDER BY id;
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+The SQL query generates an ordered list of ingredients for each pizza order, handling standard toppings, exclusions, and extras:
+
+- `ROW_NUMBER() OVER(ORDER BY order_time):` Assigns a unique ID to each row based on the order time for proper ordering.
+- `pizza_name || ': ' || ...:` Concatenates the pizza name with the formatted list of toppings.
+- `string_agg:` Aggregates ingredients into a comma-separated list:
+  - `CASE statement:` Adds "2x" before the ingredient name for extras.
+  - `ORDER BY topping_name:` Ensures alphabetical ordering of ingredients.
+- `WHERE clause:` Combines logic for standard toppings, exclusions, and extras:
+  - `EXCEPT:` Removes excluded ingredients from the standard toppings.
+  - `OR:` Includes extras in the final list.
+- `ORDER BY id:` Sorts the final result based on the unique ID assigned earlier.
+
+This query provides a detailed and well-structured list of ingredients for each order, incorporating exclusions and extras accurately.
+</details>
+
+*answer*
+
+| id  | order_id | order_items                                                                         |
+| --- | -------- | ----------------------------------------------------------------------------------- |
+| 1   | 1        | Meatlovers: BBQ Sauce, Bacon, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami   |
+| 2   | 2        | Meatlovers: BBQ Sauce, Bacon, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami   |
+| 3   | 3        | Meatlovers: BBQ Sauce, Bacon, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami   |
+| 4   | 3        | Vegetarian: Cheese, Mushrooms, Onions, Peppers, Tomato Sauce, Tomatoes              |
+| 5   | 4        | Vegetarian: Mushrooms, Onions, Peppers, Tomato Sauce, Tomatoes                      |
+| 6   | 4        | Meatlovers: BBQ Sauce, Bacon, Beef, Chicken, Mushrooms, Pepperoni, Salami           |
+| 7   | 4        | Meatlovers: BBQ Sauce, Bacon, Beef, Chicken, Mushrooms, Pepperoni, Salami           |
+| 8   | 5        | Meatlovers: BBQ Sauce, 2xBacon, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami |
+| 9   | 6        | Vegetarian: Cheese, Mushrooms, Onions, Peppers, Tomato Sauce, Tomatoes              |
+| 10  | 7        | Vegetarian: 2xBacon, Cheese, Mushrooms, Onions, Peppers, Tomato Sauce, Tomatoes     |
+| 11  | 8        | Meatlovers: BBQ Sauce, Bacon, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami   |
+| 12  | 9        | Meatlovers: BBQ Sauce, 2xBacon, Beef, 2xChicken, Mushrooms, Pepperoni, Salami       |
+| 13  | 10       | Meatlovers: 2xBacon, Beef, 2xCheese, Chicken, Pepperoni, Salami                     |
+| 14  | 10       | Meatlovers: BBQ Sauce, Bacon, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami   |
+
 #### D. Pricing and Ratings
   ...
 #### E. Bonus Questions
