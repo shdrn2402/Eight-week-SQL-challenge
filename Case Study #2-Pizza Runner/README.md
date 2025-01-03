@@ -1313,7 +1313,7 @@ SELECT
     ELSE total_sold*10
   END AS total_earned_usd
 FROM
-(SELECT
+  (SELECT
   CO.pizza_id,
     COUNT(*) AS total_sold
 	FROM runner_orders RO
