@@ -1238,7 +1238,6 @@ final_toppings_calculated AS (
       SELECT UNNEST(string_to_array(toppings, ',')::INT[])
       EXCEPT SELECT UNNEST(string_to_array(exclusions, ',')::INT[])
       UNION ALL SELECT UNNEST(string_to_array(extras, ',')::INT[])
-      ORDER BY 1
       ) AS final_toppings
   FROM delivered
 ),
