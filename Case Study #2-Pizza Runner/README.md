@@ -1307,11 +1307,11 @@ This query provides a precise count of each topping used in all delivered pizzas
 ```SQL
 SELECT
   PN.pizza_name,
-    CASE
-    	WHEN pizza_id=1
-        THEN total_sold*12
-        ELSE total_sold*10
-    END AS total_earned_usd
+  CASE
+  	WHEN pizza_id=1
+    THEN total_sold*12
+    ELSE total_sold*10
+  END AS total_earned_usd
 FROM
 	(SELECT
     CO.pizza_id,
