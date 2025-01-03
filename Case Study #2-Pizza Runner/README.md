@@ -1316,12 +1316,12 @@ FROM
   (SELECT
     CO.pizza_id,
     COUNT(*) AS total_sold
-	FROM runner_orders RO
-	JOIN customer_orders CO USING(order_id)
-	WHERE cancellation IS NULL
-	GROUP BY pizza_id) SQ
-JOIN pizza_names PN USING(pizza_id)
-ORDER BY total_earned_usd DESC;
+  FROM runner_orders RO
+  JOIN customer_orders CO USING(order_id)
+  WHERE cancellation IS NULL
+  GROUP BY pizza_id) SQ
+  JOIN pizza_names PN USING(pizza_id)
+  ORDER BY total_earned_usd DESC;
 ```
 
 <details>
@@ -1354,7 +1354,8 @@ This query provides insights into which type of pizza generates the most revenue
 | Meatlovers | 108              |
 | Vegetarian | 30               |
 
-**2.**
+**2. What if there was an additional $1 charge for any pizza extras?**
+- Add cheese is $1 extra.
 
 *query:*
 
@@ -1370,6 +1371,11 @@ This query provides insights into which type of pizza generates the most revenue
 </details>
 
 *answer*
+
+| pizza_name | total_earned_usd |
+| ---------- | ---------------- |
+| Meatlovers | 109              |
+| Vegetarian | 30               |
 
 **3.**
 
