@@ -1362,26 +1362,27 @@ This query provides insights into which type of pizza generates the most revenue
 ```SQL
 WITH extras_count AS (
   SELECT
-  CO.pizza_id,
-  COUNT(*) AS total_sold,
-  SUM(
-    CASE
-    WHEN array_position(string_to_array(CO.extras, ',')::INT[], 4) IS NOT NULL
-    THEN 1
-    ELSE 0
-    END
-  ) AS cheese_added
+    CO.pizza_id,
+    COUNT(*) AS total_sold,
+    SUM(
+      CASE
+        WHEN array_position(string_to_array(CO.extras, ',')::INT[], 4) IS NOT NULL
+        THEN 1
+        ELSE 0
+      END
+    ) AS cheese_added
   FROM runner_orders
   JOIN customer_orders CO USING(order_id)
   WHERE cancellation IS NULL
   GROUP BY CO.pizza_id
 )
 SELECT
-PN.pizza_name,
-CASE
-WHEN pizza_id = 1 THEN total_sold * 12 + cheese_added
-ELSE total_sold * 10 + cheese_added
-END AS total_earned_usd
+  PN.pizza_name,
+  CASE
+    WHEN pizza_id = 1
+    THEN total_sold * 12 + cheese_added
+    ELSE total_sold * 10 + cheese_added
+  END AS total_earned_usd
 FROM extras_count
 JOIN pizza_names PN USING(pizza_id)
 ORDER BY total_earned_usd DESC;
@@ -1390,7 +1391,25 @@ ORDER BY total_earned_usd DESC;
 <details>
   <summary><em>show description</em></summary>
 
+The SQL query calculates the total revenue for Pizza Runner, considering the base price of each pizza and additional charges for cheese. 
 
+**CTE `extras_count`:**
+   - Aggregates the number of pizzas sold (`total_sold`) and the number of cheese additions (`cheese_added`) for each pizza type (`pizza_id`).
+   - Uses:
+     - `COUNT(*)` to count the total orders for each pizza.
+     - `SUM(CASE ...)` to count the occurrences of cheese additions (`extras`) by checking if the topping ID `4` (cheese) exists in the `extras` column using `array_position` and converting the string to an array.
+
+**Main Query:**
+   - Joins the results of `extras_count` with the `pizza_names` table to include the `pizza_name` for each `pizza_id`.
+   - Calculates the total revenue (`total_earned_usd`) for each pizza type using:
+     - `$12` for each "Meat Lovers" pizza (`pizza_id = 1`).
+     - `$10` for each "Vegetarian" pizza (all others).
+     - Adds the additional charges for cheese (`cheese_added`).
+
+**Sorting:**
+   - Results are sorted by `total_earned_usd` in descending order to display the most profitable pizza type first.
+
+This query efficiently calculates the total revenue while considering additional charges for cheese toppings.
 
 </details>
 
