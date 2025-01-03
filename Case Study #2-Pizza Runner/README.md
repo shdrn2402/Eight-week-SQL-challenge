@@ -1154,10 +1154,11 @@ SELECT
       SELECT
       string_agg(
         CASE
-        WHEN topping_id = ANY(string_to_array(extras, ',')::INT[]) THEN '2x' || topping_name
-        ELSE topping_name
+          WHEN topping_id = ANY(string_to_array(extras, ',')::INT[])
+          THEN '2x' || topping_name
+          ELSE topping_name
         END, ', ' ORDER BY topping_name
-            )
+        )
       FROM pizza_toppings
       WHERE topping_id = ANY(
         array(
@@ -1298,6 +1299,95 @@ This query provides a precise count of each topping used in all delivered pizzas
 | Tomatoes     | 3           |
 
 #### D. Pricing and Ratings
-  ...
+
+**1. If a Meat Lovers pizza costs $12 and Vegetarian costs $10 and there were no charges for changes - how much money has Pizza Runner made so far if there are no delivery fees?**
+
+*query:*
+
+```SQL
+SELECT
+	PN.pizza_name,
+    CASE
+    	WHEN pizza_id=1
+        THEN total_sold*12
+        ELSE total_sold*10
+    END AS total_earned_usd
+FROM
+	(SELECT
+		CO.pizza_id,
+    	COUNT(*) AS total_sold
+	FROM runner_orders RO
+	JOIN customer_orders CO USING(order_id)
+	WHERE cancellation IS NULL
+	GROUP BY pizza_id) SQ
+JOIN pizza_names PN USING(pizza_id)
+ORDER BY total_earned_usd DESC;
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+The SQL query calculates the total revenue generated from each type of pizza.
+
+- **Inner Query (`SQ`)**:
+  - Counts the total number of each type of pizza sold (`total_sold`) by grouping rows based on `pizza_id`.
+  - Excludes orders with cancellations by filtering with `WHERE cancellation IS NULL`.
+  - Joins `runner_orders` and `customer_orders` using the common column `order_id`.
+
+- **Outer Query**:
+  - Joins the result of the inner query with the `pizza_names` table to retrieve the names of the pizzas.
+  - Uses a `CASE` statement to calculate the revenue (`total_earned_usd`) based on the price of each type of pizza:
+    - Meat Lovers (`pizza_id = 1`) are priced at $12.
+    - Vegetarian (`pizza_id = 2`) are priced at $10.
+
+- **Sorting**:
+  - The result is ordered in descending order by `total_earned_usd`, showing the pizza type with the highest revenue first.
+
+This query provides insights into which type of pizza generates the most revenue.
+
+</details>
+
+*answer*
+
+| pizza_name | total_earned_usd |
+| ---------- | ---------------- |
+| Meatlovers | 108              |
+| Vegetarian | 30               |
+
+**2.**
+
+*query:*
+
+```SQL
+
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+
+
+</details>
+
+*answer*
+
+**3.**
+
+*query:*
+
+```SQL
+
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+
+
+</details>
+
+*answer*
+
+
 #### E. Bonus Questions
   ...
