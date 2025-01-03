@@ -1306,7 +1306,7 @@ This query provides a precise count of each topping used in all delivered pizzas
 
 ```SQL
 SELECT
-	PN.pizza_name,
+  PN.pizza_name,
     CASE
     	WHEN pizza_id=1
         THEN total_sold*12
@@ -1314,8 +1314,8 @@ SELECT
     END AS total_earned_usd
 FROM
 	(SELECT
-		CO.pizza_id,
-    	COUNT(*) AS total_sold
+    CO.pizza_id,
+    COUNT(*) AS total_sold
 	FROM runner_orders RO
 	JOIN customer_orders CO USING(order_id)
 	WHERE cancellation IS NULL
