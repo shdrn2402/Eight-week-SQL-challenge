@@ -1314,7 +1314,7 @@ SELECT
   END AS total_earned_usd
 FROM
   (SELECT
-  CO.pizza_id,
+    CO.pizza_id,
     COUNT(*) AS total_sold
 	FROM runner_orders RO
 	JOIN customer_orders CO USING(order_id)
