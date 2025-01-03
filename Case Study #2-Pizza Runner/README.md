@@ -1360,7 +1360,31 @@ This query provides insights into which type of pizza generates the most revenue
 *query:*
 
 ```SQL
-
+WITH extras_count AS (
+  SELECT
+  CO.pizza_id,
+  COUNT(*) AS total_sold,
+  SUM(
+    CASE
+    WHEN array_position(string_to_array(CO.extras, ',')::INT[], 4) IS NOT NULL
+    THEN 1
+    ELSE 0
+    END
+  ) AS cheese_added
+  FROM runner_orders
+  JOIN customer_orders CO USING(order_id)
+  WHERE cancellation IS NULL
+  GROUP BY CO.pizza_id
+)
+SELECT
+PN.pizza_name,
+CASE
+WHEN pizza_id = 1 THEN total_sold * 12 + cheese_added
+ELSE total_sold * 10 + cheese_added
+END AS total_earned_usd
+FROM extras_count
+JOIN pizza_names PN USING(pizza_id)
+ORDER BY total_earned_usd DESC;
 ```
 
 <details>
