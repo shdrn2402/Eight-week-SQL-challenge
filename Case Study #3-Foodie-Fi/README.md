@@ -4,10 +4,10 @@
 - [Introduction](#introduction)
 - [Entity Relationship Diagram](#entity-relationship-diagram)
 - [Case Study Questions & Solutions](#case-study-questions--solutions)
-  - [A. Customer Journey](#a-pizza-metrics)
-  - [B. Data Analysis Questions](#b-runner-and-customer-experience)
-  - [C. Challenge Payment Question](#c-ingredient-optimisation)
-  - [D. Outside The Box Questions](#c-ingredient-optimisation)
+  - [A. Customer Journey](#a-customer-journey)
+  - [B. Data Analysis Questions](#b-data-analysis-questions)
+  - [C. Challenge Payment Question](#c-challenge-payment-question)
+  - [D. Outside The Box Questions](#d-outside-the-box-questions)
 
 ### Introduction
 
@@ -2702,7 +2702,7 @@ VALUES
 ```
 </details>
 
-![Project Logo](../images/case2_diagram.png)
+![Project Logo](../images/case3_diagram.png)
 
 
 
