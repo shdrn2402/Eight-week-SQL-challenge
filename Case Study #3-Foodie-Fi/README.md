@@ -2722,84 +2722,110 @@ WITH basic_join AS (
   JOIN plans P USING(plan_id)
   WHERE S.customer_id BETWEEN 1 AND 9
 ),
-final_join AS (
+dated_plans AS (
   SELECT
-    filtered.customer_id,
-    filtered.sign_in_date,
-    filtered.current_plan_start_date,
-    P.plan_name AS current_plan_name
-  FROM
-    (SELECT
-      customer_id,
-      MAX(start_date) AS current_plan_start_date,
-      MIN(start_date) AS sign_in_date
-    FROM basic_join
-    GROUP BY customer_id) filtered
-  JOIN subscriptions S
-    ON filtered.customer_id = S.customer_id AND filtered.current_plan_start_date = S.start_date
-  JOIN plans P
-    ON S.plan_id = P.plan_id
-  ORDER BY customer_id
+    customer_id,
+    start_date,
+    plan_name,
+    price,
+    LEAD(start_date) OVER (PARTITION BY customer_id ORDER BY start_date) AS next_start_date
+  FROM basic_join
+),
+calculated_revenue AS (
+  SELECT
+    customer_id,
+    start_date,
+    plan_name,
+    price,
+    (CASE
+       WHEN plan_name = 'churn' THEN 0
+       WHEN next_start_date IS NOT NULL THEN next_start_date - start_date
+       ELSE DATE '2024-12-31' - start_date
+     END) AS plan_duration_days,
+    (CASE
+       WHEN plan_name = 'trial' THEN 0
+       WHEN plan_name = 'churn' THEN 0
+       WHEN plan_name = 'pro annual' THEN 
+         ROUND(price * FLOOR(
+           (CASE
+             WHEN next_start_date IS NOT NULL THEN (next_start_date - start_date)
+             ELSE (DATE '2024-12-31' - start_date)
+           END) / 365.0), 2)
+       ELSE ROUND(price * FLOOR(
+           (CASE
+             WHEN next_start_date IS NOT NULL THEN (next_start_date - start_date)
+             ELSE (DATE '2024-12-31' - start_date)
+           END) / 30.0), 2)
+     END) AS revenue
+  FROM dated_plans
 )
 SELECT
-  final_join.*,
-  (CASE
-     WHEN current_plan_name = 'churn'
-     THEN EXTRACT(YEAR FROM age(current_plan_start_date, sign_in_date)) * 12 +
-          EXTRACT(MONTH FROM age(current_plan_start_date, sign_in_date))
-     ELSE EXTRACT(YEAR FROM age(CURRENT_DATE, sign_in_date)) * 12 +
-          EXTRACT(MONTH FROM age(CURRENT_DATE, sign_in_date))
-   END) AS membership_duration_months
-FROM
-  final_join
-ORDER BY
-  customer_id;
+  customer_id,
+  start_date,
+  plan_name,
+  price,
+  plan_duration_days,
+  revenue
+FROM calculated_revenue
+ORDER BY customer_id, start_date;
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
-This SQL query is divided into steps to compute relevant customer subscription data:
+This SQL query calculates detailed subscription and revenue data for customers within a specific range of `customer_id`. 
 
 - `basic_join` CTE:
-   - Joins the `subscriptions` table with the `plans` table using `plan_id` to include plan details like `plan_name` and `price`.
-   - Filters the data to include only customers with `customer_id` between 1 and 9.
-   - Collects all subscription data for these customers, maintaining their order.
+  - Joins the `subscriptions` table with the `plans` table to retrieve `plan_name` and `price`.
+  - Filters customers with `customer_id` values between 1 and 9.
 
+- `dated_plans` CTE:
+  - Calculates the next subscription start date for each customer using the `LEAD` function, partitioned by `customer_id` and ordered by `start_date`.
+  - Adds a column `next_start_date` to capture the start of the next plan or `NULL` if it doesn't exist.
 
-- `final_join` CTE:
-   - Aggregates data for each customer:
-     - Finds the earliest subscription date (`sign_in_date`) using `MIN(start_date)`.
-     - Finds the most recent subscription date (`current_plan_start_date`) using `MAX(start_date`).
-   - Joins the filtered results with the `subscriptions` table to fetch the subscription details for the `current_plan_start_date`.
-   - Matches the plan details from the `plans` table for the latest subscription (`current_plan_name`).
-   - Ensures each customer’s latest plan details are extracted.
+- `calculated_revenue` CTE:
+  - Adds the column `plan_duration_days`, which calculates the duration of each plan:
+    - For plans ending before `2024-12-31`, the duration is the difference between `next_start_date` and `start_date`.
+    - For plans without a `next_start_date`, the duration is calculated as the difference between `2024-12-31` and `start_date`.
+    - For `churn` plans, the duration is set to `0`.
+  - Adds the column `revenue`, which computes the revenue generated from each plan:
+    - For `trial` and `churn` plans, the revenue is `0`.
+    - For `pro annual` plans, revenue is calculated based on the number of full years (`365 days`) the plan was active.
+    - For all other plans, revenue is calculated based on the number of full months (`30 days`) the plan was active.
+    - Rounds revenue to two decimal places.
 
 - `Main Query`:
-   - Uses the data from `final_join` to compute the membership duration:
-     - For customers who churned (`current_plan_name = 'churn'`), calculates the difference between `current_plan_start_date` and `sign_in_date`.
-     - For active customers, calculates the difference between `CURRENT_DATE` and `sign_in_date`.
-     - Uses the `EXTRACT(YEAR FROM age(...))` and `EXTRACT(MONTH FROM age(...))` functions to compute the total duration in months.
-   - Includes all required columns in the final output.
-
-- `Ordering`:
-   - Orders the results by `customer_id` for clarity.
+  - Retrieves `customer_id`, `start_date`, `plan_name`, `price`, `plan_duration_days`, and `revenue` from the `calculated_revenue` CTE.
+  - Orders the results by `customer_id` and `start_date`.
 
 </details>
 
 *answer*
 
-| customer_id | sign_in_date | current_plan_start_date | current_plan_name | membership_duration_months |
-| ----------- | ------------ | ----------------------- | ----------------- | -------------------------- |
-| 1           | 2020-08-01   | 2020-08-08              | basic monthly     | 53                         |
-| 2           | 2020-09-20   | 2020-09-27              | pro annual        | 51                         |
-| 3           | 2020-01-13   | 2020-01-20              | basic monthly     | 59                         |
-| 4           | 2020-01-17   | 2020-04-21              | churn             | 3                          |
-| 5           | 2020-08-03   | 2020-08-10              | basic monthly     | 53                         |
-| 6           | 2020-12-23   | 2021-02-26              | churn             | 2                          |
-| 7           | 2020-02-05   | 2020-05-22              | pro monthly       | 58                         |
-| 8           | 2020-06-11   | 2020-08-03              | pro monthly       | 54                         |
-| 9           | 2020-12-07   | 2020-12-14              | pro annual        | 48                         |
+| customer_id | start_date | plan_name     | price  | plan_duration_days | revenue |
+| ----------- | ---------- | ------------- | ------ | ------------------ | ------- |
+| 1           | 2020-08-01 | trial         | 0.00   | 7                  | 0       |
+| 1           | 2020-08-08 | basic monthly | 9.90   | 1606               | 524.70  |
+| 2           | 2020-09-20 | trial         | 0.00   | 7                  | 0       |
+| 2           | 2020-09-27 | pro annual    | 199.00 | 1556               | 796.00  |
+| 3           | 2020-01-13 | trial         | 0.00   | 7                  | 0       |
+| 3           | 2020-01-20 | basic monthly | 9.90   | 1807               | 594.00  |
+| 4           | 2020-01-17 | trial         | 0.00   | 7                  | 0       |
+| 4           | 2020-01-24 | basic monthly | 9.90   | 88                 | 19.80   |
+| 4           | 2020-04-21 | churn         |        | 0                  | 0       |
+| 5           | 2020-08-03 | trial         | 0.00   | 7                  | 0       |
+| 5           | 2020-08-10 | basic monthly | 9.90   | 1604               | 524.70  |
+| 6           | 2020-12-23 | trial         | 0.00   | 7                  | 0       |
+| 6           | 2020-12-30 | basic monthly | 9.90   | 58                 | 9.90    |
+| 6           | 2021-02-26 | churn         |        | 0                  | 0       |
+| 7           | 2020-02-05 | trial         | 0.00   | 7                  | 0       |
+| 7           | 2020-02-12 | basic monthly | 9.90   | 100                | 29.70   |
+| 7           | 2020-05-22 | pro monthly   | 19.90  | 1684               | 1114.40 |
+| 8           | 2020-06-11 | trial         | 0.00   | 7                  | 0       |
+| 8           | 2020-06-18 | basic monthly | 9.90   | 46                 | 9.90    |
+| 8           | 2020-08-03 | pro monthly   | 19.90  | 1611               | 1054.70 |
+| 9           | 2020-12-07 | trial         | 0.00   | 7                  | 0       |
+| 9           | 2020-12-14 | pro annual    | 199.00 | 1478               | 796.00  |
 
 #### B. Data Analysis Questions
 
