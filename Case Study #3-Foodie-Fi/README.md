@@ -2830,7 +2830,7 @@ This SQL query calculates detailed subscription and revenue data for customers w
 <details>
   <summary><em>show customer onboarding analysis</em></summary>
 
-To ensure consistent results, a fixed date of 2024-12-31 was used to represent the current status of active customers. This prevents output changes over time.
+*To ensure consistent results, a fixed date of `2024-12-31` was used to represent the current status of active customers. This prevents output changes over time.*
 
 Customer 1: Started with a 7-day trial, then switched to the basic monthly plan. The customer has been active for 1606 days, generating 524.70 USD in revenue.
 
@@ -2849,7 +2849,6 @@ Customer 7: Began with a trial, switched to basic monthly, and later upgraded to
 Customer 8: Transitioned from a trial to basic monthly and later upgraded to pro monthly. The customer has been active for 1657 days, generating 1054.70 USD in revenue.
 
 Customer 9: Started with a trial and opted for the pro annual plan. The customer has been active for 1485 days, contributing 796.00 USD in revenue.
-
 </details>
 
 #### B. Data Analysis Questions
