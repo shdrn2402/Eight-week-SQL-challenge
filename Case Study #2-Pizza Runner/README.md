@@ -1420,23 +1420,83 @@ This query efficiently calculates the total revenue while considering additional
 | Meatlovers | 109              |
 | Vegetarian | 30               |
 
-**3.**
+**3. The Pizza Runner team now wants to add an additional ratings system that allows customers to rate their runner, how would you design an additional table for this new dataset - generate a schema for this new table and insert your own data for ratings for each successful customer order between 1 to 5.**
 
 *query:*
 
 ```SQL
+DROP TABLE IF EXISTS runners_raiting;
+CREATE TABLE runners_raiting (
+  "order_id" INTEGER NOT NULL,
+  "customer_id" INTEGER NOT NULL,
+  "runner_id" INTEGER NOT NULL,
+  "runner_rating" INTEGER NOT NULL,
+  PRIMARY KEY (order_id)
+);
 
+WITH successful_delivery AS (
+  SELECT 
+    DISTINCT CO.order_id,
+    CO.customer_id,
+    RO.runner_id
+  FROM runner_orders RO
+  JOIN customer_orders CO USING(order_id)
+  WHERE RO.cancellation IS NULL
+)
+
+INSERT INTO runners_raiting(order_id, customer_id, runner_id, runner_rating)
+SELECT 
+  SD.order_id,
+  SD.customer_id,
+  SD.runner_id,
+  (floor(random() * (5 - 1 + 1)) + 1) AS runner_rating
+FROM successful_delivery SD
+ORDER BY SD.order_id;
+
+SELECT *
+FROM runners_raiting;
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
+The query creates a new table for storing ratings and inserts random ratings for each successful order. The process includes generating random ratings between 1 and 5 for all successful deliveries and saving this information.
 
+- **Table Definition:**
+  - `runners_raiting` table is created with the following columns:
+    - `order_id`: Unique identifier for each order (primary key).
+    - `customer_id`: Identifier for the customer who made the order.
+    - `runner_id`: Identifier for the runner assigned to the order.
+    - `runner_rating`: Randomly generated rating between 1 and 5.
+
+- **CTE `successful_delivery`:**
+  - Filters out cancelled orders by checking the `cancellation` column.
+  - Joins `runner_orders` and `customer_orders` to retrieve successful orders along with their `order_id`, `customer_id`, and `runner_id`.
+  - Ensures unique rows using `DISTINCT`.
+
+- **Random Rating Generation:**
+  - Uses `floor(random() * (5 - 1 + 1)) + 1` to generate random integers between 1 and 5 for the `runner_rating` column.
+
+- **Data Insertion:**
+  - The `INSERT INTO` statement adds data from the `successful_delivery` CTE into the `runners_raiting` table.
+  - Ensures data is ordered by `order_id` for consistency.
+
+- **Output Verification:**
+  - A `SELECT` query retrieves all data from `runners_raiting` to confirm the insertion.
+
+This query fulfills the task requirements by defining the schema, generating data, and inserting ratings for successful orders.
 
 </details>
 
 *answer*
 
-
-#### E. Bonus Questions
-  ...
+| order_id | customer_id | runner_id | runner_rating |
+| -------- | ----------- | --------- | ------------- |
+| 1        | 101         | 1         | 4             |
+| 2        | 101         | 1         | 3             |
+| 3        | 102         | 1         | 5             |
+| 4        | 103         | 2         | 2             |
+| 5        | 104         | 3         | 3             |
+| 7        | 105         | 2         | 1             |
+| 8        | 102         | 2         | 5             |
+| 10       | 104         | 1         | 5             |
