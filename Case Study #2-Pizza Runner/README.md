@@ -1500,3 +1500,99 @@ This query fulfills the task requirements by defining the schema, generating dat
 | 7        | 105         | 2         | 1             |
 | 8        | 102         | 2         | 5             |
 | 10       | 104         | 1         | 5             |
+
+**4. Using your newly generated table - can you join all of the information together to form a table which has the following information for successful deliveries?**
+- customer_id
+- order_id
+- runner_id
+- rating
+- order_time
+- pickup_time
+- Time between order and pickup
+- Delivery duration
+- Average speed
+- Total number of pizzas
+
+*query:*
+
+```SQL
+WITH CTE AS (
+  SELECT
+    CO.customer_id,
+    CO.order_id,
+    RO.runner_id,
+    RR.runner_rating,
+    CO.order_time,
+    RO.pickup_time,
+    (RO.pickup_time - CO.order_time) AS time_between_order_and_pickup,
+  	(RO.duration * INTERVAL '1 minute') AS time_between_pickup_and_delivery,
+    ROUND(RO.distance::NUMERIC / RO.duration, 2)*60 AS average_speed_km_per_hour,
+    COUNT(CO.pizza_id) AS total_number_of_pizzas
+  FROM customer_orders CO
+  JOIN runner_orders RO USING(order_id)
+  JOIN runners_raiting RR USING(order_id)
+  GROUP BY 
+    CO.customer_id, CO.order_id, RO.runner_id, RR.runner_rating,
+    CO.order_time, RO.pickup_time, RO.duration, RO.distance
+)
+
+SELECT
+  CTE.customer_id,
+  CTE.order_id,
+  CTE.runner_id,
+  CTE.runner_rating AS rating,
+  CTE.order_time,
+  CTE.pickup_time,
+  CTE.time_between_order_and_pickup,
+  CTE.time_between_pickup_and_delivery,
+  (CTE.time_between_order_and_pickup + time_between_pickup_and_delivery) AS total_delivery_duration,
+  CTE.average_speed_km_per_hour AS average_speed,
+  CTE.total_number_of_pizzas
+FROM CTE
+ORDER BY CTE.order_id;
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+The SQL query generates a comprehensive table for successful deliveries, including the following columns:
+- `customer_id`: The ID of the customer who placed the order.
+- `order_id`: The ID of the order placed by the customer.
+- `runner_id`: The ID of the runner who delivered the order.
+- `rating`: The rating given to the runner for this order.
+- `order_time`: The timestamp when the order was placed.
+- `pickup_time`: The timestamp when the runner picked up the order.
+- `time_between_order_and_pickup`: The interval between the order placement and pickup by the runner.
+- `time_between_pickup_and_delivery`: The delivery duration calculated from `runner_orders.duration` converted into an interval.
+- `total_delivery_duration`: The total time from order placement to delivery, combining `time_between_order_and_pickup` and `time_between_pickup_and_delivery`.
+- `average_speed`: The average speed of the runner in kilometers per hour, calculated as `distance / duration`.
+- `total_number_of_pizzas`: The total number of pizzas in the order.
+
+**Steps:**
+1. **Common Table Expression (CTE):**
+   - Joins the `customer_orders`, `runner_orders`, and `runners_raiting` tables.
+   - Calculates intermediate columns like `time_between_order_and_pickup`, `time_between_pickup_and_delivery`, `average_speed_km_per_hour`, and `total_number_of_pizzas`.
+   - Groups the data by relevant fields to ensure correct calculations for aggregate values.
+
+2. **Final SELECT Statement:**
+   - Selects all columns from the CTE.
+   - Computes the `total_delivery_duration` by summing `time_between_order_and_pickup` and `time_between_pickup_and_delivery`.
+   - Renames and reorders columns to match the task requirements.
+   - Orders the final result by `order_id` in ascending order for clarity.
+
+This query ensures all required details for successful deliveries are displayed with correct calculations and structure.
+
+</details>
+
+*answer*
+
+| customer_id | order_id | runner_id | rating | order_time          | pickup_time         | time_between_order_and_pickup | time_between_pickup_and_delivery | total_delivery_duration | average_speed | total_number_of_pizzas |
+| ----------- | -------- | --------- | ------ | ------------------- | ------------------- | ----------------------------- | -------------------------------- | ----------------------- | ------------- | ---------------------- |
+| 101         | 1        | 1         | 2      | 2020-01-01 18:05:02 | 2020-01-01 18:15:34 | 00:10:32                      | 00:32:00                         | 00:42:32                | 37.80         | 1                      |
+| 101         | 2        | 1         | 4      | 2020-01-01 19:00:52 | 2020-01-01 19:10:54 | 00:10:02                      | 00:27:00                         | 00:37:02                | 44.40         | 1                      |
+| 102         | 3        | 1         | 3      | 2020-01-02 23:51:23 | 2020-01-03 00:12:37 | 00:21:14                      | 00:20:00                         | 00:41:14                | 40.20         | 2                      |
+| 103         | 4        | 2         | 3      | 2020-01-04 13:23:46 | 2020-01-04 13:53:03 | 00:29:17                      | 00:40:00                         | 01:09:17                | 35.40         | 3                      |
+| 104         | 5        | 3         | 3      | 2020-01-08 21:00:29 | 2020-01-08 21:10:57 | 00:10:28                      | 00:15:00                         | 00:25:28                | 40.20         | 1                      |
+| 105         | 7        | 2         | 1      | 2020-01-08 21:20:29 | 2020-01-08 21:30:45 | 00:10:16                      | 00:25:00                         | 00:35:16                | 60.00         | 1                      |
+| 102         | 8        | 2         | 2      | 2020-01-09 23:54:33 | 2020-01-10 00:15:02 | 00:20:29                      | 00:15:00                         | 00:35:29                | 93.60         | 1                      |
+| 104         | 10       | 1         | 2      | 2020-01-11 18:34:49 | 2020-01-11 18:50:20 | 00:15:31                      | 00:10:00                         | 00:25:31                | 60.00         | 2                      |
