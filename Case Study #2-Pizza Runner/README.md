@@ -1596,3 +1596,65 @@ This query ensures all required details for successful deliveries are displayed 
 | 105         | 7        | 2         | 1      | 2020-01-08 21:20:29 | 2020-01-08 21:30:45 | 00:10:16                      | 00:25:00                         | 00:35:16                | 60.00         | 1                      |
 | 102         | 8        | 2         | 2      | 2020-01-09 23:54:33 | 2020-01-10 00:15:02 | 00:20:29                      | 00:15:00                         | 00:35:29                | 93.60         | 1                      |
 | 104         | 10       | 1         | 2      | 2020-01-11 18:34:49 | 2020-01-11 18:50:20 | 00:15:31                      | 00:10:00                         | 00:25:31                | 60.00         | 2                      |
+
+**If a Meat Lovers pizza was $12 and Vegetarian $10 fixed prices with no cost for extras and each runner is paid $0.30 per kilometre traveled - how much money does Pizza Runner have left over after these deliveries?**
+
+*query:*
+
+```SQL
+WITH pizza_earnings AS (
+  SELECT
+    CASE
+      WHEN pizza_id = 1 THEN COUNT(*) * 12
+      ELSE COUNT(*) * 10
+    END AS total_earned_usd
+  FROM runner_orders RO
+  JOIN customer_orders CO USING(order_id)
+  WHERE cancellation IS NULL
+  GROUP BY pizza_id
+),
+delivery_costs AS (
+  SELECT
+    SUM(RO.distance::NUMERIC * 0.30) AS total_delivery_cost
+  FROM runner_orders RO
+  WHERE cancellation IS NULL
+)
+
+SELECT
+  ROUND(
+    (SELECT SUM(total_earned_usd) FROM pizza_earnings) - 
+    (SELECT total_delivery_cost FROM delivery_costs), 2
+    )AS net_income_usd;
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+The SQL query calculates the net income for Pizza Runner by subtracting the total delivery costs from the total pizza earnings for all successful deliveries. 
+
+- **CTE `pizza_earnings`:** 
+  - Calculates the total earnings from pizza sales:
+    - Each "Meat Lovers" pizza (pizza_id = 1) is priced at $12.
+    - Each "Vegetarian" pizza (pizza_id = 2) is priced at $10.
+    - Groups by `pizza_id` to calculate earnings for each type of pizza and sums them up.
+
+- **CTE `delivery_costs`:** 
+  - Computes the total delivery costs:
+    - Multiplies the distance traveled (`distance` column) by $0.30 (cost per kilometer).
+    - Considers only successful deliveries where `cancellation IS NULL`.
+
+- **Main Query:**
+  - Subtracts the total delivery costs from the total pizza earnings.
+  - Uses `ROUND` to format the result to two decimal places for clarity.
+  - Outputs the final `net_income_usd` as the net income.
+
+**Output:**
+The query provides the net income after deducting delivery costs from pizza sales revenue for all successful deliveries.
+
+</details>
+
+*answer*
+
+| net_income_usd |
+| -------------- |
+| 94.44          |
