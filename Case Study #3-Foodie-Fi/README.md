@@ -2773,10 +2773,10 @@ ORDER BY customer_id, start_date;
 <details>
   <summary><em>show description</em></summary>
 
-This SQL query calculates detailed subscription and revenue data for customers within a specific range of `customer_id`. 
+This SQL query calculates detailed subscription and revenue data for customers within a specific range of `customer_id`.
 
 - `basic_join` CTE:
-  - Joins the `subscriptions` table with the `plans` table to retrieve `plan_name` and `price`.
+  - Joins the `subscriptions` table with the `plans` table to retrieve `plan_name` and `price_usd`.
   - Filters customers with `customer_id` values between 1 and 9.
 
 - `dated_plans` CTE:
@@ -2788,14 +2788,14 @@ This SQL query calculates detailed subscription and revenue data for customers w
     - For plans ending before `2024-12-31`, the duration is the difference between `next_start_date` and `start_date`.
     - For plans without a `next_start_date`, the duration is calculated as the difference between `2024-12-31` and `start_date`.
     - For `churn` plans, the duration is set to `0`.
-  - Adds the column `revenue`, which computes the revenue generated from each plan:
+  - Adds the column `revenue_usd`, which computes the revenue generated from each plan:
     - For `trial` and `churn` plans, the revenue is `0`.
     - For `pro annual` plans, revenue is calculated based on the number of full years (`365 days`) the plan was active.
     - For all other plans, revenue is calculated based on the number of full months (`30 days`) the plan was active.
     - Rounds revenue to two decimal places.
 
 - `Main Query`:
-  - Retrieves `customer_id`, `start_date`, `plan_name`, `price`, `plan_duration_days`, and `revenue` from the `calculated_revenue` CTE.
+  - Retrieves `customer_id`, `start_date`, `plan_name`, `plan_duration_days`, and `revenue_usd` from the `calculated_revenue` CTE.
   - Orders the results by `customer_id` and `start_date`.
 
 </details>
