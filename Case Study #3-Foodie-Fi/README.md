@@ -2984,20 +2984,58 @@ The query calculates the count of `start_date` events after the year 2020 for ea
 | pro monthly   | 60           |
 | basic monthly | 8            |
 
-**4.**
+**4. What is the customer count and percentage of customers who have churned rounded to 1 decimal place?**
 
 *query:*
 
 ```SQL
+WITH 
+total_customers AS (
+    SELECT COUNT(DISTINCT customer_id) AS total_count
+    FROM subscriptions
+),
+churned_customers AS (
+    SELECT COUNT(DISTINCT customer_id) AS churned_count
+    FROM subscriptions
+    WHERE plan_id = 4
+)
 
+SELECT 
+    churned_customers.churned_count,
+    ROUND((churned_customers.churned_count::DECIMAL / total_customers.total_count) * 100, 1) AS churn_percentage
+FROM 
+    churned_customers, total_customers;
 ```
 
 <details>
   <summary><em>show description</em></summary>
+This SQL query calculates the count and percentage of customers who have churned, rounded to 1 decimal place.
 
+- `total_customers` CTE:
+  - Computes the total number of distinct customers in the `subscriptions` table.
+  - Uses `COUNT(DISTINCT customer_id)` to ensure unique customer counts.
+
+- `churned_customers` CTE:
+  - Computes the total number of distinct customers who have churned.
+  - Filters the `subscriptions` table to include only rows where `plan_id = 4` (indicating churn).
+
+- Main Query:
+  - Selects `churned_count` from `churned_customers` and calculates the churn percentage:
+    - Divides the churned customer count by the total customer count from the respective CTEs.
+    - Multiplies by 100 to get the percentage.
+    - Uses `ROUND(..., 1)` to round the result to 1 decimal place.
+
+- `FROM` Clause:
+  - Combines the results of `churned_customers` and `total_customers` CTEs without the need for explicit joins since both CTEs return a single-row result.
+
+This approach ensures readability and logical separation of the calculations.
 </details>
 
 *answer:*
+
+| churned_count | churn_percentage |
+| ------------- | ---------------- |
+| 307           | 30.7             |
 
 **5.**
 
