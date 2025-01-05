@@ -2882,20 +2882,61 @@ This query provides the total customer count, irrespective of their current subs
 |------------------|
 | 1000             |
 
-**2. What is the monthly distribution of trial plan start_date values for our dataset - use the start of the month as the group by value**
+**2. What is the monthly distribution of trial plan start_date values for our dataset - use the start of the month as the group by value.**
 
 *query:*
 
 ```SQL
-
+SELECT
+  DATE_TRUNC('month', start_date)::DATE AS month,
+  COUNT(*) AS trials_started
+FROM subscriptions
+WHERE plan_id = 0
+GROUP BY month
+ORDER BY month;
 ```
 
 <details>
   <summary><em>show description</em></summary>
+  
+This SQL query calculates the monthly distribution of trial plan `start_date` values using `plan_id` instead of `plan_name` for filtering.
+
+- `FROM Clause`:
+  - Uses the `subscriptions` table as the data source.
+
+- `WHERE Clause`:
+  - Filters the data to include only rows where `plan_id` equals `0`, corresponding to the `trial` plan.
+
+- `DATE_TRUNC Function`:
+  - Truncates the `start_date` to the first day of each month using `DATE_TRUNC('month', start_date)::DATE`, removing the time component.
+
+- `Aggregation`:
+  - Uses `COUNT(*)` to calculate the number of rows for each month.
+
+- `GROUP BY Clause`:
+  - Groups the results by the truncated `month`.
+
+- `Ordering`:
+  - Sorts the grouped results by the `month` in ascending order.
 
 </details>
 
 *answer*
+
+| month      | trials_started |
+| ---------- | -------------- |
+| 2020-01-01 | 88             |
+| 2020-02-01 | 68             |
+| 2020-03-01 | 94             |
+| 2020-04-01 | 81             |
+| 2020-05-01 | 88             |
+| 2020-06-01 | 79             |
+| 2020-07-01 | 89             |
+| 2020-08-01 | 88             |
+| 2020-09-01 | 87             |
+| 2020-10-01 | 79             |
+| 2020-11-01 | 75             |
+| 2020-12-01 | 84             |
 
 **3.**
 
