@@ -3011,21 +3011,21 @@ FROM
   <summary><em>show description</em></summary>
 This SQL query calculates the count and percentage of customers who have churned, rounded to 1 decimal place.
 
-- `total_customers` CTE:
+`total_customers` CTE:
   - Computes the total number of distinct customers in the `subscriptions` table.
   - Uses `COUNT(DISTINCT customer_id)` to ensure unique customer counts.
 
-- `churned_customers` CTE:
+`churned_customers` CTE:
   - Computes the total number of distinct customers who have churned.
   - Filters the `subscriptions` table to include only rows where `plan_id = 4` (indicating churn).
 
-- Main Query:
+Main Query:
   - Selects `churned_count` from `churned_customers` and calculates the churn percentage:
     - Divides the churned customer count by the total customer count from the respective CTEs.
     - Multiplies by 100 to get the percentage.
     - Uses `ROUND(..., 1)` to round the result to 1 decimal place.
 
-- `FROM` Clause:
+`FROM` Clause:
   - Combines the results of `churned_customers` and `total_customers` CTEs without the need for explicit joins since both CTEs return a single-row result.
 
 This approach ensures readability and logical separation of the calculations.
