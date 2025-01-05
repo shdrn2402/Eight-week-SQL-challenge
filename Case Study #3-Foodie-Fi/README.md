@@ -2800,7 +2800,7 @@ This SQL query calculates detailed subscription and revenue data for customers w
 
 </details>
 
-*answer*
+*answer:*
 
 | customer_id | plan_name     | start_date | plan_duration_days | revenue_usd |
 | ----------- | ------------- | ---------- | ------------------ | ----------- |
@@ -2876,7 +2876,7 @@ This query provides the total customer count, irrespective of their current subs
 
 </details>
 
-*answer*
+*answer:*
 
 | customers_amount |
 |------------------|
@@ -2898,7 +2898,7 @@ ORDER BY month;
 
 <details>
   <summary><em>show description</em></summary>
-  
+
 This SQL query calculates the monthly distribution of trial plan `start_date` values using `plan_id` instead of `plan_name` for filtering.
 
 - `FROM Clause`:
@@ -2921,7 +2921,7 @@ This SQL query calculates the monthly distribution of trial plan `start_date` va
 
 </details>
 
-*answer*
+*answer:*
 
 | month      | trials_started |
 | ---------- | -------------- |
@@ -2951,7 +2951,7 @@ This SQL query calculates the monthly distribution of trial plan `start_date` va
 
 </details>
 
-*answer*
+*answer:*
 
 **4.**
 
@@ -2966,7 +2966,7 @@ This SQL query calculates the monthly distribution of trial plan `start_date` va
 
 </details>
 
-*answer*
+*answer:*
 
 **5.**
 
@@ -2981,7 +2981,7 @@ This SQL query calculates the monthly distribution of trial plan `start_date` va
 
 </details>
 
-*answer*
+*answer:*
 
 **6.**
 
@@ -2996,7 +2996,7 @@ This SQL query calculates the monthly distribution of trial plan `start_date` va
 
 </details>
 
-*answer*
+*answer:*
 
 **7.**
 
@@ -3011,7 +3011,7 @@ This SQL query calculates the monthly distribution of trial plan `start_date` va
 
 </details>
 
-*answer*
+*answer:*
 
 
 **8.**
@@ -3027,7 +3027,7 @@ This SQL query calculates the monthly distribution of trial plan `start_date` va
 
 </details>
 
-*answer*
+*answer:*
 
 
 **9.**
@@ -3043,7 +3043,7 @@ This SQL query calculates the monthly distribution of trial plan `start_date` va
 
 </details>
 
-*answer*
+*answer:*
 
 **10.**
 
@@ -3058,7 +3058,7 @@ This SQL query calculates the monthly distribution of trial plan `start_date` va
 
 </details>
 
-*answer*
+*answer:*
 
 **11.**
 
@@ -3073,7 +3073,7 @@ This SQL query calculates the monthly distribution of trial plan `start_date` va
 
 </details>
 
-*answer*
+*answer:*
 
 
 #### C. Challenge Payment Question
@@ -3091,7 +3091,7 @@ This SQL query calculates the monthly distribution of trial plan `start_date` va
 
 </details>
 
-*answer*
+*answer:*
 
 #### D. Outside The Box Questions
 
@@ -3108,7 +3108,7 @@ This SQL query calculates the monthly distribution of trial plan `start_date` va
 
 </details>
 
-*answer*
+*answer:*
 
 **2.**
 
@@ -3123,7 +3123,7 @@ This SQL query calculates the monthly distribution of trial plan `start_date` va
 
 </details>
 
-*answer*
+*answer:*
 
 **3.**
 
@@ -3138,7 +3138,7 @@ This SQL query calculates the monthly distribution of trial plan `start_date` va
 
 </details>
 
-*answer*
+*answer:*
 
 **4.**
 
@@ -3153,7 +3153,7 @@ This SQL query calculates the monthly distribution of trial plan `start_date` va
 
 </details>
 
-*answer*
+*answer:*
 
 **5.**
 
@@ -3168,4 +3168,4 @@ This SQL query calculates the monthly distribution of trial plan `start_date` va
 
 </details>
 
-*answer*
+*answer:*
