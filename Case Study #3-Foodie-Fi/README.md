@@ -2938,20 +2938,51 @@ This SQL query calculates the monthly distribution of trial plan `start_date` va
 | 2020-11-01 | 75             |
 | 2020-12-01 | 84             |
 
-**3.**
+**3. What plan start_date values occur after the year 2020 for our dataset? Show the breakdown by count of events for each plan_name.**
 
 *query:*
 
 ```SQL
-
+SELECT
+  plan_name,
+  COUNT(*) AS events_count
+FROM subscriptions
+JOIN plans USING(plan_id)
+WHERE start_date > '2020-12-31'
+GROUP BY plan_name
+ORDER BY events_count DESC;
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
+The query calculates the count of `start_date` events after the year 2020 for each `plan_name` in the dataset.
+
+`FROM and JOIN`:
+  - The `subscriptions` table is joined with the `plans` table using the `plan_id` key to retrieve plan details.
+
+`WHERE Condition`:
+  - Filters rows where the `start_date` is later than `2020-12-31`, ensuring only events from 2021 onward are included.
+
+`GROUP BY`:
+  - Groups the results by `plan_name` to calculate the count of events for each distinct plan.
+
+`SELECT`:
+  - Retrieves the `plan_name` and the count of events (`events_count`) for each plan.
+
+`ORDER BY`:
+  - Sorts the results in descending order of `events_count` to show plans with the highest counts first.
+
 </details>
 
 *answer:*
+
+| plan_name     | events_count |
+| ------------- | ------------ |
+| churn         | 71           |
+| pro annual    | 63           |
+| pro monthly   | 60           |
+| basic monthly | 8            |
 
 **4.**
 
