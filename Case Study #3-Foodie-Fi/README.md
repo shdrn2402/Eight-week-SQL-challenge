@@ -3042,15 +3042,59 @@ This approach ensures readability and logical separation of the calculations.
 *query:*
 
 ```SQL
+WITH plan_transitions AS (
+  SELECT 
+    s.customer_id,
+    p.plan_name AS current_plan,
+    LEAD(p.plan_name) OVER (
+      PARTITION BY s.customer_id
+      ORDER BY s.start_date
+    ) AS next_plan
+  FROM subscriptions s
+  JOIN plans p 
+    ON s.plan_id = p.plan_id
+)
+SELECT 
+  COUNT(customer_id) AS churned_customers,
+  ROUND(100.0 * COUNT(customer_id) / (SELECT COUNT(DISTINCT customer_id) FROM subscriptions), 0) AS churned_percentage
+FROM plan_transitions
+WHERE current_plan = 'trial' 
+  AND next_plan = 'churn';
 
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
+- `trial_to_churn_transitions` CTE:
+   - Retrieves each customer's `current_plan` and the `next_plan` using the `LEAD` window function.
+   - The `LEAD` function is partitioned by `customer_id` and ordered by `start_date` to identify the immediate next plan following the current one.
+   - Includes the following columns:
+     - `customer_id`: Unique identifier for each customer.
+     - `current_plan`: The current plan the customer is on for the given `start_date`.
+     - `next_plan`: The plan the customer transitions to after the current plan.
+
+- Main Query:
+   - Filters data from `trial_to_churn_transitions` to include only rows where `current_plan` is `trial` and `next_plan` is `churn`, indicating customers who churned immediately after their free trial.
+   - Calculates:
+     - `churned_customers`: The count of unique customers who fit the criteria.
+     - `churned_percentage`: The percentage of churned customers out of the total number of customers in the dataset.
+       - Uses a subquery to determine the total number of distinct customers.
+       - Multiplies the ratio of churned customers to total customers by 100 and rounds to the nearest whole number.
+   - Returns two columns:
+     - `churned_customers`: The total number of customers who churned directly after the trial.
+     - `churned_percentage`: The percentage of customers who churned relative to the total customer base.
+
+- Ordering:
+   - Not explicitly applied since the output consists of aggregated values.
+
 </details>
 
 *answer:*
+
+| churned_customers | churned_percentage |
+| ----------------- | ------------------ |
+| 92                | 9                  |
 
 **6.**
 
