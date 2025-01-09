@@ -3111,12 +3111,6 @@ WITH plan_transitions AS (
      ) AS next_plan
   FROM subscriptions S
   JOIN plans P USING(plan_id)
-),
-filtered_plan_transitions AS (
-  SELECT
-    *
-  FROM plan_transitions
-  WHERE plan_name = 'trial' AND next_plan != 'churn'
 )
 
 SELECT
@@ -3124,10 +3118,11 @@ SELECT
     COUNT(customer_id) AS customer_count, 
     ROUND(
         100.0 * COUNT(customer_id) / 
-        (SELECT COUNT(DISTINCT customer_id) FROM filtered_plan_transitions), 
+        (SELECT COUNT(DISTINCT customer_id) FROM subscriptions), 
         1
     ) AS percentage
-FROM filtered_plan_transitions
+FROM plan_transitions
+WHERE next_plan IS NOT NULL AND plan_name = 'trial'
 GROUP BY next_plan
 ORDER BY percentage DESC;
 ```
@@ -3135,27 +3130,30 @@ ORDER BY percentage DESC;
 <details>
   <summary><em>show description</em></summary>
 
-- `WITH plan_transitions AS`  
-  This CTE calculates the transitions between plans for each user:  
-  - It extracts `customer_id`, the current `plan_name`, and the next plan (`next_plan`), determined using the `LEAD` window function.
-  - The window function operates within each `customer_id` and orders records by `start_date` to ensure the correct sequence of transitions.
-  - The `subscriptions` table is joined with the `plans` table using the `plan_id` field to retrieve readable plan names.
+- `WITH plan_transitions AS (...)`:
+  - Creates a Common Table Expression (CTE) `plan_transitions` to calculate transitions between customer plans.
+  - Retrieves the `customer_id`, the current plan name (`plan_name`), and the next plan name (`next_plan`).
+  - Uses the `LEAD` function to get the next plan name within the same `customer_id`, ordered by the `start_date` of the subscription.
+  - Joins the `subscriptions` table (`S`) with the `plans` table (`P`) on the `plan_id` to translate numerical plan IDs into their corresponding names.
 
-- `WITH filtered_plan_transitions AS`  
-  The second CTE filters the results from the first CTE:  
-  - Rows are filtered to include only those where the current plan (plan_name) is trial and the next plan (next_plan) is not churn.
-  - The exclusion of rows with `next_plan = churn` is because a user leaving the service (`churn`) is not a plan and does not align with the question, which requires analyzing the distribution of actual plans after the free trial.
-  - This ensures only records where users started with a trial plan (`trial`) and transitioned to another plan, rather than leaving the service, are included.
+- `SELECT next_plan AS plan_after_trial, ... FROM plan_transitions`:
+  - Aggregates the results from `plan_transitions` to calculate the distribution of customer plans following a trial period.
+  - Filters the data to include only rows where:
+    - `next_plan IS NOT NULL`, ensuring there is a subsequent plan after the current one.
+    - `plan_name = 'trial'`, focusing specifically on customers transitioning from a trial plan.
 
-- Main Query:  
-  - Extracts `next_plan` as `plan_after_trial`, the count of users for each subsequent plan (`COUNT(customer_id)`), and the percentage of these users relative to the total number of users in the filtered dataset.
-  - The total percentage is calculated using a subquery:  
-    - `SELECT COUNT(DISTINCT customer_id) FROM filtered_plan_transitions` returns the number of unique users after filtering.
-    - The percentage is rounded to two decimal places using `ROUND`.
-  - Results are grouped by `next_plan` and sorted in descending order of percentage (`ORDER BY percentage DESC`).
+- `COUNT(customer_id)`:
+  - Counts the number of customers who transitioned from the trial plan to each subsequent plan.
 
-- Result:  
-  The query returns a list of next plans after the trial period, the number of users choosing each plan, and the percentage for each plan.
+- `ROUND(100.0 * COUNT(customer_id) / ...) AS percentage`:
+  - Calculates the percentage of customers transitioning to each subsequent plan relative to the total number of unique customers in the `subscriptions` table.
+  - The `COUNT(DISTINCT customer_id)` in the subquery determines the total unique customers.
+
+- `GROUP BY next_plan`:
+  - Groups the data by the `next_plan`, which represents the plan each customer transitioned to after the trial.
+
+- `ORDER BY percentage DESC`:
+  - Orders the results by the percentage in descending order to show the most popular plans first.
 
 </details>
 
@@ -3163,9 +3161,10 @@ ORDER BY percentage DESC;
 
 | plan_after_trial | customer_count | percentage |
 | ---------------- | -------------- | ---------- |
-| basic monthly    | 546            | 60.1       |
-| pro monthly      | 325            | 35.8       |
-| pro annual       | 37             | 4.1        |
+| basic monthly    | 546            | 54.6       |
+| pro monthly      | 325            | 32.5       |
+| churn            | 92             | 9.2        |
+| pro annual       | 37             | 3.7        |
 
 **7.**
 
