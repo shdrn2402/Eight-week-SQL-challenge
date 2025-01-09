@@ -3128,7 +3128,6 @@ SELECT
         1
     ) AS percentage
 FROM filtered_plan_transitions
-WHERE next_plan IS NOT NULL AND plan_name = 'trial'
 GROUP BY next_plan
 ORDER BY percentage DESC;
 ```
