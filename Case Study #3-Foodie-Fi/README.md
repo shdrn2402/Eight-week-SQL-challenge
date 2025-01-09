@@ -3037,7 +3037,7 @@ This approach ensures readability and logical separation of the calculations.
 | ------------- | ---------------- |
 | 307           | 30.7             |
 
-**5.**
+**5. How many customers have churned straight after their initial free trial - what percentage is this rounded to the nearest whole number?**
 
 *query:*
 
@@ -3101,15 +3101,72 @@ WHERE current_plan = 'trial'
 *query:*
 
 ```SQL
+WITH plan_transitions AS (
+  SELECT 
+    S.customer_id, 
+    P.plan_name, 
+    LEAD(P.plan_name) OVER (
+      PARTITION BY S.customer_id 
+      ORDER BY S.start_date
+     ) AS next_plan
+  FROM subscriptions S
+  JOIN plans P USING(plan_id)
+),
+filtered_plan_transitions AS (
+  SELECT
+    *
+  FROM plan_transitions
+  WHERE plan_name = 'trial' AND next_plan != 'churn'
+)
 
+SELECT
+    next_plan AS plan_after_trial, 
+    COUNT(customer_id) AS customer_count, 
+    ROUND(
+        100.0 * COUNT(customer_id) / 
+        (SELECT COUNT(DISTINCT customer_id) FROM filtered_plan_transitions), 
+        2
+    ) AS percentage
+FROM filtered_plan_transitions
+WHERE next_plan IS NOT NULL AND plan_name = 'trial'
+GROUP BY next_plan
+ORDER BY percentage DESC;
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
+- `WITH plan_transitions AS`  
+  This CTE calculates the transitions between plans for each user:  
+  - It extracts `customer_id`, the current `plan_name`, and the next plan (`next_plan`), determined using the `LEAD` window function.
+  - The window function operates within each `customer_id` and orders records by `start_date` to ensure the correct sequence of transitions.
+  - The `subscriptions` table is joined with the `plans` table using the `plan_id` field to retrieve readable plan names.
+
+- `WITH filtered_plan_transitions AS`  
+  The second CTE filters the results from the first CTE:  
+  - Rows are filtered to include only those where the current plan (plan_name) is trial and the next plan (next_plan) is not churn.
+  - The exclusion of rows with `next_plan = churn` is because a user leaving the service (`churn`) is not a plan and does not align with the question, which requires analyzing the distribution of actual plans after the free trial.
+  - This ensures only records where users started with a trial plan (`trial`) and transitioned to another plan, rather than leaving the service, are included.
+
+- Main Query:  
+  - Extracts `next_plan` as `plan_after_trial`, the count of users for each subsequent plan (`COUNT(customer_id)`), and the percentage of these users relative to the total number of users in the filtered dataset.
+  - The total percentage is calculated using a subquery:  
+    - `SELECT COUNT(DISTINCT customer_id) FROM filtered_plan_transitions` returns the number of unique users after filtering.
+    - The percentage is rounded to two decimal places using `ROUND`.
+  - Results are grouped by `next_plan` and sorted in descending order of percentage (`ORDER BY percentage DESC`).
+
+- Result:  
+  The query returns a list of next plans after the trial period, the number of users choosing each plan, and the percentage for each plan.
+
 </details>
 
 *answer:*
+
+| plan_after_trial | customer_count | percentage |
+| ---------------- | -------------- | ---------- |
+| basic monthly    | 546            | 60.13      |
+| pro monthly      | 325            | 35.79      |
+| pro annual       | 37             | 4.07       |
 
 **7.**
 
