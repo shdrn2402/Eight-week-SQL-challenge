@@ -3096,7 +3096,7 @@ WHERE current_plan = 'trial'
 | ----------------- | ------------------ |
 | 92                | 9                  |
 
-**6.**
+**6. What is the number and percentage of customer plans after their initial free trial?**
 
 *query:*
 
@@ -3125,7 +3125,7 @@ SELECT
     ROUND(
         100.0 * COUNT(customer_id) / 
         (SELECT COUNT(DISTINCT customer_id) FROM filtered_plan_transitions), 
-        2
+        1
     ) AS percentage
 FROM filtered_plan_transitions
 WHERE next_plan IS NOT NULL AND plan_name = 'trial'
@@ -3164,9 +3164,9 @@ ORDER BY percentage DESC;
 
 | plan_after_trial | customer_count | percentage |
 | ---------------- | -------------- | ---------- |
-| basic monthly    | 546            | 60.13      |
-| pro monthly      | 325            | 35.79      |
-| pro annual       | 37             | 4.07       |
+| basic monthly    | 546            | 60.1       |
+| pro monthly      | 325            | 35.8       |
+| pro annual       | 37             | 4.1        |
 
 **7.**
 
