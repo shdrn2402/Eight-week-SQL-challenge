@@ -3180,7 +3180,7 @@ SELECT
   P.plan_name,
   COUNT(DISTINCT FS.customer_id) AS customers_amount,
   ROUND(
-    COUNT(DISTINCT FS.customer_id)::NUMERIC / (
+    CAST(COUNT(DISTINCT FS.customer_id) AS DECIMAL) / (
       SELECT COUNT(DISTINCT customer_id)
       FROM filtered_subscriptions
     ) * 100, 2
@@ -3193,11 +3193,12 @@ GROUP BY
   P.plan_name
 ORDER BY
   percentage DESC;
+
 ```
 
 <details>
   <summary><em>show description</em></summary>
-  
+
 - The query begins by defining a Common Table Expression (CTE) named `filtered_subscriptions`. This CTE selects all rows from the `subscriptions` table where the `start_date` is on or before `2020-12-31`.
 
 - The main query calculates the customer count and percentage breakdown for each `plan_name`:
@@ -3224,21 +3225,52 @@ ORDER BY
 | churn         | 236              | 23.60      |
 | pro annual    | 195              | 19.50      |
 
-**8.**
+**8. How many customers have upgraded to an annual plan in 2020?**
 
 *query:*
 
 ```SQL
-
+WITH year_filtered_table AS(
+  SELECT
+    S.customer_id,
+    P.plan_name,
+    LAG(P.plan_name) OVER (PARTITION BY S.customer_id ORDER BY S.start_date) AS previous_plan,
+    S.start_date
+  FROM
+    subscriptions S
+  JOIN plans P USING(plan_id)
+  )
+SELECT
+ previous_plan AS upgraded_from_plan,
+ COUNT (*) AS customers_amount
+FROM
+  year_filtered_table
+WHERE 
+  plan_name LIKE '%annual%' AND EXTRACT(year FROM start_date) = 2020
+GROUP BY previous_plan
+ORDER BY customers_amount DESC;
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
+The original question aimed to determine how many customers upgraded to an annual plan in 2020. However, this solution extends the analysis to include the previous plans that customers were on before upgrading. This was done out of interest in understanding the customer journey leading to the annual plan transition.
+
+- `year_filtered_table`: This Common Table Expression (CTE) retrieves all relevant subscription data, including the `customer_id`, the `plan_name`, and the previous plan (`previous_plan`) for each customer. The previous plan is calculated using the `LAG()` window function, partitioned by `customer_id` and ordered by `start_date`.
+
+- The main query calculates the number of customers (`customers_amount`) grouped by their `previous_plan` before upgrading to an annual plan in 2020. It filters for rows where `plan_name` contains the term "annual" and the `start_date` is in 2020.
+
+- The `COUNT(*)` function is used to count the number of customers for each group. The query then sorts the results in descending order of `customers_amount`, making it easy to see which previous plans contributed most to annual plan upgrades.
+
 </details>
 
 *answer:*
 
+| upgraded_from_plan | customers_amount |
+| ------------------ | ---------------- |
+| basic monthly      | 88               |
+| pro monthly        | 70               |
+| trial              | 37               |
 
 **9.**
 
