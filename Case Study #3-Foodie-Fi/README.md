@@ -3227,7 +3227,7 @@ ORDER BY
 
 **8. How many customers have upgraded to an annual plan in 2020?\***
 
-*The original question aimed to determine how many customers upgraded to an annual plan in 2020. However, this solution extends the analysis to include the previous plans that customers were on before upgrading. This was done out of interest in understanding the customer journey leading to the annual plan transition.
+**\***The original question aimed to determine how many customers upgraded to an annual plan in 2020. However, this solution extends the analysis to include the previous plans that customers were on before upgrading. This was done out of interest in understanding the customer journey leading to the annual plan transition.
 
 *query:*
 
@@ -3272,20 +3272,58 @@ ORDER BY customers_amount DESC;
 | pro monthly        | 70               |
 | trial              | 37               |
 
-**9.**
+**9. How many days on average does it take for a customer to an annual plan from the day they join Foodie-Fi?**
 
 *query:*
 
 ```SQL
-
+WITH customer_transitions AS (
+  SELECT
+    S.customer_id,
+    MIN(S.start_date) AS join_date, -- Date of joining Foodie-Fi
+    MIN(CASE WHEN P.plan_name LIKE '%annual%' THEN S.start_date END) AS annual_plan_date -- First annual plan date
+  FROM
+    subscriptions S
+  JOIN plans P USING(plan_id)
+  GROUP BY S.customer_id
+),
+days_to_annual_plan AS (
+  SELECT
+    customer_id,
+    annual_plan_date - join_date AS days_to_annual
+  FROM
+    customer_transitions
+  WHERE annual_plan_date IS NOT NULL -- Only include customers who upgraded to an annual plan
+)
+SELECT
+  ROUND(AVG(days_to_annual), 0) AS avg_days_to_annual
+FROM
+  days_to_annual_plan;
 ```
 
 <details>
   <summary><em>show description</em></summary>
+  
+- `customer_transitions`: This Common Table Expression (CTE) identifies two key dates for each customer:
+  - `join_date`: The earliest `start_date` recorded in the `subscriptions` table, representing when the customer first joined Foodie-Fi.
+  - `annual_plan_date`: The earliest `start_date` associated with an annual plan, filtered by `plan_name` containing "annual."
+
+- `days_to_annual_plan`: This CTE calculates the number of days between `join_date` and `annual_plan_date` for customers who upgraded to an annual plan:
+  - It uses the `annual_plan_date` and `join_date` fields to compute the difference in days.
+  - Customers without an upgrade to an annual plan are excluded (`WHERE annual_plan_date IS NOT NULL`).
+
+- The final query:
+  - Aggregates the number of days taken for all customers to upgrade to an annual plan.
+  - Calculates the average using the `AVG` function.
+  - The result is rounded to 2 decimal places for clarity using the `ROUND` function.
 
 </details>
 
 *answer:*
+
+| avg_days_to_annual |
+| ------------------ |
+| 105                |
 
 **10.**
 
