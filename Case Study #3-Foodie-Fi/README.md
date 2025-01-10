@@ -3225,7 +3225,9 @@ ORDER BY
 | churn         | 236              | 23.60      |
 | pro annual    | 195              | 19.50      |
 
-**8. How many customers have upgraded to an annual plan in 2020?**
+**8. How many customers have upgraded to an annual plan in 2020?\***
+
+*The original question aimed to determine how many customers upgraded to an annual plan in 2020. However, this solution extends the analysis to include the previous plans that customers were on before upgrading. This was done out of interest in understanding the customer journey leading to the annual plan transition.
 
 *query:*
 
@@ -3253,8 +3255,6 @@ ORDER BY customers_amount DESC;
 
 <details>
   <summary><em>show description</em></summary>
-
-The original question aimed to determine how many customers upgraded to an annual plan in 2020. However, this solution extends the analysis to include the previous plans that customers were on before upgrading. This was done out of interest in understanding the customer journey leading to the annual plan transition.
 
 - `year_filtered_table`: This Common Table Expression (CTE) retrieves all relevant subscription data, including the `customer_id`, the `plan_name`, and the previous plan (`previous_plan`) for each customer. The previous plan is calculated using the `LAG()` window function, partitioned by `customer_id` and ordered by `start_date`.
 
