@@ -3425,21 +3425,53 @@ ORDER BY
 | 91-120 days | 35              |
 | 120+ days   | 116             |
 
-**11.**
+**11. How many customers downgraded from a pro monthly to a basic monthly plan in 2020?**
 
 *query:*
 
 ```SQL
-
+WITH year_filtered_table AS (
+  SELECT
+    S.customer_id,
+    P.plan_name,
+    LAG(P.plan_name) OVER (PARTITION BY S.customer_id ORDER BY S.start_date) AS previous_plan,
+    S.start_date
+  FROM
+    subscriptions S
+  JOIN plans P USING(plan_id)
+)
+SELECT
+  COUNT(*) AS customers_downgraded
+FROM
+  year_filtered_table
+WHERE
+  previous_plan = 'pro monthly'
+  AND plan_name = 'basic monthly'
+  AND EXTRACT(year FROM start_date) = 2020;
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
+- `WITH year_filtered_table`: A Common Table Expression (CTE) is created to add a column that tracks the previous subscription plan for each customer using the `LAG` window function. This allows us to compare the current plan with the previous one for each customer. The CTE also includes the `start_date` column to filter data by year.
+
+- `SELECT COUNT(*) AS customers_downgraded`: The main query calculates the total number of customers who downgraded their subscription.
+
+- `previous_plan = 'pro monthly'`: This condition ensures that the downgrade starts from the "pro monthly" plan.
+
+- `plan_name = 'basic monthly'`: This condition ensures that the downgrade ends at the "basic monthly" plan.
+
+- `EXTRACT(year FROM start_date) = 2020`: This condition filters transitions that occurred in the year 2020.
+
+- The combination of these conditions ensures that only customers who moved from "pro monthly" to "basic monthly" in 2020 are counted. The result is displayed as `customers_downgraded`.
+
 </details>
 
 *answer:*
 
+| customers_downgraded |
+| -------------------- |
+| 0                    |
 
 #### C. Challenge Payment Question
 
