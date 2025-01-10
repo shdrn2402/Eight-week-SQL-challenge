@@ -3303,7 +3303,7 @@ FROM
 
 <details>
   <summary><em>show description</em></summary>
-  
+
 - `customer_transitions`: This Common Table Expression (CTE) identifies two key dates for each customer:
   - `join_date`: The earliest `start_date` recorded in the `subscriptions` table, representing when the customer first joined Foodie-Fi.
   - `annual_plan_date`: The earliest `start_date` associated with an annual plan, filtered by `plan_name` containing "annual."
@@ -3325,20 +3325,105 @@ FROM
 | ------------------ |
 | 105                |
 
-**10.**
+**10. Can you further breakdown this average value into 30 day periods (i.e. 0-30 days, 31-60 days etc)**
 
 *query:*
 
 ```SQL
-
+WITH days_to_annual_plan AS (
+  SELECT
+    S.customer_id,
+    MIN(S.start_date) AS join_date,
+    MIN(
+      CASE 
+        WHEN P.plan_name LIKE '%annual%' THEN S.start_date 
+      END
+    ) AS annual_plan_date
+  FROM
+    subscriptions S
+  JOIN
+    plans P USING(plan_id)
+  GROUP BY
+    S.customer_id
+),
+days_difference AS (
+  SELECT
+    customer_id,
+    annual_plan_date - join_date AS days_to_annual
+  FROM
+    days_to_annual_plan
+  WHERE
+    annual_plan_date IS NOT NULL
+),
+time_intervals AS (
+  SELECT
+    customer_id,
+    CASE
+      WHEN days_to_annual <= 30 THEN '0-30 days'
+      WHEN days_to_annual <= 60 THEN '31-60 days'
+      WHEN days_to_annual <= 90 THEN '61-90 days'
+      WHEN days_to_annual <= 120 THEN '91-120 days'
+      ELSE '120+ days'
+    END AS time_period
+  FROM
+    days_difference
+)
+SELECT
+  time_period,
+  COUNT(customer_id) AS customers_count
+FROM
+  time_intervals
+GROUP BY
+  time_period
+ORDER BY
+  CASE
+    WHEN time_period = '0-30 days' THEN 1
+    WHEN time_period = '31-60 days' THEN 2
+    WHEN time_period = '61-90 days' THEN 3
+    WHEN time_period = '91-120 days' THEN 4
+    ELSE 5
+  END;
 ```
 
 <details>
   <summary><em>show description</em></summary>
+  
+- `days_to_annual_plan`:
+  - This Common Table Expression (CTE) retrieves the initial subscription (`join_date`) and the first date the customer upgrades to an annual plan (`annual_plan_date`) for each customer.
+  - It uses the `MIN` function to find the earliest `start_date` for both the initial subscription and the annual plan subscription.
+  - A conditional `CASE` is applied to ensure only rows with annual plans are considered for the `annual_plan_date`.
+
+- `days_difference`:
+  - Calculates the difference in days between `annual_plan_date` and `join_date` for each customer.
+  - Filters out rows where `annual_plan_date` is `NULL`, as these customers did not upgrade to an annual plan.
+
+- `time_intervals`:
+  - Categorizes the difference in days (`days_to_annual`) into predefined 30-day intervals:
+    - `0-30 days`
+    - `31-60 days`
+    - `61-90 days`
+    - `91-120 days`
+    - `120+ days`
+  - Assigns these intervals to a new column `time_period`.
+
+- Main Query:
+  - Groups customers by `time_period` and counts the number of customers in each interval.
+  - Orders the results logically by interval, using a custom `CASE` to define the order.
+
+- Final Output:
+  - Displays the number of customers (`customers_count`) who upgraded to an annual plan within each 30-day interval.
 
 </details>
 
 *answer:*
+
+| time_period | customers_count |
+| ----------- | --------------- |
+| 0-30 days   | 49              |
+| 31-60 days  | 24              |
+| 61-90 days  | 34              |
+| 91-120 days | 35              |
+| 120+ days   | 116             |
 
 **11.**
 
