@@ -3549,7 +3549,8 @@ ORDER BY customer_id, payment_date;
 
 SELECT
   *
-FROM payments
+FROM
+  payments
 LIMIT 20;
 ```
 
