@@ -3166,21 +3166,63 @@ ORDER BY percentage DESC;
 | churn            | 92             | 9.2        |
 | pro annual       | 37             | 3.7        |
 
-**7.**
+**7. What is the customer count and percentage breakdown of all 5 plan_name values at 2020-12-31?**
 
 *query:*
 
 ```SQL
-
+WITH filtered_subscriptions AS (
+  SELECT *
+  FROM subscriptions
+  WHERE start_date <= '2020-12-31'
+)
+SELECT
+  P.plan_name,
+  COUNT(DISTINCT FS.customer_id) AS customers_amount,
+  ROUND(
+    COUNT(DISTINCT FS.customer_id)::NUMERIC / (
+      SELECT COUNT(DISTINCT customer_id)
+      FROM filtered_subscriptions
+    ) * 100, 2
+  ) AS percentage
+FROM
+  filtered_subscriptions FS
+JOIN
+  plans P USING(plan_id)
+GROUP BY
+  P.plan_name
+ORDER BY
+  percentage DESC;
 ```
 
 <details>
   <summary><em>show description</em></summary>
+  
+- The query begins by defining a Common Table Expression (CTE) named `filtered_subscriptions`. This CTE selects all rows from the `subscriptions` table where the `start_date` is on or before `2020-12-31`.
+
+- The main query calculates the customer count and percentage breakdown for each `plan_name`:
+  - It selects data from the CTE `filtered_subscriptions` and joins it with the `plans` table using the `plan_id` field.
+  - For each `plan_name`, the query computes:
+    - `customers_amount`: The number of unique customers for the specific plan.
+    - `percentage`: The percentage of customers for the plan relative to the total number of unique customers across all plans in the `filtered_subscriptions` CTE.
+      - A subquery is used to calculate the total count of unique customers in the CTE.
+      - The percentage is rounded to two decimal places.
+
+- The results are grouped by `plan_name` to aggregate data for each plan.
+
+- The results are sorted in descending order by `percentage`, ensuring that the most popular plans appear first in the output.
 
 </details>
 
 *answer:*
 
+| plan_name     | customers_amount | percentage |
+| ------------- | ---------------- | ---------- |
+| trial         | 1000             | 100.00     |
+| basic monthly | 538              | 53.80      |
+| pro monthly   | 479              | 47.90      |
+| churn         | 236              | 23.60      |
+| pro annual    | 195              | 19.50      |
 
 **8.**
 
