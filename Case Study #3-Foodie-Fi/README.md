@@ -3227,7 +3227,7 @@ ORDER BY
 
 **8. How many customers have upgraded to an annual plan in 2020?\***
 
-**\***The original question aimed to determine how many customers upgraded to an annual plan in 2020. However, this solution extends the analysis to include the previous plans that customers were on before upgrading. This was done out of interest in understanding the customer journey leading to the annual plan transition.
+**\*** The original question aimed to determine how many customers upgraded to an annual plan in 2020. However, this solution extends the analysis to include the previous plans that customers were on before upgrading. This was done out of interest in understanding the customer journey leading to the annual plan transition.
 
 *query:*
 
