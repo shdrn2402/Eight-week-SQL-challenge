@@ -3475,20 +3475,153 @@ WHERE
 
 #### C. Challenge Payment Question
 
-**1.**
+**The Foodie-Fi team wants you to create a new payments table for the year 2020 that includes amounts paid by each customer in the subscriptions table with the following requirements:**
+
+- monthly payments always occur on the same day of month as the original start_date of any monthly paid plan
+- upgrades from basic to monthly or pro plans are reduced by the current paid amount in that month and start immediately
+- upgrades from pro monthly to pro annual are paid at the end of the current billing period and also starts at the end of the month period
+- once a customer churns they will no longer make payments
 
 *query:*
 
 ```SQL
+CREATE TABLE payments (
+    customer_id INTEGER,
+    plan_id INTEGER,
+    plan_name VARCHAR(255),
+    payment_date DATE,
+    amount DECIMAL(10, 2),
+    payment_order INTEGER
+);
 
+
+WITH payment_schedule AS (
+  SELECT
+    s.customer_id,
+    s.plan_id,
+    p.plan_name,
+    p.price AS amount,
+    s.start_date
+  FROM subscriptions s
+  JOIN plans p USING(plan_id)
+  WHERE s.start_date BETWEEN '2020-01-01' AND '2020-12-31'
+    AND p.plan_name NOT IN ('trial', 'churn') -- Exclude 'trial' and 'churn'
+),
+monthly_payments AS (
+  SELECT
+    customer_id,
+    plan_id,
+    plan_name,
+    payment_date::DATE,
+    amount
+  FROM payment_schedule,
+  LATERAL generate_series(
+    start_date,
+    '2020-12-31'::DATE,
+    INTERVAL '1 month'
+  ) AS payment_date
+  WHERE plan_name LIKE '%monthly%'
+),
+annual_payments AS (
+  SELECT
+    customer_id,
+    plan_id,
+    plan_name,
+    start_date AS payment_date,
+    amount
+  FROM payment_schedule
+  WHERE plan_name LIKE '%annual%'
+)
+INSERT INTO payments (customer_id, plan_id, plan_name, payment_date, amount, payment_order)
+SELECT
+  customer_id,
+  plan_id,
+  plan_name,
+  payment_date,
+  amount,
+  ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY payment_date) AS payment_order
+FROM (
+  SELECT * FROM monthly_payments
+  UNION ALL
+  SELECT * FROM annual_payments
+) all_payments
+ORDER BY customer_id, payment_date;
+
+SELECT
+  *
+FROM payments
+LIMIT 20;
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
+This query creates a `payments` table for the year 2020 based on customer subscriptions and the corresponding payment logic. The solution differentiates between monthly and annual plans and ensures that payments align with the requirements outlined in the task.
+
+- **Steps:**
+  - A new table `payments` is created with the following columns:
+    - `customer_id`: Identifier for the customer.
+    - `plan_id`: Identifier for the plan.
+    - `plan_name`: Name of the subscribed plan.
+    - `payment_date`: Date of each payment.
+    - `amount`: Payment amount.
+    - `payment_order`: Sequential order of payments for the customer.
+
+  - A `WITH` clause is used to define two Common Table Expressions (`CTEs`):
+    - `payment_schedule`:
+      - Retrieves all subscriptions between `2020-01-01` and `2020-12-31`.
+      - Joins the `subscriptions` and `plans` tables.
+      - Excludes `trial` and `churn` plans.
+    - `monthly_payments`:
+      - Uses `generate_series` to generate monthly payment dates starting from `start_date` until `2020-12-31`.
+      - Filters records to include only `monthly` plans.
+    - `annual_payments`:
+      - Retrieves a single payment for each annual plan using its `start_date` as the payment date.
+
+  - A combined dataset is created using `UNION ALL` to merge monthly and annual payments.
+
+  - The final `SELECT`:
+    - Assigns a `payment_order` to each payment based on the customer and the payment date.
+    - Orders payments by `customer_id` and `payment_date`.
+
+  - The `INSERT INTO payments`:
+    - Inserts the resulting dataset into the `payments` table.
+
+  - The final `SELECT`:
+    - Retrieves the first 20 rows from the `payments` table to validate the results.
+
+- **Notes:**
+  - Monthly payments align with the subscription start date and occur on the same day of each month until `2020-12-31`.
+  - Annual payments are processed once at the subscription start date.
+  - Plans with `trial` or `churn` are excluded from the final payments.
+  - The solution uses `generate_series` to efficiently calculate recurring payments for monthly plans.
+
 </details>
 
 *answer:*
+
+| customer_id | plan_id | plan_name     | payment_date | amount | payment_order |
+| ----------- | ------- | ------------- | ------------ | ------ | ------------- |
+| 1           | 1       | basic monthly | 2020-08-08   | 9.90   | 1             |
+| 1           | 1       | basic monthly | 2020-09-08   | 9.90   | 2             |
+| 1           | 1       | basic monthly | 2020-10-08   | 9.90   | 3             |
+| 1           | 1       | basic monthly | 2020-11-08   | 9.90   | 4             |
+| 1           | 1       | basic monthly | 2020-12-08   | 9.90   | 5             |
+| 2           | 3       | pro annual    | 2020-09-27   | 199.00 | 1             |
+| 3           | 1       | basic monthly | 2020-01-20   | 9.90   | 1             |
+| 3           | 1       | basic monthly | 2020-02-20   | 9.90   | 2             |
+| 3           | 1       | basic monthly | 2020-03-20   | 9.90   | 3             |
+| 3           | 1       | basic monthly | 2020-04-20   | 9.90   | 4             |
+| 3           | 1       | basic monthly | 2020-05-20   | 9.90   | 5             |
+| 3           | 1       | basic monthly | 2020-06-20   | 9.90   | 6             |
+| 3           | 1       | basic monthly | 2020-07-20   | 9.90   | 7             |
+| 3           | 1       | basic monthly | 2020-08-20   | 9.90   | 8             |
+| 3           | 1       | basic monthly | 2020-09-20   | 9.90   | 9             |
+| 3           | 1       | basic monthly | 2020-10-20   | 9.90   | 10            |
+| 3           | 1       | basic monthly | 2020-11-20   | 9.90   | 11            |
+| 3           | 1       | basic monthly | 2020-12-20   | 9.90   | 12            |
+| 4           | 1       | basic monthly | 2020-01-24   | 9.90   | 1             |
+| 4           | 1       | basic monthly | 2020-02-24   | 9.90   | 2             |
 
 #### D. Outside The Box Questions
 
