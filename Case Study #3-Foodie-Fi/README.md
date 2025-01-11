@@ -3828,7 +3828,7 @@ This query helps analyze how the number of transitions to paid plans fluctuates 
 *analisys:*
 
 - In 2020, noticeable fluctuations in the number of transitions to paid plans are observed.
-- The highest growth is recorded in August, while the most notable decline is in November.
+- The highest growth is recorded in August, while the most notable decline is in January 2021.
 - In 2021, transitions to paid plans occur only in January, likely from customers who started trial plans in December 2020, as no new customers were identified in 2021 in the previous query.
 
 
