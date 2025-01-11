@@ -3630,9 +3630,97 @@ This query creates a `payments` table for the year 2020 based on customer subscr
 
 *answer:*
 
-Growth of the company can be measured through metrics such as acquiring new customers, transitions to paid plans, and revenue growth over specific periods. In answering the question "How would you calculate the rate of growth for Foodie-Fi?" the focus will be on these metrics to reflect short-term dynamics.
+Growth of the company can be measured through metrics such as:
 
-**\*** Additionally, the following queries will utilize both the original database schema and the payments table created during the "C. Challenge Payment Question" section. This ensures a comprehensive analysis by combining subscription and payment data for detailed insights.
+- acquiring new customers
+- transitions to paid plans
+- revenue growth over specific periods
+
+In answering the question "How would you calculate the rate of growth for Foodie-Fi?" the focus will be on these metrics to reflect short-term dynamics.
+
+**\*** Additionally, the following queries will utilize both the original database schema and the `payments` table created during the "C. Challenge Payment Question" section. This ensures a comprehensive analysis by combining subscription and payment data for detailed insights.
+
+*a. acquiring new customers*
+
+*query:*
+
+```SQL
+WITH trial_plans_analysis AS (
+  SELECT
+    EXTRACT(year FROM start_date) AS start_year,
+    DATE_TRUNC('month', start_date)::DATE AS start_month,
+    COUNT(customer_id) AS new_customers_amount,
+    LAG(COUNT(customer_id)) OVER(ORDER BY DATE_TRUNC('month', start_date)::DATE) AS previous_month_new_customers_amount
+  FROM
+    subscriptions
+  WHERE
+    plan_id = 0 -- id 0 represents trial plan and means a new customer
+  GROUP BY start_year, start_month
+)
+SELECT
+  *,
+  CASE
+    WHEN previous_month_new_customers_amount IS NULL
+    THEN new_customers_amount
+    ELSE new_customers_amount - previous_month_new_customers_amount
+  END AS new_customers_amount_changes
+FROM trial_plans_analysis
+ORDER BY start_year, start_month;
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+This query calculates the monthly growth of new customers for Foodie-Fi by focusing on trial plan subscriptions (`plan_id = 0`), which represent new customer sign-ups. The results include the total number of new customers for each month and the change in the number of new customers compared to the previous month.
+
+- `WITH trial_plans_analysis`: Creates a Common Table Expression (CTE) that aggregates data for new customers on trial plans.
+
+  - `EXTRACT(year FROM start_date)` and `DATE_TRUNC('month', start_date)::DATE`: Extract the year and truncate the date to the first day of the month for grouping.
+  - `COUNT(customer_id) AS new_customers_amount`: Counts the number of customers starting a trial plan in each month.
+  - `LAG(COUNT(customer_id)) OVER(ORDER BY DATE_TRUNC('month', start_date)::DATE) AS previous_month_new_customers_amount`: Calculates the number of customers in the previous month for comparison.
+  - `GROUP BY start_year, start_month`: Groups the data by year and month.
+
+- Main `SELECT` statement: Outputs the results from the CTE, along with the monthly changes in new customers.
+
+  - `CASE` statement: 
+    - When `previous_month_new_customers_amount` is `NULL` (first month), the change is set to the total new customer count for that month.
+    - Otherwise, it calculates the difference between the current and previous month's new customer counts.
+  - `ORDER BY start_year, start_month`: Ensures results are displayed chronologically.
+
+The query produces a table with the following columns:
+- `start_year`: Year of the trial plan start.
+- `start_month`: Month of the trial plan start.
+- `new_customers_amount`: Total number of customers who started a trial plan in that month.
+- `previous_month_new_customers_amount`: Number of customers who started a trial plan in the previous month.
+- `new_customers_amount_changes`: Difference in the number of new customers compared to the previous month.
+
+This query provides valuable insights into the monthly dynamics of new customer acquisition, allowing for performance evaluation and identification of growth patterns.
+
+</details>
+
+*table:*
+
+| start_year | start_month | new_customers_amount | previous_month_new_customers_amount | new_customers_amount_changes |
+| ---------- | ----------- | -------------------- | ----------------------------------- | ---------------------------- |
+| 2020       | 2020-01-01  | 88                   |                                     | 88                           |
+| 2020       | 2020-02-01  | 68                   | 88                                  | -20                          |
+| 2020       | 2020-03-01  | 94                   | 68                                  | 26                           |
+| 2020       | 2020-04-01  | 81                   | 94                                  | -13                          |
+| 2020       | 2020-05-01  | 88                   | 81                                  | 7                            |
+| 2020       | 2020-06-01  | 79                   | 88                                  | -9                           |
+| 2020       | 2020-07-01  | 89                   | 79                                  | 10                           |
+| 2020       | 2020-08-01  | 88                   | 89                                  | -1                           |
+| 2020       | 2020-09-01  | 87                   | 88                                  | -1                           |
+| 2020       | 2020-10-01  | 79                   | 87                                  | -8                           |
+| 2020       | 2020-11-01  | 75                   | 79                                  | -4                           |
+| 2020       | 2020-12-01  | 84                   | 75                                  | 9                            |
+
+*analisys:*
+- In 2020, significant fluctuations in the number of new customers are observed.
+- The highest growth is recorded in March, while the most notable declines are in February and October.
+- In 2021, no new customers are recorded. Although the `subscriptions` table contains entries related to 2021, all of them are associated with changes to existing plans rather than the start of trial periods for new customers.
+
+**b. transitions to paid plans**
 
 *query:*
 
@@ -3643,9 +3731,20 @@ Growth of the company can be measured through metrics such as acquiring new cust
 <details>
   <summary><em>show description</em></summary>
 
+
 </details>
 
 *table:*
+
+
+*analisys:*
+
+
+
+
+
+
+
 
 
 **2.**
