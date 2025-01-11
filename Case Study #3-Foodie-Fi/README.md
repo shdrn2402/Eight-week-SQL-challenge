@@ -3640,7 +3640,7 @@ In answering the question "How would you calculate the rate of growth for Foodie
 
 **\*** Additionally, the following queries will utilize both the original database schema and the `payments` table created during the "C. Challenge Payment Question" section. This ensures a comprehensive analysis by combining subscription and payment data for detailed insights.
 
-*a. acquiring new customers*
+**a. acquiring new customers**
 
 *query:*
 
