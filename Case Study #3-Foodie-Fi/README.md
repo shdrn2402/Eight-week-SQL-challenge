@@ -3635,8 +3635,6 @@ Annual growth of the company can be measured through metrics such as:
 - subscribers amount change
 - revenue calculation
 
-In answering the question "How would you calculate the rate of growth for Foodie-Fi?" the focus will be on these metrics to reflect short-term dynamics.
-
 We limit the analysis to the year 2020 to focus on complete data for a full calendar year. This approach avoids the influence of partial data from 2021, ensuring a more accurate and consistent representation of the company's growth dynamics.
 
 **a. subscribers amount change**
