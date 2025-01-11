@@ -3716,30 +3716,120 @@ This query provides valuable insights into the monthly dynamics of new customer 
 | 2020       | 2020-12-01  | 84                   | 75                                  | 9                            |
 
 *analisys:*
-- In 2020, significant fluctuations in the number of new customers are observed.
-- The highest growth is recorded in March, while the most notable declines are in February and October.
-- In 2021, no new customers are recorded. Although the `subscriptions` table contains entries related to 2021, all of them are associated with changes to existing plans rather than the start of trial periods for new customers.
+- In 2020, significant fluctuations in the number of new customers are observed
+- The highest growth is recorded in March, while the most notable declines are in February and April
+- In 2021, no new customers are recorded. Although the `subscriptions` table contains entries related to 2021, all of them are associated with changes to existing plans rather than the start of trial periods for new customers
 
 **b. transitions to paid plans**
 
 *query:*
 
 ```SQL
-
+WITH next_plan_id_evaluation AS (
+  SELECT
+    customer_id,
+    plan_id,
+    EXTRACT(year FROM start_date) AS start_year,
+    DATE_TRUNC('month', start_date)::DATE AS start_month,
+    LAG(plan_id) OVER(PARTITION BY customer_id ORDER BY start_date) AS previous_plan_id
+  FROM
+    subscriptions
+),
+filtered_transitions AS (
+  SELECT
+    start_year,
+    start_month,
+    COUNT(customer_id) AS transitions_to_paid_plans_amount
+  FROM
+    next_plan_id_evaluation
+  WHERE
+    previous_plan_id = 0 AND plan_id != 4 -- 0 represents a trial plan; 4 represents churn
+  GROUP BY
+    start_year, start_month
+),
+final_output AS (
+  SELECT
+    *,
+    LAG(transitions_to_paid_plans_amount) OVER(ORDER BY start_year, start_month) AS previous_month_transitions_to_paid_plans_amount
+  FROM
+    filtered_transitions
+)
+SELECT
+  *,
+  CASE
+    WHEN previous_month_transitions_to_paid_plans_amount IS NULL THEN transitions_to_paid_plans_amount
+    ELSE transitions_to_paid_plans_amount - previous_month_transitions_to_paid_plans_amount
+  END AS transitions_to_paid_plans_changes
+FROM
+  final_output
+ORDER BY
+  start_year, start_month;
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
+This query calculates the monthly count of transitions from trial plans (`plan_id = 0`) to paid plans (excluding churn, represented by `plan_id = 4`). It also measures the changes in the number of these transitions compared to the previous month.
+
+- `WITH next_plan_id_evaluation`:
+  - Identifies each customer's `plan_id` and their previous plan using the `LAG` function.
+  - Columns:
+    - `customer_id`: Unique identifier for each customer.
+    - `plan_id`: Identifier for the current plan.
+    - `start_year`: Extracted year from the `start_date` of the current plan.
+    - `start_month`: Month truncated to the first day for grouping purposes.
+    - `previous_plan_id`: Plan ID of the customer's previous subscription.
+
+- `WITH filtered_transitions`:
+  - Filters for transitions from trial plans (`previous_plan_id = 0`) to paid plans (excluding churn).
+  - Aggregates the number of transitions grouped by `start_year` and `start_month`.
+  - Columns:
+    - `start_year`: Year of the transition.
+    - `start_month`: Month of the transition.
+    - `transitions_to_paid_plans_amount`: Count of transitions in the given month.
+
+- `WITH final_output`:
+  - Adds the number of transitions from the previous month using the `LAG` function.
+  - Columns:
+    - `previous_month_transitions_to_paid_plans_amount`: Number of transitions in the previous month for comparison.
+
+- Final `SELECT`:
+  - Calculates the monthly changes in transitions compared to the previous month using a `CASE` statement:
+    - If there is no previous month (`previous_month_transitions_to_paid_plans_amount` is `NULL`), the change equals the current month's transitions.
+    - Otherwise, the change is the difference between the current and previous month's transitions.
+  - Outputs:
+    - `start_year`, `start_month`: Year and month of the transitions.
+    - `transitions_to_paid_plans_amount`: Number of transitions in the given month.
+    - `previous_month_transitions_to_paid_plans_amount`: Number of transitions in the previous month.
+    - `transitions_to_paid_plans_changes`: Change in transitions compared to the previous month.
+
+This query helps analyze how the number of transitions to paid plans fluctuates over time, providing insights into customer behavior and the effectiveness of Foodie-Fi's trial-to-paid conversion strategy.
 
 </details>
 
 *table:*
 
+| start_year | start_month | transitions_to_paid_plans_amount | previous_month_transitions_to_paid_plans_amount | transitions_to_paid_plans_changes |
+| ---------- | ----------- | -------------------------------- | ----------------------------------------------- | --------------------------------- |
+| 2020       | 2020-01-01  | 61                               |                                                 | 61                                |
+| 2020       | 2020-02-01  | 69                               | 61                                              | 8                                 |
+| 2020       | 2020-03-01  | 83                               | 69                                              | 14                                |
+| 2020       | 2020-04-01  | 70                               | 83                                              | -13                               |
+| 2020       | 2020-05-01  | 80                               | 70                                              | 10                                |
+| 2020       | 2020-06-01  | 77                               | 80                                              | -3                                |
+| 2020       | 2020-07-01  | 71                               | 77                                              | -6                                |
+| 2020       | 2020-08-01  | 86                               | 71                                              | 15                                |
+| 2020       | 2020-09-01  | 77                               | 86                                              | -9                                |
+| 2020       | 2020-10-01  | 78                               | 77                                              | 1                                 |
+| 2020       | 2020-11-01  | 63                               | 78                                              | -15                               |
+| 2020       | 2020-12-01  | 76                               | 63                                              | 13                                |
+| 2021       | 2021-01-01  | 17                               | 76                                              | -59                               |
 
 *analisys:*
 
-
+- In 2020, noticeable fluctuations in the number of transitions to paid plans are observed.
+- The highest growth is recorded in August, while the most notable decline is in November.
+- In 2021, transitions to paid plans occur only in January, likely from customers who started trial plans in December 2020, as no new customers were identified in 2021 in the previous query.
 
 
 
