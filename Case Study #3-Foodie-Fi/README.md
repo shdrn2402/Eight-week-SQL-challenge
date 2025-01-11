@@ -3738,191 +3738,20 @@ This query provides insight into which subscription plans contribute the most to
 | pro annual    | 38805.00          |
 | basic monthly | 33679.80          |
 
-<!-- **2. What key metrics would you recommend Foodie-Fi management to track over time to assess performance of their overall business?**
-**a.**
+**2. What key metrics would you recommend Foodie-Fi management to track over time to assess performance of their overall business?**
 
-*query:*
+*answer:*
 
-```SQL
-WITH trial_plans_analysis AS (
-  SELECT
-    EXTRACT(year FROM start_date) AS start_year,
-    DATE_TRUNC('month', start_date)::DATE AS start_month,
-    COUNT(customer_id) AS new_customers_amount,
-    LAG(COUNT(customer_id)) OVER(ORDER BY DATE_TRUNC('month', start_date)::DATE) AS previous_month_new_customers_amount
-  FROM
-    subscriptions
-  WHERE
-    EXTRACT(year FROM start_date) = 2020
-      AND plan_id = 0 -- id 0 represents trial plan and means a new customer
-  GROUP BY start_year, start_month
-)
-SELECT
-  *,
-  CASE
-    WHEN previous_month_new_customers_amount IS NULL
-    THEN new_customers_amount
-    ELSE new_customers_amount - previous_month_new_customers_amount
-  END AS new_customers_amount_changes
-FROM trial_plans_analysis
-ORDER BY start_year, start_month;
-```
+To effectively analyze Foodie-Fi's business performance, it is important to track the following key metrics:
 
-<details>
-  <summary><em>show description</em></summary>
+- monthly revenue growth: a key metric of profitability that reflects the company's total revenue for each month.
+- monthly customer growth: a metric that helps to understand the dynamics of new user acquisition and customer base growth.
+- churn rate: a metric that indicates the percentage of users leaving the service over a certain period.
+- average revenue per user (ARPU): a metric that estimates the average revenue generated per customer.
 
-  This query calculates the monthly growth of new customers for Foodie-Fi by focusing on trial plan subscriptions (`plan_id = 0`), which represent new customer sign-ups. The results include the total number of new customers for each month and the change in the number of new customers compared to the previous month.
+These metrics collectively provide a comprehensive analysis, enabling Foodie-Fi to make informed decisions to enhance customer retention, boost revenue, and refine user acquisition strategies.
 
-  - `WITH trial_plans_analysis`: Creates a Common Table Expression (CTE) that aggregates data for new customers on trial plans.
-
-    - `EXTRACT(year FROM start_date)` and `DATE_TRUNC('month', start_date)::DATE`: Extract the year and truncate the date to the first day of the month for grouping.
-    - `COUNT(customer_id) AS new_customers_amount`: Counts the number of customers starting a trial plan in each month.
-    - `LAG(COUNT(customer_id)) OVER(ORDER BY DATE_TRUNC('month', start_date)::DATE) AS previous_month_new_customers_amount`: Calculates the number of customers in the previous month for comparison.
-    - `GROUP BY start_year, start_month`: Groups the data by year and month.
-
-  - Main `SELECT` statement: Outputs the results from the CTE, along with the monthly changes in new customers.
-
-    - `CASE` statement: 
-      - When `previous_month_new_customers_amount` is `NULL` (first month), the change is set to the total new customer count for that month.
-      - Otherwise, it calculates the difference between the current and previous month's new customer counts.
-    - `ORDER BY start_year, start_month`: Ensures results are displayed chronologically.
-
-  The query produces a table with the following columns:
-  - `start_year`: Year of the trial plan start.
-  - `start_month`: Month of the trial plan start.
-  - `new_customers_amount`: Total number of customers who started a trial plan in that month.
-  - `previous_month_new_customers_amount`: Number of customers who started a trial plan in the previous month.
-  - `new_customers_amount_changes`: Difference in the number of new customers compared to the previous month.
-
-  This query provides valuable insights into the monthly dynamics of new customer acquisition, allowing for performance evaluation and identification of growth patterns.
-
-</details>
-
-*table:*
-
-| start_year | start_month | new_customers_amount | previous_month_new_customers_amount | new_customers_amount_changes |
-| ---------- | ----------- | -------------------- | ----------------------------------- | ---------------------------- |
-| 2020       | 2020-01-01  | 88                   |                                     | 88                           |
-| 2020       | 2020-02-01  | 68                   | 88                                  | -20                          |
-| 2020       | 2020-03-01  | 94                   | 68                                  | 26                           |
-| 2020       | 2020-04-01  | 81                   | 94                                  | -13                          |
-| 2020       | 2020-05-01  | 88                   | 81                                  | 7                            |
-| 2020       | 2020-06-01  | 79                   | 88                                  | -9                           |
-| 2020       | 2020-07-01  | 89                   | 79                                  | 10                           |
-| 2020       | 2020-08-01  | 88                   | 89                                  | -1                           |
-| 2020       | 2020-09-01  | 87                   | 88                                  | -1                           |
-| 2020       | 2020-10-01  | 79                   | 87                                  | -8                           |
-| 2020       | 2020-11-01  | 75                   | 79                                  | -4                           |
-| 2020       | 2020-12-01  | 84                   | 75                                  | 9                            |
-
-
-**b.**
-
-*query:*
-
-```SQL
-WITH next_plan_id_evaluation AS (
-  SELECT
-    customer_id,
-    plan_id,
-    EXTRACT(year FROM start_date) AS start_year,
-    DATE_TRUNC('month', start_date)::DATE AS start_month,
-    LAG(plan_id) OVER(PARTITION BY customer_id ORDER BY start_date) AS previous_plan_id
-  FROM
-    subscriptions
-  WHERE
-    EXTRACT(year FROM start_date) = 2020
-),
-filtered_transitions AS (
-  SELECT
-    start_year,
-    start_month,
-    COUNT(customer_id) AS transitions_to_paid_plans_amount
-  FROM
-    next_plan_id_evaluation
-  WHERE
-    previous_plan_id = 0 AND plan_id != 4 -- 0 represents a trial plan; 4 represents churn
-  GROUP BY
-    start_year, start_month
-),
-final_output AS (
-  SELECT
-    *,
-    LAG(transitions_to_paid_plans_amount) OVER(ORDER BY start_year, start_month) AS previous_month_transitions_to_paid_plans_amount
-  FROM
-    filtered_transitions
-)
-SELECT
-  *,
-  CASE
-    WHEN previous_month_transitions_to_paid_plans_amount IS NULL THEN transitions_to_paid_plans_amount
-    ELSE transitions_to_paid_plans_amount - previous_month_transitions_to_paid_plans_amount
-  END AS transitions_to_paid_plans_changes
-FROM
-  final_output
-ORDER BY
-  start_year, start_month;
-```
-
-<details>
-  <summary><em>show description</em></summary>
-
-This query calculates the monthly count of transitions from trial plans (`plan_id = 0`) to paid plans (excluding churn, represented by `plan_id = 4`). It also measures the changes in the number of these transitions compared to the previous month.
-
-- `WITH next_plan_id_evaluation`:
-  - Identifies each customer's `plan_id` and their previous plan using the `LAG` function.
-  - Columns:
-    - `customer_id`: Unique identifier for each customer.
-    - `plan_id`: Identifier for the current plan.
-    - `start_year`: Extracted year from the `start_date` of the current plan.
-    - `start_month`: Month truncated to the first day for grouping purposes.
-    - `previous_plan_id`: Plan ID of the customer's previous subscription.
-
-- `WITH filtered_transitions`:
-  - Filters for transitions from trial plans (`previous_plan_id = 0`) to paid plans (excluding churn).
-  - Aggregates the number of transitions grouped by `start_year` and `start_month`.
-  - Columns:
-    - `start_year`: Year of the transition.
-    - `start_month`: Month of the transition.
-    - `transitions_to_paid_plans_amount`: Count of transitions in the given month.
-
-- `WITH final_output`:
-  - Adds the number of transitions from the previous month using the `LAG` function.
-  - Columns:
-    - `previous_month_transitions_to_paid_plans_amount`: Number of transitions in the previous month for comparison.
-
-- Final `SELECT`:
-  - Calculates the monthly changes in transitions compared to the previous month using a `CASE` statement:
-    - If there is no previous month (`previous_month_transitions_to_paid_plans_amount` is `NULL`), the change equals the current month's transitions.
-    - Otherwise, the change is the difference between the current and previous month's transitions.
-  - Outputs:
-    - `start_year`, `start_month`: Year and month of the transitions.
-    - `transitions_to_paid_plans_amount`: Number of transitions in the given month.
-    - `previous_month_transitions_to_paid_plans_amount`: Number of transitions in the previous month.
-    - `transitions_to_paid_plans_changes`: Change in transitions compared to the previous month.
-
-This query helps analyze how the number of transitions to paid plans fluctuates over time, providing insights into customer behavior and the effectiveness of Foodie-Fi's trial-to-paid conversion strategy.
-
-</details>
-
-*table:*
-
-| start_year | start_month | transitions_to_paid_plans_amount | previous_month_transitions_to_paid_plans_amount | transitions_to_paid_plans_changes |
-| ---------- | ----------- | -------------------------------- | ----------------------------------------------- | --------------------------------- |
-| 2020       | 2020-01-01  | 61                               |                                                 | 61                                |
-| 2020       | 2020-02-01  | 69                               | 61                                              | 8                                 |
-| 2020       | 2020-03-01  | 83                               | 69                                              | 14                                |
-| 2020       | 2020-04-01  | 70                               | 83                                              | -13                               |
-| 2020       | 2020-05-01  | 80                               | 70                                              | 10                                |
-| 2020       | 2020-06-01  | 77                               | 80                                              | -3                                |
-| 2020       | 2020-07-01  | 71                               | 77                                              | -6                                |
-| 2020       | 2020-08-01  | 86                               | 71                                              | 15                                |
-| 2020       | 2020-09-01  | 77                               | 86                                              | -9                                |
-| 2020       | 2020-10-01  | 78                               | 77                                              | 1                                 |
-| 2020       | 2020-11-01  | 63                               | 78                                              | -15                               |
-| 2020       | 2020-12-01  | 76                               | 63                                              | 13                                |
-
-**c. monthly revenue growth**
+**a. monthly revenue growth**
 
 **\*** The following query will utilize the `payments` table created during the "C. Challenge Payment Question" section.
 
@@ -3932,7 +3761,7 @@ This query helps analyze how the number of transitions to paid plans fluctuates 
 WITH monthly_revenue AS (
   SELECT
     EXTRACT(year FROM payment_date) AS payment_year,
-    DATE_TRUNC('month', payment_date) AS payment_month,
+    DATE_TRUNC('month', payment_date)::DATE AS payment_month,
     SUM(amount) AS total_revenue_usd
   FROM
     payments
@@ -3971,7 +3800,6 @@ This query calculates the monthly revenue for Foodie-Fi in 2020, along with the 
   - `ORDER BY payment_year, payment_month`: Ensures results are displayed chronologically.
 
 The query generates a table with the following columns:
-- `payment_year`: The year of the payments.
 - `payment_month`: The month of the payments.
 - `total_revenue_usd`: The total revenue for the month.
 - `previous_month_revenue`: The revenue of the previous month.
@@ -3980,19 +3808,92 @@ The query generates a table with the following columns:
 </details>
 
 *table:*
-| payment_year | payment_month          | total_revenue_usd | previous_month_revenue | revenue_change |
-| ------------ | ---------------------- | ----------------- | ---------------------- | -------------- |
-| 2020         | 2020-01-01 00:00:00+00 | 1282.00           |                        | 1282.00        |
-| 2020         | 2020-02-01 00:00:00+00 | 2822.40           | 1282.00                | 1540.40        |
-| 2020         | 2020-03-01 00:00:00+00 | 4441.80           | 2822.40                | 1619.40        |
-| 2020         | 2020-04-01 00:00:00+00 | 6280.40           | 4441.80                | 1838.60        |
-| 2020         | 2020-05-01 00:00:00+00 | 7979.20           | 6280.40                | 1698.80        |
-| 2020         | 2020-06-01 00:00:00+00 | 9857.20           | 7979.20                | 1878.00        |
-| 2020         | 2020-07-01 00:00:00+00 | 11884.80          | 9857.20                | 2027.60        |
-| 2020         | 2020-08-01 00:00:00+00 | 14329.80          | 11884.80               | 2445.00        |
-| 2020         | 2020-09-01 00:00:00+00 | 15939.80          | 14329.80               | 1610.00        |
-| 2020         | 2020-10-01 00:00:00+00 | 18723.50          | 15939.80               | 2783.70        |
-| 2020         | 2020-11-01 00:00:00+00 | 17457.40          | 18723.50               | -1266.10       |
-| 2020         | 2020-12-01 00:00:00+00 | 18838.30          | 17457.40               | 1380.90        |
+| payment_year | payment_month | total_revenue_usd | previous_month_revenue | revenue_change |
+| ------------ | ------------- | ----------------- | ---------------------- | -------------- |
+| 2020         | 2020-01-01    | 1282.00           |                        | 1282.00        |
+| 2020         | 2020-02-01    | 2822.40           | 1282.00                | 1540.40        |
+| 2020         | 2020-03-01    | 4441.80           | 2822.40                | 1619.40        |
+| 2020         | 2020-04-01    | 6280.40           | 4441.80                | 1838.60        |
+| 2020         | 2020-05-01    | 7979.20           | 6280.40                | 1698.80        |
+| 2020         | 2020-06-01    | 9857.20           | 7979.20                | 1878.00        |
+| 2020         | 2020-07-01    | 11884.80          | 9857.20                | 2027.60        |
+| 2020         | 2020-08-01    | 14329.80          | 11884.80               | 2445.00        |
+| 2020         | 2020-09-01    | 15939.80          | 14329.80               | 1610.00        |
+| 2020         | 2020-10-01    | 18723.50          | 15939.80               | 2783.70        |
+| 2020         | 2020-11-01    | 17457.40          | 18723.50               | -1266.10       |
+| 2020         | 2020-12-01    | 18838.30          | 17457.40               | 1380.90        |
 
- -->
+
+
+**b. monthly customer growth**
+
+*query:*
+
+```SQL
+WITH trial_plans_analysis AS (
+  SELECT
+    DATE_TRUNC('month', start_date)::DATE AS start_month,
+    COUNT(customer_id) AS new_customers_amount,
+    LAG(COUNT(customer_id)) OVER(ORDER BY DATE_TRUNC('month', start_date)::DATE) AS previous_month_new_customers_amount
+  FROM
+    subscriptions
+  WHERE
+    EXTRACT(year FROM start_date) = 2020
+      AND plan_id = 0 -- id 0 represents trial plan and means a new customer
+  GROUP BY start_month
+)
+SELECT
+  *,
+  CASE
+    WHEN previous_month_new_customers_amount IS NULL
+    THEN new_customers_amount
+    ELSE new_customers_amount - previous_month_new_customers_amount
+  END AS new_customers_amount_changes
+FROM trial_plans_analysis
+ORDER BY start_month;
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+  This query calculates the monthly growth of new customers for Foodie-Fi by focusing on trial plan subscriptions (`plan_id = 0`), which represent new customer sign-ups. The results include the total number of new customers for each month and the change in the number of new customers compared to the previous month.
+
+  - `WITH trial_plans_analysis`: Creates a Common Table Expression (CTE) that aggregates data for new customers on trial plans.
+
+    - `EXTRACT(year FROM start_date)` and `DATE_TRUNC('month', start_date)::DATE`: Extract the year and truncate the date to the first day of the month for grouping.
+    - `COUNT(customer_id) AS new_customers_amount`: Counts the number of customers starting a trial plan in each month.
+    - `LAG(COUNT(customer_id)) OVER(ORDER BY DATE_TRUNC('month', start_date)::DATE) AS previous_month_new_customers_amount`: Calculates the number of customers in the previous month for comparison.
+    - `GROUP BY start_year, start_month`: Groups the data by year and month.
+
+  - Main `SELECT` statement: Outputs the results from the CTE, along with the monthly changes in new customers.
+
+    - `CASE` statement: 
+      - When `previous_month_new_customers_amount` is `NULL` (first month), the change is set to the total new customer count for that month.
+      - Otherwise, it calculates the difference between the current and previous month's new customer counts.
+    - `ORDER BY start_year, start_month`: Ensures results are displayed chronologically.
+
+  The query produces a table with the following columns:
+  - `start_month`: Month of the trial plan start.
+  - `new_customers_amount`: Total number of customers who started a trial plan in that month.
+  - `previous_month_new_customers_amount`: Number of customers who started a trial plan in the previous month.
+  - `new_customers_amount_changes`: Difference in the number of new customers compared to the previous month.
+
+  This query provides valuable insights into the monthly dynamics of new customer acquisition, allowing for performance evaluation and identification of growth patterns.
+
+</details>
+
+*table:*
+| start_month | new_customers_amount | previous_month_new_customers_amount | new_customers_amount_changes |
+| ----------- | -------------------- | ----------------------------------- | ---------------------------- |
+| 2020-01-01  | 88                   |                                     | 88                           |
+| 2020-02-01  | 68                   | 88                                  | -20                          |
+| 2020-03-01  | 94                   | 68                                  | 26                           |
+| 2020-04-01  | 81                   | 94                                  | -13                          |
+| 2020-05-01  | 88                   | 81                                  | 7                            |
+| 2020-06-01  | 79                   | 88                                  | -9                           |
+| 2020-07-01  | 89                   | 79                                  | 10                           |
+| 2020-08-01  | 88                   | 89                                  | -1                           |
+| 2020-09-01  | 87                   | 88                                  | -1                           |
+| 2020-10-01  | 79                   | 87                                  | -8                           |
+| 2020-11-01  | 75                   | 79                                  | -4                           |
+| 2020-12-01  | 84                   | 75                                  | 9                            |
