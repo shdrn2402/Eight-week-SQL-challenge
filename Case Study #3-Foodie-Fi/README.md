@@ -3626,7 +3626,13 @@ This query creates a `payments` table for the year 2020 based on customer subscr
 
 #### D. Outside The Box Questions
 
-**1.**
+**1. How would you calculate the rate of growth for Foodie-Fi?**
+
+*answer:*
+
+Growth of the company can be measured through metrics such as acquiring new customers, transitions to paid plans, and revenue growth over specific periods. In answering the question "How would you calculate the rate of growth for Foodie-Fi?" the focus will be on these metrics to reflect short-term dynamics.
+
+**\*** Additionally, the following queries will utilize both the original database schema and the payments table created during the "C. Challenge Payment Question" section. This ensures a comprehensive analysis by combining subscription and payment data for detailed insights.
 
 *query:*
 
@@ -3639,7 +3645,8 @@ This query creates a `payments` table for the year 2020 based on customer subscr
 
 </details>
 
-*answer:*
+*table:*
+
 
 **2.**
 
