@@ -3630,17 +3630,64 @@ This query creates a `payments` table for the year 2020 based on customer subscr
 
 *answer:*
 
-Growth of the company can be measured through metrics such as:
+Annual growth of the company can be measured through metrics such as:
 
-- acquiring new customers
-- transitions to paid plans
-- revenue growth over specific periods
+- subscribers amount change
+- change in paid subscriptions
+- revenue calculation
 
 In answering the question "How would you calculate the rate of growth for Foodie-Fi?" the focus will be on these metrics to reflect short-term dynamics.
 
-**\*** Additionally, the following queries will utilize both the original database schema and the `payments` table created during the "C. Challenge Payment Question" section. This ensures a comprehensive analysis by combining subscription and payment data for detailed insights.
+We limit the analysis to the year 2020 to focus on complete data for a full calendar year. This approach avoids the influence of partial data from 2021, ensuring a more accurate and consistent representation of the company's growth dynamics.
 
-**a. acquiring new customers**
+**a. subscribers amount change**
+
+*query:*
+
+```SQL
+
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+</details>
+
+*table:*
+
+**b. change in paid subscriptions**
+
+*query:*
+
+```SQL
+
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+</details>
+
+*table:*
+
+**c. revenue calculation**
+
+*query:*
+
+```SQL
+
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+</details>
+
+*table:*
+
+
+<!-- **2. What key metrics would you recommend Foodie-Fi management to track over time to assess performance of their overall business?**
+**a.**
 
 *query:*
 
@@ -3654,7 +3701,8 @@ WITH trial_plans_analysis AS (
   FROM
     subscriptions
   WHERE
-    plan_id = 0 -- id 0 represents trial plan and means a new customer
+    EXTRACT(year FROM start_date) = 2020
+      AND plan_id = 0 -- id 0 represents trial plan and means a new customer
   GROUP BY start_year, start_month
 )
 SELECT
@@ -3671,30 +3719,30 @@ ORDER BY start_year, start_month;
 <details>
   <summary><em>show description</em></summary>
 
-This query calculates the monthly growth of new customers for Foodie-Fi by focusing on trial plan subscriptions (`plan_id = 0`), which represent new customer sign-ups. The results include the total number of new customers for each month and the change in the number of new customers compared to the previous month.
+  This query calculates the monthly growth of new customers for Foodie-Fi by focusing on trial plan subscriptions (`plan_id = 0`), which represent new customer sign-ups. The results include the total number of new customers for each month and the change in the number of new customers compared to the previous month.
 
-- `WITH trial_plans_analysis`: Creates a Common Table Expression (CTE) that aggregates data for new customers on trial plans.
+  - `WITH trial_plans_analysis`: Creates a Common Table Expression (CTE) that aggregates data for new customers on trial plans.
 
-  - `EXTRACT(year FROM start_date)` and `DATE_TRUNC('month', start_date)::DATE`: Extract the year and truncate the date to the first day of the month for grouping.
-  - `COUNT(customer_id) AS new_customers_amount`: Counts the number of customers starting a trial plan in each month.
-  - `LAG(COUNT(customer_id)) OVER(ORDER BY DATE_TRUNC('month', start_date)::DATE) AS previous_month_new_customers_amount`: Calculates the number of customers in the previous month for comparison.
-  - `GROUP BY start_year, start_month`: Groups the data by year and month.
+    - `EXTRACT(year FROM start_date)` and `DATE_TRUNC('month', start_date)::DATE`: Extract the year and truncate the date to the first day of the month for grouping.
+    - `COUNT(customer_id) AS new_customers_amount`: Counts the number of customers starting a trial plan in each month.
+    - `LAG(COUNT(customer_id)) OVER(ORDER BY DATE_TRUNC('month', start_date)::DATE) AS previous_month_new_customers_amount`: Calculates the number of customers in the previous month for comparison.
+    - `GROUP BY start_year, start_month`: Groups the data by year and month.
 
-- Main `SELECT` statement: Outputs the results from the CTE, along with the monthly changes in new customers.
+  - Main `SELECT` statement: Outputs the results from the CTE, along with the monthly changes in new customers.
 
-  - `CASE` statement: 
-    - When `previous_month_new_customers_amount` is `NULL` (first month), the change is set to the total new customer count for that month.
-    - Otherwise, it calculates the difference between the current and previous month's new customer counts.
-  - `ORDER BY start_year, start_month`: Ensures results are displayed chronologically.
+    - `CASE` statement: 
+      - When `previous_month_new_customers_amount` is `NULL` (first month), the change is set to the total new customer count for that month.
+      - Otherwise, it calculates the difference between the current and previous month's new customer counts.
+    - `ORDER BY start_year, start_month`: Ensures results are displayed chronologically.
 
-The query produces a table with the following columns:
-- `start_year`: Year of the trial plan start.
-- `start_month`: Month of the trial plan start.
-- `new_customers_amount`: Total number of customers who started a trial plan in that month.
-- `previous_month_new_customers_amount`: Number of customers who started a trial plan in the previous month.
-- `new_customers_amount_changes`: Difference in the number of new customers compared to the previous month.
+  The query produces a table with the following columns:
+  - `start_year`: Year of the trial plan start.
+  - `start_month`: Month of the trial plan start.
+  - `new_customers_amount`: Total number of customers who started a trial plan in that month.
+  - `previous_month_new_customers_amount`: Number of customers who started a trial plan in the previous month.
+  - `new_customers_amount_changes`: Difference in the number of new customers compared to the previous month.
 
-This query provides valuable insights into the monthly dynamics of new customer acquisition, allowing for performance evaluation and identification of growth patterns.
+  This query provides valuable insights into the monthly dynamics of new customer acquisition, allowing for performance evaluation and identification of growth patterns.
 
 </details>
 
@@ -3715,12 +3763,8 @@ This query provides valuable insights into the monthly dynamics of new customer 
 | 2020       | 2020-11-01  | 75                   | 79                                  | -4                           |
 | 2020       | 2020-12-01  | 84                   | 75                                  | 9                            |
 
-*analisys:*
-- In 2020, significant fluctuations in the number of new customers are observed
-- The highest growth is recorded in March, while the most notable declines are in February and April
-- In 2021, no new customers are recorded. Although the `subscriptions` table contains entries related to 2021, all of them are associated with changes to existing plans rather than the start of trial periods for new customers
 
-**b. transitions to paid plans**
+**b.**
 
 *query:*
 
@@ -3734,6 +3778,8 @@ WITH next_plan_id_evaluation AS (
     LAG(plan_id) OVER(PARTITION BY customer_id ORDER BY start_date) AS previous_plan_id
   FROM
     subscriptions
+  WHERE
+    EXTRACT(year FROM start_date) = 2020
 ),
 filtered_transitions AS (
   SELECT
@@ -3823,76 +3869,78 @@ This query helps analyze how the number of transitions to paid plans fluctuates 
 | 2020       | 2020-10-01  | 78                               | 77                                              | 1                                 |
 | 2020       | 2020-11-01  | 63                               | 78                                              | -15                               |
 | 2020       | 2020-12-01  | 76                               | 63                                              | 13                                |
-| 2021       | 2021-01-01  | 17                               | 76                                              | -59                               |
 
-*analisys:*
+**c. monthly revenue growth**
 
-- In 2020, noticeable fluctuations in the number of transitions to paid plans are observed.
-- The highest growth is recorded in August, while the most notable decline is in January 2021.
-- In 2021, transitions to paid plans occur only in January, likely from customers who started trial plans in December 2020, as no new customers were identified in 2021 in the previous query.
-
-
-
-
-
-
-
-**2.**
+**\*** The following query will utilize the `payments` table created during the "C. Challenge Payment Question" section.
 
 *query:*
 
 ```SQL
-
+WITH monthly_revenue AS (
+  SELECT
+    EXTRACT(year FROM payment_date) AS payment_year,
+    DATE_TRUNC('month', payment_date) AS payment_month,
+    SUM(amount) AS total_revenue_usd
+  FROM
+    payments
+  GROUP BY 
+    payment_year, payment_month
+  ORDER BY
+    payment_year, payment_month
+)
+SELECT
+  *,
+  LAG(total_revenue_usd) OVER (ORDER BY payment_year, payment_month) AS previous_month_revenue,
+  CASE
+    WHEN LAG(total_revenue_usd) OVER (ORDER BY payment_year, payment_month) IS NULL THEN total_revenue_usd
+    ELSE total_revenue_usd - LAG(total_revenue_usd) OVER (ORDER BY payment_year, payment_month)
+  END AS revenue_change
+FROM
+  monthly_revenue;
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
-</details>
+This query calculates the monthly revenue for Foodie-Fi in 2020, along with the revenue changes compared to the previous month.
 
-*answer:*
+- `WITH monthly_revenue`: Creates a Common Table Expression (CTE) to aggregate the total revenue for each month.
+  - `EXTRACT(year FROM payment_date)` and `DATE_TRUNC('month', payment_date)`: Extract the year and truncate the date to the first day of the month for grouping.
+  - `SUM(amount) AS total_revenue_usd`: Sums all payments for the corresponding month.
+  - `GROUP BY payment_year, payment_month`: Groups data by year and month.
+  - `ORDER BY payment_year, payment_month`: Ensures chronological order of results.
 
-**3.**
+- `Main Query`:
+  - `LAG(total_revenue_usd) OVER (ORDER BY payment_year, payment_month)`: Retrieves the revenue for the previous month.
+  - `CASE` expression:
+    - If no previous month data exists (e.g., the first month), it returns the current month's revenue (`total_revenue_usd`).
+    - Otherwise, it calculates the difference between the current month's revenue and the previous month's revenue (`total_revenue_usd - LAG(total_revenue_usd)`).
+  - `ORDER BY payment_year, payment_month`: Ensures results are displayed chronologically.
 
-*query:*
-
-```SQL
-
-```
-
-<details>
-  <summary><em>show description</em></summary>
-
-</details>
-
-*answer:*
-
-**4.**
-
-*query:*
-
-```SQL
-
-```
-
-<details>
-  <summary><em>show description</em></summary>
+The query generates a table with the following columns:
+- `payment_year`: The year of the payments.
+- `payment_month`: The month of the payments.
+- `total_revenue_usd`: The total revenue for the month.
+- `previous_month_revenue`: The revenue of the previous month.
+- `revenue_change`: The difference between the current month's revenue and the previous month's revenue.
 
 </details>
 
-*answer:*
+*table:*
+| payment_year | payment_month          | total_revenue_usd | previous_month_revenue | revenue_change |
+| ------------ | ---------------------- | ----------------- | ---------------------- | -------------- |
+| 2020         | 2020-01-01 00:00:00+00 | 1282.00           |                        | 1282.00        |
+| 2020         | 2020-02-01 00:00:00+00 | 2822.40           | 1282.00                | 1540.40        |
+| 2020         | 2020-03-01 00:00:00+00 | 4441.80           | 2822.40                | 1619.40        |
+| 2020         | 2020-04-01 00:00:00+00 | 6280.40           | 4441.80                | 1838.60        |
+| 2020         | 2020-05-01 00:00:00+00 | 7979.20           | 6280.40                | 1698.80        |
+| 2020         | 2020-06-01 00:00:00+00 | 9857.20           | 7979.20                | 1878.00        |
+| 2020         | 2020-07-01 00:00:00+00 | 11884.80          | 9857.20                | 2027.60        |
+| 2020         | 2020-08-01 00:00:00+00 | 14329.80          | 11884.80               | 2445.00        |
+| 2020         | 2020-09-01 00:00:00+00 | 15939.80          | 14329.80               | 1610.00        |
+| 2020         | 2020-10-01 00:00:00+00 | 18723.50          | 15939.80               | 2783.70        |
+| 2020         | 2020-11-01 00:00:00+00 | 17457.40          | 18723.50               | -1266.10       |
+| 2020         | 2020-12-01 00:00:00+00 | 18838.30          | 17457.40               | 1380.90        |
 
-**5.**
-
-*query:*
-
-```SQL
-
-```
-
-<details>
-  <summary><em>show description</em></summary>
-
-</details>
-
-*answer:*
+ -->
