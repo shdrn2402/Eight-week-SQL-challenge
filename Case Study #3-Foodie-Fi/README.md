@@ -4055,3 +4055,48 @@ This query provides a detailed monthly view of customer retention and churn rate
 | 2020-10-01 | 688                  | 3.34                  |
 | 2020-11-01 | 737                  | 3.53                  |
 | 2020-12-01 | 789                  | 4.06                  |
+
+**d. average revenue per user (ARPU)**
+
+**\*** The following query will utilize the `payments` table created during the "C. Challenge Payment Question" section.
+
+*query:*
+
+```SQL
+SELECT
+  ROUND(AVG(total_customer_revenue), 2) AS avg_revenue_usd
+FROM
+  (SELECT
+    customer_id,
+    SUM(amount) AS total_customer_revenue
+  FROM
+    payments
+  GROUP BY
+    customer_id
+  ) subquery;
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+This query calculates the Average Revenue Per User (ARPU) by aggregating the total revenue per customer and then averaging it across all customers.
+
+- Subquery:
+  - Groups the `payments` table by `customer_id` to calculate the total revenue (`total_customer_revenue`) for each customer.
+    - `SUM(amount) AS total_customer_revenue`: Sums all payment amounts for a given `customer_id`.
+    - `GROUP BY customer_id`: Ensures the revenue is calculated individually for each customer.
+
+- Main Query:
+  - Averages the total revenue values from the subquery across all customers.
+    - `AVG(total_customer_revenue)`: Calculates the average of the `total_customer_revenue` for all customers.
+    - `ROUND(..., 2)`: Rounds the result to two decimal places for better readability.
+
+The query produces a single value, `avg_revenue`, representing the average revenue generated per user, which is a standard metric for understanding the financial performance of a subscription-based business.
+
+</details>
+
+*table:*
+
+| avg_revenue_usd |
+| --------------- |
+| 145.72          |
