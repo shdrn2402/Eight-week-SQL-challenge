@@ -3632,9 +3632,9 @@ This query creates a `payments` table for the year 2020 based on customer subscr
 
 Annual growth of the company can be measured through metrics such as:
 
-- clients churn rate
-- subscribers amount change
-- revenue calculation
+- clients churn rate (calculated as a percentage of customers who churned relative to the total customer base for the year),
+- subscribers amount change (absolute number of new customers added during the year),
+- revenue calculation (total revenue generated across all subscription plans).
 
 We limit the analysis to the year 2020 to focus on complete data for a full calendar year. This approach avoids the influence of partial data from 2021, ensuring a more accurate and consistent representation of the company's growth dynamics.
 
@@ -3644,7 +3644,7 @@ We limit the analysis to the year 2020 to focus on complete data for a full cale
 
 ```SQL
 SELECT
-  ROUND((COUNT(DISTINCT customer_id) FILTER (WHERE plan_id = 4) * 100.0) /
+  ROUND((COUNT(DISTINCT customer_id) FILTER (WHERE plan_id = 4) * 100.0) / -- id 4 represents churned customers
   COUNT(DISTINCT customer_id), 2) AS churn_rate_percentage
 FROM
   subscriptions
@@ -3697,7 +3697,7 @@ WHERE
       subscriptions
     WHERE 
       EXTRACT(year FROM start_date) = 2020 
-      AND plan_id = 4
+      AND plan_id = 4 -- id 4 represents churned customers
     );
 ```
 
@@ -3729,6 +3729,8 @@ Key components:
 | annual_customers_growth |
 | ----------------------- |
 | 764                     |
+
+**\*** The calculated annual growth metric reflects the net addition of 764 unique customers during 2020. Since no prior data exists, this figure establishes a baseline for tracking future customer growth trends.
 
 **c. revenue calculation**
 
@@ -3786,11 +3788,11 @@ This query provides insight into which subscription plans contribute the most to
 
 *answer:*
 
-To effectively analyze Foodie-Fi's business performance, it is important to track the following key metrics:
+To effectively analyze Foodie-Fi's business performance, it is important to track key metrics that provide insights into different aspects of the business, including profitability, customer dynamics, and retention.
 
 - monthly revenue growth: a key metric of profitability that reflects the company's total revenue for each month.
 - monthly customer growth: a metric that helps to understand the dynamics of new user acquisition and customer base growth.
-- churn rate: a metric that indicates the percentage of users leaving the service over a certain period.
+- monthly churn rate: a metric that indicates the percentage of users leaving the service over a certain period.
 - average revenue per user (ARPU): a metric that estimates the average revenue generated per customer.
 
 These metrics collectively provide a comprehensive analysis, enabling Foodie-Fi to make informed decisions to enhance customer retention, boost revenue, and refine user acquisition strategies.
@@ -3837,10 +3839,12 @@ This query calculates the monthly revenue for Foodie-Fi in 2020, along with the 
   - `ORDER BY payment_year, payment_month`: Ensures chronological order of results.
 
 - `Main Query`:
-  - `LAG(total_revenue_usd) OVER (ORDER BY payment_year, payment_month)`: Retrieves the revenue for the previous month.
+  - `LAG(total_revenue_usd) OVER (ORDER BY payment_year, payment_month)`:
+    - Retrieves the revenue for the previous month, enabling the calculation of month-to-month changes.
+    - This function is useful even if some months have missing data, as it handles the sequence based on available records.
   - `CASE` expression:
-    - If no previous month data exists (e.g., the first month), it returns the current month's revenue (`total_revenue_usd`).
-    - Otherwise, it calculates the difference between the current month's revenue and the previous month's revenue (`total_revenue_usd - LAG(total_revenue_usd)`).
+    - Handles scenarios where no previous month data exists (e.g., the first month) by returning the current month's revenue (`total_revenue_usd`).
+    - For other months, it calculates the revenue change as the difference between the current and previous month's revenue (`total_revenue_usd - LAG(total_revenue_usd)`).
   - `ORDER BY payment_year, payment_month`: Ensures results are displayed chronologically.
 
 The query generates a table with the following columns:
@@ -3942,3 +3946,112 @@ ORDER BY start_month;
 | 2020-11-01  | 75                   | 79                                  | -4                           |
 | 2020-12-01  | 84                   | 75                                  | 9                            |
 
+
+**c. monthly churn rate**
+
+*query:*
+
+```SQL
+WITH new_customers AS (
+  SELECT
+    DATE_TRUNC('month', start_date)::DATE AS month,
+    COUNT(customer_id) AS new_customers
+  FROM
+    subscriptions
+  WHERE
+    EXTRACT(year FROM start_date) = 2020
+    AND plan_id = 0
+  GROUP BY
+    month
+),
+churned_customers AS (
+  SELECT
+    DATE_TRUNC('month', start_date)::DATE AS month,
+    COUNT(customer_id) AS churned_customers
+  FROM
+    subscriptions
+  WHERE
+    EXTRACT(year FROM start_date) = 2020
+    AND plan_id = 4
+  GROUP BY
+    month
+),
+combined_data AS (
+  SELECT
+    NC.month,
+    NC.new_customers,
+    LAG(CC.churned_customers) OVER (ORDER BY NC.month) AS previous_month_churned_customers
+  FROM
+    new_customers NC
+  LEFT JOIN
+    churned_customers CC
+  USING(month)
+),
+cumulative_data AS (
+  SELECT
+    month,
+    new_customers,
+    COALESCE(previous_month_churned_customers, 0) AS previous_month_churned_customers,
+    SUM(new_customers - COALESCE(previous_month_churned_customers, 0)) OVER (ORDER BY month) AS cumulative_customers
+  FROM
+    combined_data
+)
+SELECT
+  month,
+  cumulative_customers,
+  ROUND((COALESCE(previous_month_churned_customers, 0) * 100.0) / NULLIF(cumulative_customers, 0), 2) AS churn_rate_percentage
+FROM
+  cumulative_data
+ORDER BY
+  month;
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+This query calculates the cumulative number of active customers and the monthly churn rate percentage for the year 2020. It uses a step-by-step approach with Common Table Expressions (CTEs) for better readability and modular calculations.
+
+- `WITH new_customers`:
+  - Extracts the number of new customers (`new_customers`) who subscribed to the trial plan (`plan_id = 0`) for each month.
+  - Groups the data by month and limits the scope to the year 2020.
+
+- `WITH churned_customers`:
+  - Calculates the number of customers who churned (`churned_customers`) by subscribing to the churn plan (`plan_id = 4`) for each month.
+  - Groups the data by month and filters for the year 2020.
+
+- `WITH combined_data`:
+  - Joins `new_customers` and `churned_customers` on the `month` column using a `LEFT JOIN`.
+  - Adds the column `previous_month_churned_customers`, which shifts the churned customer count to the next month using the `LAG` function. This reflects the churn impact on the subsequent month's active customer count.
+
+- `WITH cumulative_data`:
+  - Adds the cumulative number of active customers (`cumulative_customers`) using a running total of `new_customers` minus `previous_month_churned_customers` with a `SUM` window function.
+  - Handles `NULL` values in `previous_month_churned_customers` by treating them as 0 with `COALESCE`.
+
+- Final `SELECT`:
+  - Outputs:
+    - `month`: The month being calculated.
+    - `cumulative_customers`: The cumulative total of active customers.
+    - `churn_rate_percentage`: The churn rate percentage, calculated as `(previous_month_churned_customers * 100.0) / cumulative_customers`.
+  - Uses `ROUND` to limit the churn rate percentage to two decimal places.
+  - Ensures no division by zero using `NULLIF` when `cumulative_customers` is 0.
+
+This query provides a detailed monthly view of customer retention and churn rates, helping analyze subscription dynamics and overall performance.
+
+</details>
+
+*table:*
+
+| month      | cumulative_customers | churn_rate_percentage |
+| ---------- | -------------------- | --------------------- |
+| 2020-01-01 | 88                   | 0.00                  |
+| 2020-02-01 | 147                  | 6.12                  |
+| 2020-03-01 | 232                  | 3.88                  |
+| 2020-04-01 | 300                  | 4.33                  |
+| 2020-05-01 | 370                  | 4.86                  |
+| 2020-06-01 | 428                  | 4.91                  |
+| 2020-07-01 | 498                  | 3.82                  |
+| 2020-08-01 | 558                  | 5.02                  |
+| 2020-09-01 | 632                  | 2.06                  |
+| 2020-10-01 | 688                  | 3.34                  |
+| 2020-11-01 | 737                  | 3.53                  |
+| 2020-12-01 | 789                  | 4.06                  |
