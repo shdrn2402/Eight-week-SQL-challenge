@@ -4100,3 +4100,74 @@ The query produces a single value, `avg_revenue`, representing the average reven
 | avg_revenue_usd |
 | --------------- |
 | 145.72          |
+
+### Analysis of Foodie-Fi's 2020 Performance
+
+Assuming 2020 was the first year of operation due to the absence of data from previous years, and based on the data processed and analyzed through our queries, we can draw the following insights about Foodie-Fi's performance:
+
+#### **Overall Customer Base and Churn:**
+- In 2020, the company attracted 1,000 unique subscribers. Of these:
+  - 90 customers did not continue beyond the trial period.
+  - 146 customers churned after transitioning to paid plans.
+- The churn rate was 23.6% (236 customers), leaving an active customer base of 764 by the end of the year.
+
+#### **Revenue:**
+- **Revenue breakdown by plan:**
+  | Plan            | Revenue (USD)  |
+  |-----------------|----------------|
+  | Pro Monthly     | 57,351.80      |
+  | Pro Annual      | 38,805.00      |
+  | Basic Monthly   | 33,679.80      |
+- Monthly revenue consistently increased, except in November, which saw a decline of 1,266.10 USD. The highest monthly revenue growth occurred in October (2,783.70 USD).
+- The average revenue per user (ARPU) for the year was 145.72 USD.
+
+#### **Customer Growth and Churn Dynamics:**
+- The highest influx of new customers occurred in April (94 new users), while the lowest was in March (68 users).
+- The growth rate of new customers gradually decreased by 1–9 users per month.
+- Monthly churn rates ranged from 2.06% (September) to 6.12% (February).
+
+#### **Churn Analysis:**
+- Most churn occurred within the first 180 days after transitioning to paid plans:
+  | Time Interval   | Basic Monthly | Pro Monthly |
+  |-----------------|---------------|-------------|
+  | 0-30 days       | 18            | 17          |
+  | 31-90 days      | 28            | 30          |
+  | 91-180 days     | 35            | 36          |
+  | 181-365 days    | 9             | 0           |
+- Similar churn patterns across plans within the first 180 days suggest comparable drivers of churn.
+
+---
+
+### **What are some key customer journeys or experiences that you would analyse further to improve customer retention?**
+1. Customers who churned immediately after the trial period (90 users): Why didn't they transition to paid plans?
+2. Users who churned within the first 180 days of paid plans: What were the primary reasons for leaving?
+3. Seasonal trends: Investigate the April customer influx and September churn reduction to understand potential external influences.
+
+---
+
+### **If the Foodie-Fi team were to create an exit survey shown to customers who wish to cancel their subscription, what questions would you include in the survey?**
+1. What were the main reasons for canceling your subscription?
+2. Did our service meet your expectations? Why or why not?
+3. Were there any challenges in using the service?
+4. Do you consider the subscription price fair for the value provided?
+5. What improvements or features would have encouraged you to stay?
+
+---
+
+### **What business levers could the Foodie-Fi team use to reduce the customer churn rate? How would you validate the effectiveness of your ideas?**
+#### **Churn Reduction Strategies:**
+1. Highlight the value of the service through periodic reminders, especially within the first six months.
+2. Offer loyalty programs, discounts, or bonuses after 3–6 months to encourage long-term engagement.
+3. Enhance the service with new features or exclusive content to increase perceived value.
+4. Conduct targeted promotions or cross-selling opportunities to drive additional engagement.
+
+#### **ARPU Growth Strategies:**
+1. Introduce premium features or content to encourage upgrades.
+2. Experiment with price increases, coupled with added value, and validate through A/B testing.
+
+#### **Validation Methods:**
+- A/B testing: Compare churn rates or ARPU between control groups and those exposed to interventions.
+- Surveys: Collect direct feedback from customers about new features, loyalty programs, or pricing changes.
+- Retention analytics: Monitor the lifetime value (LTV) and average subscription duration to evaluate the impact of new initiatives.
+
+This combined analysis and strategy aim to optimize customer retention, revenue growth, and overall business performance.
