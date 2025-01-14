@@ -4126,7 +4126,7 @@ Assuming 2020 was the first year of operation due to the absence of data from pr
 - The growth rate of new customers gradually decreased by 1–9 users per month.
 - Monthly churn rates ranged from 2.06% (September) to 6.12% (February).
 
-#### **Churn Analysis:**
+#### **Churn Analysis:\***
 - Most churn occurred within the first 180 days after transitioning to paid plans:
   | Time Interval   | Basic Monthly | Pro Monthly |
   |-----------------|---------------|-------------|
@@ -4136,6 +4136,81 @@ Assuming 2020 was the first year of operation due to the absence of data from pr
   | 181-365 days    | 9             | 0           |
 - Similar churn patterns across plans within the first 180 days suggest comparable drivers of churn.
 
+<details>
+  <summary><em>**\***show query</em></summary>
+  
+```SQL
+WITH plan_churn_data AS (
+  SELECT
+    S.customer_id,
+    MIN(S.start_date) AS paid_plan_date,
+    MIN(
+      CASE 
+        WHEN P.plan_name = 'churn' THEN S.start_date 
+      END
+    ) AS churn_date,
+    MAX(
+      CASE
+        WHEN P.plan_name = %(plan_name)s THEN S.start_date
+      END
+    ) AS target_plan_date
+  FROM
+    subscriptions S
+  JOIN
+    plans P USING(plan_id)
+  WHERE
+    EXTRACT(year FROM S.start_date) = 2020
+  GROUP BY
+    S.customer_id
+),
+filtered_data AS (
+  SELECT
+    customer_id,
+    target_plan_date,
+    churn_date
+  FROM
+    plan_churn_data
+  WHERE
+    target_plan_date IS NOT NULL -- Учитываются только пользователи, которые были на выбранном тарифе
+      AND churn_date IS NOT NULL -- Учитываются только те, кто покинул подписку
+),
+days_between AS (
+  SELECT
+    customer_id,
+    AGE(churn_date, target_plan_date) AS days_to_churn
+  FROM
+    filtered_data
+),
+time_intervals AS (
+  SELECT
+    customer_id,
+    CASE
+      WHEN days_to_churn <= INTERVAL '30 days' THEN '0-30 days'
+      WHEN days_to_churn <= INTERVAL '90 days' THEN '31-90 days'
+      WHEN days_to_churn <= INTERVAL '180 days' THEN '91-180 days'
+      WHEN days_to_churn <= INTERVAL '365 days' THEN '181-365 days'
+      ELSE '365+ days'
+    END AS time_period
+  FROM
+    days_between
+)
+SELECT
+  time_period,
+  COUNT(customer_id) AS churned_customers_count
+FROM
+  time_intervals
+GROUP BY
+  time_period
+ORDER BY
+  CASE
+    WHEN time_period = '0-30 days' THEN 1
+    WHEN time_period = '31-90 days' THEN 2
+    WHEN time_period = '91-180 days' THEN 3
+    WHEN time_period = '181-365 days' THEN 4
+    ELSE 5
+  END;
+```
+</details>
 ---
 
 ### **What are some key customer journeys or experiences that you would analyse further to improve customer retention?**
