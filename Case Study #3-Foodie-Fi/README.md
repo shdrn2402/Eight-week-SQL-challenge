@@ -4137,8 +4137,8 @@ Assuming 2020 was the first year of operation due to the absence of data from pr
 - Similar churn patterns across plans within the first 180 days suggest comparable drivers of churn.
 
 <details>
-  <summary><em>**\***show query</em></summary>
-  
+  <summary><em><b>*</b>show query</em></summary>
+
 ```SQL
 WITH plan_churn_data AS (
   SELECT
@@ -4211,6 +4211,7 @@ ORDER BY
   END;
 ```
 </details>
+
 ---
 
 ### **What are some key customer journeys or experiences that you would analyse further to improve customer retention?**
