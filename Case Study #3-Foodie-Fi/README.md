@@ -8,6 +8,7 @@
   - [B. Data Analysis Questions](#b-data-analysis-questions)
   - [C. Challenge Payment Question](#c-challenge-payment-question)
   - [D. Outside The Box Questions](#d-outside-the-box-questions)
+- [Analysis of Foodie-Fi's 2020 Performance](#analysis-of-foodie-fis-2020-performance)
 
 ### Introduction
 
