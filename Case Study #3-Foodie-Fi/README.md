@@ -4126,7 +4126,7 @@ Assuming 2020 was the first year of operation due to the absence of data from pr
 - The growth rate of new customers gradually decreased by 1–9 users per month.
 - Monthly churn rates ranged from 2.06% (September) to 6.12% (February).
 
-#### **Churn Analysis:\***
+#### **Churn Analysis:**
 - Most churn occurred within the first 180 days after transitioning to paid plans:
   | Time Interval   | Basic Monthly | Pro Monthly |
   |-----------------|---------------|-------------|
@@ -4137,7 +4137,7 @@ Assuming 2020 was the first year of operation due to the absence of data from pr
 - Similar churn patterns across plans within the first 180 days suggest comparable drivers of churn.
 
 <details>
-  <summary><em><b>*</b>show query</em></summary>
+  <summary><em>show query</em></summary>
 
 ```SQL
 WITH plan_churn_data AS (
