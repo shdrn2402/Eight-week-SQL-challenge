@@ -1,6 +1,6 @@
 ![Project Logo](../images/case4_logo.png)
 
-### Contents:
+<!-- ### Contents:
 - [Introduction](#introduction)
 - [Entity Relationship Diagram](#entity-relationship-diagram)
 - [Case Study Questions & Solutions](#case-study-questions--solutions)
@@ -9453,4 +9453,4 @@ VALUES
 ...
 
 #### Extension Request
-...
+... -->
