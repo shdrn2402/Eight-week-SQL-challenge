@@ -1,6 +1,6 @@
 ![Project Logo](../images/case4_logo.png)
 
-<!-- ### Contents:
+### Contents:
 - [Introduction](#introduction)
 - [Entity Relationship Diagram](#entity-relationship-diagram)
 - [Case Study Questions & Solutions](#case-study-questions--solutions)
@@ -19,7 +19,7 @@
 >The goal of this case study is to explore customer data, calculate key metrics, and analyze trends to help the management team improve customer growth strategies and optimize data storage forecasting for future scalability.
 
 ### Entity Relationship Diagram
-<details>
+<!-- <details>
   <summary><em>show database schema</em></summary>
 
 ```SQL
@@ -9432,7 +9432,7 @@ VALUES
   ('189', '2020-01-22', 'deposit', '302'),
   ('189', '2020-01-27', 'withdrawal', '861');
 ```
-</details>
+</details> -->
 
 ![Project Logo](../images/case4_diagram.png)
 
@@ -9453,4 +9453,4 @@ VALUES
 ...
 
 #### Extension Request
-... -->
+... 
