@@ -78,6 +78,11 @@ VALUES
   ('A', '2021-01-07'),
   ('B', '2021-01-09');
 ```
+
+**\*Note**: Primary keys are not explicitly defined in the tables, likely due to the educational nature of the project.
+- The data is artificially generated and static, minimizing the risk of integrity violations.
+- In real-world scenarios, defining primary keys is essential to ensure data integrity and uniqueness.
+
 </details>
 
 ![Project Logo](../images/case1_diagram.png)
