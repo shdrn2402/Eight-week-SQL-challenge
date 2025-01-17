@@ -46,12 +46,12 @@ CREATE TABLE customer_transactions (
   txn_type VARCHAR(10),
   txn_amount INTEGER
 );
-
--- Note: Primary keys are not explicitly defined in the tables, likely due to the educational nature of the project.
--- The data is artificially generated and static, minimizing the risk of integrity violations.
--- In real-world scenarios, defining primary keys is essential to ensure data integrity and uniqueness.
-
 ```
+
+**\*Note**: Primary keys are not explicitly defined in the tables, likely due to the educational nature of the project.
+- The data is artificially generated and static, minimizing the risk of integrity violations.
+- In real-world scenarios, defining primary keys is essential to ensure data integrity and uniqueness.
+
 </details>
 
 
