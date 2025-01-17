@@ -55,8 +55,6 @@ CREATE TABLE customer_transactions (
 </details>
 
 
-
-
 ![Project Logo](../images/case4_diagram.png)
 
 
@@ -68,16 +66,27 @@ CREATE TABLE customer_transactions (
 *query:*
 
 ```SQL
-
+SELECT
+  COUNT(DISTINCT node_id) AS unique_nodes_ammount
+FROM
+  customer_nodes;
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
+The SQL query calculates the total number of unique `node_id` values in the `customer_nodes` table.
+
+- `COUNT(DISTINCT node_id)`: Counts only the distinct (unique) `node_id` values, ensuring duplicates are not included in the result.
+- `AS unique_nodes_ammount`: Assigns an alias to the resulting column for better readability.
 
 </details>
 
 *answer:*
+
+| unique_nodes_ammount |
+| -------------------- |
+| 5                    |
 
 **2. What is the number of nodes per region?**
 
