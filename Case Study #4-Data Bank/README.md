@@ -125,6 +125,8 @@ The SQL query calculates the total number of unique `node_id` values in the `cus
 | -------------------- |
 | 5                    |
 
+---
+
 **2. What is the number of nodes per region?**
 
 *query:*
@@ -170,6 +172,8 @@ The query provides a list of regions and the number of unique nodes they contain
 | Asia        | 5                    |
 | Australia   | 5                    |
 | Europe      | 5                    |
+
+---
 
 **3. How many customers are allocated to each region?**
 
@@ -217,6 +221,8 @@ The SQL query calculates the number of unique customers allocated to each region
 | Asia        | 95               |
 | Europe      | 88               |
 
+---
+
 **4. How many days on average are customers reallocated to a different node?**
 
 *query:*
@@ -262,6 +268,8 @@ Final Query:
 | avg_days_on_node |
 | ---------------- |
 | 23               |
+
+---
 
 **5. What is the median, 80th and 95th percentile for this same reallocation days metric for each region?**
 
@@ -330,6 +338,8 @@ This approach accounts for detailed node-level data while providing insights at 
 | Australia   | 21     | 34            | 51            |
 | Europe      | 23     | 34            | 52            |
 
+---
+
 #### B. Customer Transactions
 
 **1. What is the unique count and total amount for each transaction type?**
@@ -372,6 +382,8 @@ The query returns a table with each transaction type, the count of unique transa
 | deposit    | 929               | 1359168          |
 | purchase   | 815               | 806537           |
 | withdrawal | 804               | 793003           |
+
+---
 
 **2. What is the average total historical deposit counts and amounts for all customers?**
 
@@ -424,6 +436,8 @@ This query calculates the average total deposit counts and amounts for all custo
 | avg_deposits_amount | avg_deposits_sum |
 | ------------------- | ---------------- |
 | 5                   | 2718             |
+
+---
 
 **3. For each month - how many Data Bank customers make more than 1 deposit and either 1 purchase or 1 withdrawal in a single month?**
 
@@ -485,7 +499,7 @@ ORDER BY
 
 <details>
   <summary><em>show description</em></summary>
-  
+
 This query calculates the number of Data Bank customers who, in a single month, made more than 1 deposit and at least 1 purchase or withdrawal.
 
 - `WITH monthly_activity AS (...)`:
@@ -519,22 +533,82 @@ This query methodically filters, joins, and aggregates data to provide the requi
 | 2020-03-01    | 113            |
 | 2020-04-01    | 50             |
 
+---
+
 **4. What is the closing balance for each customer at the end of the month?**
 
 *query:*
 
 ```SQL
-
+WITH current_month_balance AS (
+  SELECT
+    customer_id,
+    DATE_TRUNC('month', txn_date)::DATE AS current_month,
+    SUM(
+      CASE
+        WHEN
+          txn_type = 'deposit'
+        THEN
+          txn_amount
+        ELSE
+          -txn_amount
+      END
+    ) AS txn_amount_with_sign
+  FROM
+    customer_transactions
+  GROUP BY
+    customer_id,
+    DATE_TRUNC('month', txn_date)::DATE
+  )
+ 
+SELECT
+  customer_id,
+  current_month,
+  SUM(txn_amount_with_sign) 
+    OVER (PARTITION BY customer_id ORDER BY current_month) AS closing_balance
+FROM
+  current_month_balance
+ORDER BY
+  customer_id,
+  current_month
 ```
 
 <details>
   <summary><em>show description</em></summary>
 
+The query calculates the closing balance for each customer at the end of each month based on transaction data.
+
+- The `WITH` clause defines a Common Table Expression (CTE) named `current_month_balance` that computes the net transaction amount for each customer for every month.
+- Inside the CTE:
+  - `DATE_TRUNC('month', txn_date)::DATE` truncates the transaction date to the start of the month.
+  - `SUM(CASE ... END)` calculates the net transaction amount by adding deposit amounts and subtracting withdrawal amounts.
+  - The results are grouped by customer ID and truncated month using `GROUP BY`.
+- The main query:
+  - Selects the `customer_id`, `current_month`, and computes the cumulative sum of transaction amounts for each customer using `SUM(txn_amount_with_sign) OVER (PARTITION BY customer_id ORDER BY current_month)`.
+  - The `PARTITION BY customer_id` ensures the cumulative sum is calculated separately for each customer.
+  - The `ORDER BY current_month` ensures transactions are processed in chronological order.
+- The final result includes the closing balance for each customer at the end of each month, sorted by `customer_id` and `current_month`.
 
 </details>
 
 *answer:*
 
+| customer_id | current_month | closing_balance |
+| ----------- | ------------- | --------------- |
+| 1           | 2020-01-01    | 312             |
+| 1           | 2020-03-01    | -640            |
+| 2           | 2020-01-01    | 549             |
+| 2           | 2020-03-01    | 610             |
+| 3           | 2020-01-01    | 144             |
+| 3           | 2020-02-01    | -821            |
+| 3           | 2020-03-01    | -1222           |
+| 3           | 2020-04-01    | -729            |
+| ...         | ...           | ...             |
+| 500         | 2020-01-01    | 1594            |
+| 500         | 2020-02-01    | 2981            |
+| 500         | 2020-03-01    | 2251            |
+
+---
 
 **5. What is the percentage of customers who increase their closing balance by more than 5%?**
 
