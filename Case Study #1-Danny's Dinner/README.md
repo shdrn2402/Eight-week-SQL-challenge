@@ -82,11 +82,11 @@ VALUES
 ```
 
 **\*Note**:
-- Primary keys are not explicitly defined in the tables. This might be intentional due to the educational nature of the project:  
+1. Primary keys are not explicitly defined in the tables. This might be intentional due to the educational nature of the project:  
   - The data is artificially generated and static, minimizing the risk of integrity violations.  
   - In real-world scenarios, primary keys are essential to enforce data integrity and uniqueness.  
 
-- Data type mismatches are present in the inserted values:  
+2. Data type mismatches are present in the inserted values:  
   - For example, string values are being inserted into columns with numeric data types.  
   - PostgreSQL implicitly converts these values, allowing the data to be stored. However, this practice is discouraged in production systems.  
   - Explicit type casting should be used to ensure data consistency and to prevent unexpected errors.  
