@@ -32,6 +32,15 @@ CREATE TABLE regions (
   region_name VARCHAR(9)
 );
 
+INSERT INTO regions
+  (region_id, region_name)
+VALUES
+  ('1', 'Australia'),
+  ('2', 'America'),
+  ('3', 'Africa'),
+  ('4', 'Asia'),
+  ('5', 'Europe');
+
 CREATE TABLE customer_nodes (
   customer_id INTEGER,
   region_id INTEGER,
@@ -40,17 +49,45 @@ CREATE TABLE customer_nodes (
   end_date DATE
 );
 
+INSERT INTO customer_nodes
+  (customer_id, region_id, node_id, start_date, end_date)
+VALUES
+  ('1', '3', '4', '2020-01-02', '2020-01-03'),
+  ('2', '3', '5', '2020-01-03', '2020-01-17'),
+  ('3', '5', '4', '2020-01-27', '2020-02-18'),
+  ('4', '5', '4', '2020-01-07', '2020-01-19'),
+  ('5', '3', '3', '2020-01-15', '2020-01-23'),
+  -- ...
+  ('498', '1', '2', '2020-04-05', '9999-12-31'),
+  ('499', '5', '1', '2020-02-03', '9999-12-31'),
+  ('500', '2', '2', '2020-04-15', '9999-12-31');
+
 CREATE TABLE customer_transactions (
   customer_id INTEGER,
   txn_date DATE,
   txn_type VARCHAR(10),
   txn_amount INTEGER
 );
+
+INSERT INTO customer_transactions
+  (customer_id, txn_date, txn_type, txn_amount)
+VALUES
+  ('429', '2020-01-21', 'deposit', '82'),
+  ('155', '2020-01-10', 'deposit', '712'),
+  ('398', '2020-01-01', 'deposit', '196'),
+  ('255', '2020-01-14', 'deposit', '563'),
+  ('185', '2020-01-29', 'deposit', '626'),
+  -- ...
+  ('189', '2020-02-06', 'purchase', '393'),
+  ('189', '2020-01-22', 'deposit', '302'),
+  ('189', '2020-01-27', 'withdrawal', '861');
 ```
 
 **\*Note**: Primary keys are not explicitly defined in the tables, likely due to the educational nature of the project.
 - The data is artificially generated and static, minimizing the risk of integrity violations.
 - In real-world scenarios, defining primary keys is essential to ensure data integrity and uniqueness.
+- Some inserted values do not match the expected data types (e.g., INTEGER columns receiving string inputs). This works because PostgreSQL can implicitly convert values, but such practice is discouraged in production systems where explicit type casting ensures data consistency.
+- Inconsistencies in data representation should be addressed to align with real-world practices.
 
 </details>
 
@@ -275,9 +312,7 @@ This query calculates the median, 80th percentile, and 95th percentile of the da
 - Main `SELECT` statement:
   - Joins the aggregated node data (`days_on_node_count`) with the `regions` table using `region_id`.
   - Calculates the following metrics for each region:
-    - `PERCENTILE_CONT(0.5)` computes the median, selecting an actual value from the dataset without interpolation.
-    - `PERCENTILE_DISC(0.8)` computes the 80th percentile, similar to the median.
-    - `PERCENTILE_DISC(0.95)` computes the 95th percentile, similar to the 80th percentile.
+    - `PERCENTILE_CONT()` computes the Nth percentile, selecting an actual value from the dataset without interpolation.
   - Groups the results by `region_name`.
 
 - `ORDER BY` ensures the output is sorted alphabetically by `region_name`.
@@ -296,7 +331,226 @@ This approach accounts for detailed node-level data while providing insights at 
 | Europe      | 23     | 34            | 52            |
 
 #### B. Customer Transactions
-...
+
+**1. What is the unique count and total amount for each transaction type?**
+
+*query:*
+
+```SQL
+SELECT
+  txn_type,
+  COUNT(DISTINCT txn_amount) AS unique_txn_amount,
+  SUM(txn_amount) AS total_txn_amount
+FROM
+  customer_transactions
+GROUP BY
+  txn_type
+ORDER BY
+  txn_type ASC
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+The SQL query calculates metrics related to transaction types from the `customer_transactions` table.
+
+- `txn_type`: Retrieves the type of transaction (e.g., deposit, withdrawal, purchase).
+- `COUNT(DISTINCT txn_amount)`: Counts the unique transaction amounts for each transaction type.
+- `SUM(txn_amount)`: Computes the total transaction amount for each transaction type.
+- `FROM customer_transactions`: Specifies the table containing the transaction data.
+- `GROUP BY txn_type`: Groups the results by transaction type to calculate metrics for each type.
+- `ORDER BY txn_type ASC`: Ensures the output is sorted in ascending order of transaction type.
+
+The query returns a table with each transaction type, the count of unique transaction amounts, and the total transaction amount.
+
+</details>
+
+*answer:*
+
+| txn_type   | unique_txn_amount | total_txn_amount |
+| ---------- | ----------------- | ---------------- |
+| deposit    | 929               | 1359168          |
+| purchase   | 815               | 806537           |
+| withdrawal | 804               | 793003           |
+
+**2. What is the average total historical deposit counts and amounts for all customers?**
+
+*query:*
+
+```SQL
+WITH totals AS (
+  SELECT
+    customer_id,
+    COUNT(*) AS total_deposits_amount,
+    SUM(txn_amount) AS total_deposits_sum
+  FROM
+    customer_transactions
+  WHERE
+    txn_type = 'deposit'
+  GROUP BY
+    customer_id,
+    txn_type
+)
+SELECT
+  ROUND(AVG(total_deposits_amount)) AS avg_deposits_amount,
+  ROUND(AVG(total_deposits_sum)) AS avg_deposits_sum
+FROM
+  totals;
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+This query calculates the average total deposit counts and amounts for all customers.
+
+- `WITH totals AS`:
+  - Creates a Common Table Expression (CTE) named `totals` that calculates the total number of deposits (`COUNT(*)`) and the total sum of deposit amounts (`SUM(txn_amount)`) for each customer.
+  - Filters the data to include only rows where the `txn_type` is 'deposit'.
+  - Groups the data by `customer_id` and `txn_type` to compute the aggregated metrics per customer.
+
+- Main `SELECT` statement:
+  - Uses the `totals` CTE as the data source.
+  - `ROUND(AVG(total_deposits_amount))`: Calculates the average number of deposits made by each customer and rounds the result.
+  - `ROUND(AVG(total_deposits_sum))`: Calculates the average total deposit amount for all customers and rounds the result.
+
+- The query returns two metrics:
+  - `avg_deposits_amount`: Average number of deposits per customer.
+  - `avg_deposits_sum`: Average total amount of deposits per customer.
+
+</details>
+
+*answer:*
+
+| avg_deposits_amount | avg_deposits_sum |
+| ------------------- | ---------------- |
+| 5                   | 2718             |
+
+**3. For each month - how many Data Bank customers make more than 1 deposit and either 1 purchase or 1 withdrawal in a single month?**
+
+*query:*
+
+```SQL
+WITH monthly_activity AS (
+  SELECT
+    customer_id,
+    DATE_TRUNC('month', txn_date)::DATE AS current_month,
+    txn_type,
+    COUNT(txn_type) AS txn_count
+  FROM
+    customer_transactions
+  GROUP BY
+    customer_id,
+    DATE_TRUNC('month', txn_date),
+    txn_type
+),
+filtered_deposits AS (
+  SELECT
+    customer_id,
+    current_month
+  FROM
+    monthly_activity
+  WHERE
+    txn_type = 'deposit' AND txn_count > 1
+),
+filtered_purchases_withdrawals AS (
+  SELECT
+    customer_id,
+    current_month
+  FROM
+    monthly_activity
+  WHERE
+    txn_type IN ('purchase', 'withdrawal') AND txn_count = 1
+),
+combined_data AS (
+  SELECT DISTINCT
+    d.customer_id,
+    d.current_month
+  FROM
+    filtered_deposits d
+  JOIN
+    filtered_purchases_withdrawals p
+  ON
+    d.customer_id = p.customer_id AND d.current_month = p.current_month
+)
+SELECT
+  current_month,
+  COUNT(DISTINCT customer_id) AS customer_count
+FROM
+  combined_data
+GROUP BY
+  current_month
+ORDER BY
+  current_month;
+```
+
+<details>
+  <summary><em>show description</em></summary>
+  
+This query calculates the number of Data Bank customers who, in a single month, made more than 1 deposit and at least 1 purchase or withdrawal.
+
+- `WITH monthly_activity AS (...)`:
+  - Groups transactions by `customer_id`, month (`current_month`), and `txn_type`.
+  - Calculates the count of transactions for each type using `COUNT(txn_type)`.
+
+- `WITH filtered_deposits AS (...)`:
+  - Selects rows from `monthly_activity` where `txn_type = 'deposit'` and `txn_count > 1`.
+
+- `WITH filtered_purchases_withdrawals AS (...)`:
+  - Selects rows from `monthly_activity` where `txn_type` is `'purchase'` or `'withdrawal'` and `txn_count = 1`.
+
+- `WITH combined_data AS (...)`:
+  - Joins `filtered_deposits` and `filtered_purchases_withdrawals` on `customer_id` and `current_month`.
+  - Ensures both conditions are met for the same customer in the same month.
+
+- Final `SELECT`:
+  - Groups the resulting data by `current_month`.
+  - Counts distinct `customer_id` in each group.
+  - Orders the results chronologically by `current_month`.
+
+This query methodically filters, joins, and aggregates data to provide the required customer activity metrics.
+
+</details>
+
+*answer:*
+| current_month | customer_count |
+| ------------- | -------------- |
+| 2020-01-01    | 115            |
+| 2020-02-01    | 108            |
+| 2020-03-01    | 113            |
+| 2020-04-01    | 50             |
+
+**4. What is the closing balance for each customer at the end of the month?**
+
+*query:*
+
+```SQL
+
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+
+</details>
+
+*answer:*
+
+
+**5. What is the percentage of customers who increase their closing balance by more than 5%?**
+
+*query:*
+
+```SQL
+
+```
+
+<details>
+  <summary><em>show description</em></summary>
+
+
+</details>
+
+*answer:*
 
 #### C. Data Allocation Challenge
 ...
