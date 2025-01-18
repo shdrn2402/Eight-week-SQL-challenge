@@ -247,7 +247,7 @@ WITH days_on_node_count AS (
 
 SELECT
   R.region_name,
-  PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY DNC.days_on_node) AS median,
+  PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY DNC.days_on_node) AS median,
   PERCENTILE_DISC(0.8) WITHIN GROUP (ORDER BY DNC.days_on_node) AS percentile_80,
   PERCENTILE_DISC(0.95) WITHIN GROUP (ORDER BY DNC.days_on_node) AS percentile_95
 FROM
@@ -275,8 +275,8 @@ This query calculates the median, 80th percentile, and 95th percentile of the da
 - Main `SELECT` statement:
   - Joins the aggregated node data (`days_on_node_count`) with the `regions` table using `region_id`.
   - Calculates the following metrics for each region:
-    - `PERCENTILE_CONT(0.5)` computes the median based on a continuous distribution of days.
-    - `PERCENTILE_DISC(0.8)` computes the 80th percentile, selecting an actual value from the dataset without interpolation.
+    - `PERCENTILE_CONT(0.5)` computes the median, selecting an actual value from the dataset without interpolation.
+    - `PERCENTILE_DISC(0.8)` computes the 80th percentile, similar to the median.
     - `PERCENTILE_DISC(0.95)` computes the 95th percentile, similar to the 80th percentile.
   - Groups the results by `region_name`.
 
