@@ -66,27 +66,26 @@ JOIN menu m ON s.product_id = m.product_id
 GROUP BY s.customer_id
 ORDER BY total_spent DESC;
 ```
+
 <details>
   <summary><em><strong>show description</strong></em></summary>
-  <p>The SQL query retrieves the `customer_id` and calculates the `total amount spent` (total_spent) by each customer at the restaurant.</p>
-  <ul>
-    <li>It joins the sales table (s) and the menu table (m) using the `product_id` column, which serves as a common key between the two tables.</li>
-    <li>The query then groups the results by `customer_id`, aggregating the `total price` (SUM(m.price)) for each customer.</li>
-    <li>The SUM() function calculates the total amount spent by each customer across all their purchases.</li>
-    <li>Finally, the results are sorted in descending order (DESC) based on the total_spent value, so customers who spent the most appear at the top.</li>
-  </ul>
+
+- The SQL query retrieves the `customer_id` and calculates the `total amount spent` (total_spent) by each customer at the restaurant.
+- It joins the sales table (s) and the menu table (m) using the `product_id` column, which serves as a common key between the two tables.
+- The query then groups the results by `customer_id`, aggregating the `total price` (SUM(m.price)) for each customer.
+- The SUM() function calculates the total amount spent by each customer across all their purchases. 
+- Finally, the results are sorted in descending order (DESC) based on the total_spent value, so customers who spent the most appear at the top.
+
 </details>
 
-<details>
-  <summary><em><strong>show answer</strong></em></summary>
-
+***answer***
 | customer_id | total_spent |
 | ----------- | ----------- |
 | A           | 76          |
 | B           | 74          |
 | C           | 36          |
 
-</details>
+---
 
 ### 2. How many days has each customer visited the restaurant?
 
@@ -100,24 +99,22 @@ ORDER BY visits_amount ASC;
 
 <details>
   <summary><em><strong>show description</strong></em></summary>
-  <p>The SQL query retrieves the `customer_id` and calculates the total number of unique visit dates (visits_amount) for each customer at the restaurant.</p>
-  <ul>
-    <li>It uses the `COUNT(DISTINCT order_date)` function to count the number of unique dates each customer visited the restaurant, ensuring duplicate dates are not counted.</li>
-    <li>The query groups the results by customer_id, so the count of unique dates is calculated for each individual customer.</li>
-    <li>The results are then sorted in ascending order (ASC) based on `visits_amount`, so customers with the fewest visits appear first.</li>
-  </ul>
+
+The SQL query retrieves the `customer_id` and calculates the total number of unique visit dates (visits_amount) for each customer at the restaurant.
+- It uses the `COUNT(DISTINCT order_date)` function to count the number of unique dates each customer visited the restaurant, ensuring duplicate dates are not counted.
+- The query groups the results by customer_id, so the count of unique dates is calculated for each individual customer.
+- The results are then sorted in ascending order (ASC) based on `visits_amount`, so customers with the fewest visits appear first.
+
 </details>
 
-<details>
-  <summary><em><strong>show answer</strong></em></summary>
-
+***answer:***
 | customer_id | visits_amount |
 | ----------- | ------------- |
 | C           | 2             |
 | A           | 4             |
 | B           | 6             |
 
-</details>
+---
 
 ### 3. What was the first item from the menu purchased by each customer?
 
@@ -144,21 +141,20 @@ ORDER BY fp.customer_id;
 
 <details>
   <summary><em><strong>show description</strong></em></summary>
-  <p>The SQL query retrieves the `customer_id` and identifies the first menu item (product_name) purchased by each customer based on their earliest order date.</p>
-  <ui>
-    <li>It uses a Common Table Expression (CTE) named `first_purchases` to calculate the first order date (first_order_date) for each customer.</li>
-    <li>Within the CTE, the `MIN(order_date)` function is applied to find the earliest purchase date for each customer_id, and the results are grouped by customer to ensure accuracy.</li>
-    <li>The main query joins the result of the CTE (first_purchases) with the `sales` table on both `customer_id` and `order_date` to retrieve all rows corresponding to the first purchase date for each customer.</li>
-    <li>It then joins the sales table with the menu table on `product_id` to extract the product name (product_name) of the items purchased on that date.</li>
-    <li>The final result is sorted by `customer_id` to provide an organized output.</li>
-  </ui>
-  <p>This query focuses on identifying items purchased on the first recorded date for each customer. It assumes that all purchases on the same date are part of a single order and doesn't account for the sequence of purchases within the day, as the dataset lacks time information.</p>
-  <p>While the `DENSE_RANK()` function could also be used to identify the first purchase, this approach was chosen for its simplicity and clarity, given the dataset's structure.</p>
+
+The SQL query retrieves the `customer_id` and identifies the first menu item (product_name) purchased by each customer based on their earliest order date.
+- It uses a Common Table Expression (CTE) named `first_purchases` to calculate the first order date (first_order_date) for each customer.
+- Within the CTE, the `MIN(order_date)` function is applied to find the earliest purchase date for each customer_id, and the results are grouped by customer to ensure accuracy.
+- The main query joins the result of the CTE (first_purchases) with the `sales` table on both `customer_id` and `order_date` to retrieve all rows corresponding to the first purchase date for each customer.
+- It then joins the sales table with the menu table on `product_id` to extract the product name (product_name) of the items purchased on that date.
+- The final result is sorted by `customer_id` to provide an organized output.
+
+This query focuses on identifying items purchased on the first recorded date for each customer. It assumes that all purchases on the same date are part of a single order and doesn't account for the sequence of purchases within the day, as the dataset lacks time information.
+While the `DENSE_RANK()` function could also be used to identify the first purchase, this approach was chosen for its simplicity and clarity, given the dataset's structure.
+
 </details>
 
-<details>
-  <summary><em><strong>show answer</strong></em></summary>
-
+***answer:***
 | customer_id | product_name |
 | ----------- | ------------ |
 | A           | sushi        |
@@ -167,7 +163,7 @@ ORDER BY fp.customer_id;
 | C           | ramen        |
 | C           | ramen        |
 
-</details>
+---
 
 ### 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
 
@@ -191,24 +187,22 @@ WHERE total_purchases = (SELECT MAX(total_purchases) FROM product_counts);
 
 <details>
   <summary><em><strong>show description</strong></em></summary>
-  <p>The SQL query retrieves the most popular menu item(s) based on the total number of purchases (total_purchases).</p>
-  <ui>
-    <li>It uses a Common Table Expression (CTE) named `product_counts` to calculate the total number of purchases for each product. The `COUNT(*)` function counts all purchases, while the results are grouped by product_name using the GROUP BY clause.</li>
-    <li>The sales table is joined with the menu table on `product_id` to link sales records with their corresponding product names.</li>
-    <li>The main query selects the `product_name` (renamed as most_popular) and `total_purchases` from the CTE.</li>
-    <li>It includes a subquery to find the maximum value of total_purchases using the MAX() function. Only products with a purchase count equal to this maximum value are returned.</li>
-    <li>This ensures that all products with the highest number of purchases are included, even if multiple products share the same maximum value.</li>
-  </ui>
+
+The SQL query retrieves the most popular menu item(s) based on the total number of purchases (total_purchases).
+- It uses a Common Table Expression (CTE) named `product_counts` to calculate the total number of purchases for each product. The `COUNT(*)` function counts all purchases, while the results are grouped by product_name using the GROUP BY clause.
+- The sales table is joined with the menu table on `product_id` to link sales records with their corresponding product names.
+- The main query selects the `product_name` (renamed as most_popular) and `total_purchases` from the CTE.
+- It includes a subquery to find the maximum value of total_purchases using the MAX() function. Only products with a purchase count equal to this maximum value are returned.
+- This ensures that all products with the highest number of purchases are included, even if multiple products share the same maximum value.
+
 </details>
 
-<details>
-  <summary><em><strong>show answer</strong></em></summary>
-
+***answer:***
 | most_popular | total_purchases |
 | ------------ | --------------- |
 | ramen        | 8               |
 
-</details>
+---
 
 ### 5. Which item was the most popular for each customer?
 
@@ -232,20 +226,20 @@ ORDER BY customer_id;
 
 <details>
   <summary><em><strong>show description</strong></em></summary>
-  <p>The SQL query uses a Common Table Expression (CTE) named `sold_per_customer` to generate a temporary result set that calculates the popularity of items purchased by each customer.</p>
-  <ui>
-    <li>Within the CTE, it selects the `customer_id`, `product_id`, and calculates the number of times each product was purchased by the customer (items_sold) using the `COUNT(product_id)` function.</li>
-    <li>The results are grouped by `customer_id` and `product_id` using the GROUP BY clause, ensuring that the purchase count is calculated for each product of every customer.</li>
-    <li>The `DENSE_RANK()` function assigns a rank to each row within the partition of each `customer_id`, ordered by the purchase count (items_sold) in descending order. The most popular product(s) for each customer receive a rank of 1.</li>
-    <li>Next, the main query retrieves the `customer_id`, the `purchase count` (items_sold), and the product name (product_name) by joining the CTE with the menu table on the product_id field. It filters the results to include only the rows where the rank (rank_value) is equal to 1, which corresponds to the most purchased product(s) for each customer.</li>
-    <li>Finally, the results are sorted by customer_id, returning each customer's ID, their most popular product, and the number of times it was purchased. This query accounts for cases where multiple products are tied as the most popular for a single customer by including all such products in the result.</li>
-  </ui>
-  <p>The JOIN between the sold_per_customer CTE and the menu table is performed in the main query rather than inside the CTE. This approach ensures that the grouping, ranking, and filtering are applied to a smaller subset of data (only the sales table), which can improve performance when the menu table is large. By deferring the JOIN to the main query, the data processing is streamlined, focusing on only the necessary rows with rank_value = 1.</p>
+
+The SQL query uses a Common Table Expression (CTE) named `sold_per_customer` to generate a temporary result set that calculates the popularity of items purchased by each customer.
+
+- Within the CTE, it selects the `customer_id`, `product_id`, and calculates the number of times each product was purchased by the customer (items_sold) using the `COUNT(product_id)` function.
+- The results are grouped by `customer_id` and `product_id` using the GROUP BY clause, ensuring that the purchase count is calculated for each product of every customer.
+- The `DENSE_RANK()` function assigns a rank to each row within the partition of each `customer_id`, ordered by the purchase count (items_sold) in descending order. The most popular product(s) for each customer receive a rank of 1.
+- Next, the main query retrieves the `customer_id`, the `purchase count` (items_sold), and the product name (product_name) by joining the CTE with the menu table on the product_id field. It filters the results to include only the rows where the rank (rank_value) is equal to 1, which corresponds to the most purchased product(s) for each customer.
+- Finally, the results are sorted by customer_id, returning each customer's ID, their most popular product, and the number of times it was purchased. This query accounts for cases where multiple products are tied as the most popular for a single customer by including all such products in the result.
+
+The JOIN between the sold_per_customer CTE and the menu table is performed in the main query rather than inside the CTE. This approach ensures that the grouping, ranking, and filtering are applied to a smaller subset of data (only the sales table), which can improve performance when the menu table is large. By deferring the JOIN to the main query, the data processing is streamlined, focusing on only the necessary rows with rank_value = 1.
+
 </details>
 
-<details>
-  <summary><em><strong>show answer</strong></em></summary>
-
+***answer:***
 | customer_id | product_name | items_sold |
 | ----------- | ------------ | ---------- |
 | A           | ramen        | 3          |
@@ -254,7 +248,7 @@ ORDER BY customer_id;
 | B           | ramen        | 2          |
 | C           | ramen        | 3          |
 
-</details>
+---
 
 ### 6. Which item was purchased first by the customer after they became a member?
 
@@ -281,26 +275,24 @@ ORDER BY s.customer_id, s.order_date;
 
 <details>
   <summary><em><strong>show description</strong></em></summary>
-  <p>The SQL query retrieves the first product purchased by each customer after they joined the loyalty program.</p>
-  <ui>
-    <li>It uses a Common Table Expression (CTE) named `first_purchase_date` to calculate the first available order date (`first_order_date`) for each customer after their membership date.</li>
-    <li>Within the CTE, the `MIN(s.order_date)` function is used to identify the earliest order date for each customer, and the results are grouped by `customer_id` to ensure the calculation is accurate for each individual.</li>
-    <li>The main query joins the `sales` table with the CTE on `customer_id` and `first_order_date`, selecting only the orders that match the earliest date for each customer.</li>
-    <li>The query also joins the `sales` table with the `menu` table on `product_id`, enabling the retrieval of the product name (`product_name`) for the identified orders.</li>
-    <li>The `WHERE` clause in the CTE filters the results to include only orders made on or after the customer's `join_date`, ensuring that purchases prior to membership are excluded.</li>
-    <li>The `ORDER BY s.customer_id, s.order_date` clause ensures the results are sorted by customer and by the date of the order for clear organization.</li>
-  </ui>
+
+The SQL query retrieves the first product purchased by each customer after they joined the loyalty program.
+- It uses a Common Table Expression (CTE) named `first_purchase_date` to calculate the first available order date (`first_order_date`) for each customer after their membership date.
+- Within the CTE, the `MIN(s.order_date)` function is used to identify the earliest order date for each customer, and the results are grouped by `customer_id` to ensure the calculation is accurate for each individual.
+- The main query joins the `sales` table with the CTE on `customer_id` and `first_order_date`, selecting only the orders that match the earliest date for each customer.
+- The query also joins the `sales` table with the `menu` table on `product_id`, enabling the retrieval of the product name (`product_name`) for the identified orders.
+- The `WHERE` clause in the CTE filters the results to include only orders made on or after the customer's `join_date`, ensuring that purchases prior to membership are excluded.
+- The `ORDER BY s.customer_id, s.order_date` clause ensures the results are sorted by customer and by the date of the order for clear organization.
+
 </details>
 
-<details>
-  <summary><em><strong>show answer</strong></em></summary>
-
+***answer:***
 | customer_id | product_name | order_date |
 | ----------- | ------------ | ---------- |
 | A           | curry        | 2021-01-07 |
 | B           | sushi        | 2021-01-11 |
 
-</details>
+---
 
 ### 7. Which item was purchased just before the customer became a member?
 
@@ -327,19 +319,18 @@ ORDER BY s.customer_id, s.order_date;
 
 <details>
   <summary><em><strong>show description</strong></em></summary>
-  <p>The SQL query retrieves the last product purchased by each customer before they joined the loyalty program.</p>
-  <ui>
-    <li>It uses a Common Table Expression (CTE) named `last_purchase_before_membership` to calculate the last available order date (`last_order_date`) for each customer before their membership date.</li>
-    <li>Within the CTE, the `MAX(s.order_date)` function is used to identify the most recent order date for each customer before their membership, and the results are grouped by `customer_id` to ensure the calculation is specific to each individual.</li>
-    <li>The main query joins the `sales` table with the CTE on `customer_id` and `last_order_date`, selecting only the orders that match the last date for each customer.</li>
-    <li>The query also joins the `sales` table with the `menu` table on `product_id`, enabling the retrieval of the product name (`product_name`) for the identified orders.</li>
-    <li>The `WHERE` clause in the CTE filters the results to include only orders made before the customer's `join_date`, ensuring that purchases on or after membership are excluded.</li>
-    <li>The `ORDER BY s.customer_id, s.order_date` clause ensures the results are sorted by customer and by the date of the order for clear organization.</li>
-  </ui>
+
+The SQL query retrieves the last product purchased by each customer before they joined the loyalty program.
+- It uses a Common Table Expression (CTE) named `last_purchase_before_membership` to calculate the last available order date (`last_order_date`) for each customer before their membership date.
+- Within the CTE, the `MAX(s.order_date)` function is used to identify the most recent order date for each customer before their membership, and the results are grouped by `customer_id` to ensure the calculation is specific to each individual.
+- The main query joins the `sales` table with the CTE on `customer_id` and `last_order_date`, selecting only the orders that match the last date for each customer.
+- The query also joins the `sales` table with the `menu` table on `product_id`, enabling the retrieval of the product name (`product_name`) for the identified orders.
+- The `WHERE` clause in the CTE filters the results to include only orders made before the customer's `join_date`, ensuring that purchases on or after membership are excluded.
+- The `ORDER BY s.customer_id, s.order_date` clause ensures the results are sorted by customer and by the date of the order for clear organization.
+
 </details>
 
-<details>
-  <summary><em><strong>show answer</strong></em></summary>
+***answer:***
 
 | customer_id | product_name | order_date |
 | ----------- | ------------ | ---------- |
@@ -347,7 +338,7 @@ ORDER BY s.customer_id, s.order_date;
 | A           | curry        | 2021-01-01 |
 | B           | sushi        | 2021-01-04 |
 
-</details>
+---
 
 ### 8. What is the total items and amount spent for each member before they became a member?
 
@@ -366,28 +357,27 @@ ORDER BY s.customer_id;
 ```
 <details>
   <summary><em><strong>show description</strong></em></summary>
-  <p>The SQL query retrieves the `customer_id` along with the total count of items ordered (`total_items`) and the total amount spent (`total_amount`) by each customer before they became a member.</p>
-  <ui>
-    <li>It retrieves data from the `sales` table and joins it with the `menu` table based on matching `product_id`.</li>
-    <li>It also joins the `sales` table with the `members` table based on matching `customer_id`.</li>
-    <li>The results are filtered based on the condition that the `order_date` in the `sales` table is less than the `join_date` of the customer in the `members` table.</li>
-    <li>The `COUNT(s.product_id)` function calculates the number of occurrences of each `product_id` in the `sales` table, giving the total number of items ordered by each customer.</li>
-    <li>The `SUM(m.price)` function calculates the sum of the price from the `menu` table, providing the total amount spent by each customer.</li>
-    <li>Results are grouped by `customer_id` to get the totals for each customer.</li>
-    <li>The query then presents the `customer_id`, `total_items`, and `total_amount` for each customer who placed orders before joining as a member.</li>
-    <li>Finally, the results are sorted in ascending order based on the `customer_id`.</li>
-  </ui>
+
+The SQL query retrieves the `customer_id` along with the total count of items ordered (`total_items`) and the total amount spent (`total_amount`) by each customer before they became a member.
+
+- It retrieves data from the `sales` table and joins it with the `menu` table based on matching `product_id`.
+- It also joins the `sales` table with the `members` table based on matching `customer_id`.
+- The results are filtered based on the condition that the `order_date` in the `sales` table is less than the `join_date` of the customer in the `members` table.
+- The `COUNT(s.product_id)` function calculates the number of occurrences of each `product_id` in the `sales` table, giving the total number of items ordered by each customer.
+- The `SUM(m.price)` function calculates the sum of the price from the `menu` table, providing the total amount spent by each customer.
+- Results are grouped by `customer_id` to get the totals for each customer.
+- The query then presents the `customer_id`, `total_items`, and `total_amount` for each customer who placed orders before joining as a member.
+- Finally, the results are sorted in ascending order based on the `customer_id`.
+
 </details>
 
-<details>
-  <summary><em><strong>show answer</strong></em></summary>
-
+***answer:***
 | customer_id | total_items | total_amount |
 | ----------- | ----------- | ------------ |
 | A           | 2           | 25           |
 | B           | 3           | 40           |
 
-</details>
+---
 
 ### 9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
 
@@ -409,30 +399,26 @@ ORDER BY s.customer_id;
 
 <details>
   <summary><em><strong>show description</strong></em></summary>
-  <p>The SQL query calculates the total loyalty points earned by each customer based on their purchases, with a 2x multiplier applied for sushi.</p>
-  <ui>
-    <li>It retrieves data from the `sales` table and joins it with the `menu` table based on matching `product_id`.</li>
-    <li>The `CASE` statement is used to apply the points calculation:</li>
-      <ui>
-        <li>For products with `product_name` equal to `'sushi'`, the points are calculated as `m.price * 20` (since $1 spent equals 10 points, and sushi has a 2x multiplier).</li>
-        <li>For all other products, the points are calculated as `m.price * 10`.</li>
-      </ui>
-    <li>The `SUM()` function aggregates the total points earned across all purchases for each customer.</li>
-    <li>The query groups the results by `customer_id` to calculate the total points for each customer individually.</li>
-    <li>The results are ordered by `customer_id` in ascending order to provide a clear, organized output.</li>
-  </ui>
+
+The SQL query calculates the total loyalty points earned by each customer based on their purchases, with a 2x multiplier applied for sushi.
+- It retrieves data from the `sales` table and joins it with the `menu` table based on matching `product_id`.
+- The `CASE` statement is used to apply the points calculation:
+  - For products with `product_name` equal to `'sushi'`, the points are calculated as `m.price * 20` (since $1 spent equals 10 points, and sushi has a 2x multiplier).
+  - For all other products, the points are calculated as `m.price * 10`. 
+- The `SUM()` function aggregates the total points earned across all purchases for each customer.
+- The query groups the results by `customer_id` to calculate the total points for each customer individually.
+- The results are ordered by `customer_id` in ascending order to provide a clear, organized output.
+
 </details>
 
-<details>
-  <summary><em><strong>show answer</strong></em></summary>
-
+***answer:***
 | customer_id | total_points |
 | ----------- | ------------ |
 | A           | 860          |
 | B           | 940          |
 | C           | 360          |
 
-</details>
+---
 
 ### 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
 
@@ -457,34 +443,29 @@ ORDER BY s.customer_id;
 
 <details>
   <summary><em><strong>show description</strong></em></summary>
-  <p>The SQL query calculates the total loyalty points earned by each customer by the end of January 2021, with a 2x multiplier applied to all items purchased during the first week after joining the loyalty program.</p>
-  <ui>
-    <li>It retrieves data from the `sales` table and joins it with the `menu` table on matching `product_id` to fetch product prices.</li>
-    <li>It also joins the `sales` table with the `members` table on matching `customer_id` to determine the `join_date` for each customer.</li>
-    <li>The `CASE` statement is used to apply the points calculation:</li>
-    <ui>
-      <li>For purchases made between `join_date` and `join_date + INTERVAL '6 days'` (the first week of membership), points are calculated as `m.price * 20` (2x multiplier for all items).</li>
-      <li>For all other purchases, points are calculated as `m.price * 10`.</li>
-    </ui>
-    <li>The `WHERE` clause filters the results to include only orders made on or before `'2021-01-31'`, ensuring that only January purchases are considered.</li>
-    <li>The `SUM()` function aggregates the total points earned across all purchases for each customer.</li>
-    <li>The query groups the results by `customer_id` to calculate the total points for each customer individually.</li>
-    <li>The results are sorted by `customer_id` in ascending order to provide a clear, organized output.</li>
-  </ui>
+The SQL query calculates the total loyalty points earned by each customer by the end of January 2021, with a 2x multiplier applied to all items purchased during the first week after joining the loyalty program.
+
+- It retrieves data from the `sales` table and joins it with the `menu` table on matching `product_id` to fetch product prices.
+- It also joins the `sales` table with the `members` table on matching `customer_id` to determine the `join_date` for each customer.
+- The `CASE` statement is used to apply the points calculation:
+  - For purchases made between `join_date` and `join_date + INTERVAL '6 days'` (the first week of membership), points are calculated as `m.price * 20` (2x multiplier for all items).
+  - For all other purchases, points are calculated as `m.price * 10`.
+- The `WHERE` clause filters the results to include only orders made on or before `'2021-01-31'`, ensuring that only January purchases are considered.
+- The `SUM()` function aggregates the total points earned across all purchases for each customer.
+- The query groups the results by `customer_id` to calculate the total points for each customer individually.
+- The results are sorted by `customer_id` in ascending order to provide a clear, organized output.
+
 </details>
 
-<details>
-  <summary><em><strong>answer</strong></em></summary>
-
+***answer***
 | customer_id | total_points |
 | ----------- | ------------ |
 | A           | 1270         |
 | B           | 720          |
 
-</details>
+---
 
 ## Bonus Questions & Solutions
-
 ### 1. Join All The Things
 
 ***query:***
@@ -506,22 +487,18 @@ ORDER BY s.customer_id, s.order_date, m.product_name;
 
 <details>
   <summary><em><strong>show description</strong></em></summary>
-  <p>The SQL query recreates the requested table output by combining information from the `sales`, `menu`, and `members` tables.</p>
-  <ui>
-    <li>It retrieves data from the `sales` table and joins it with the `menu` table on matching `product_id` to include the product name (`product_name`) and price (`price`) for each order.</li>
-    <li>A `LEFT JOIN` is used to connect the `sales` table with the `members` table on `customer_id`, allowing access to the `join_date` for each customer while including non-member customers.</li>
-    <li>A `CASE` statement is used to determine the membership status (`member`) for each order:</li>
-    <ui>
-        <li>Returns `'Y'` if the `order_date` is greater than or equal to the `join_date`.</li>
-        <li>Returns `'N'` if the `order_date` is before the `join_date` or the customer is not a member.</li>
-    </ui>
-    <li>The query results are ordered by `customer_id`, `order_date`, and `product_name` to match the desired output structure.</li>
-  </ui>
+
+The SQL query recreates the requested table output by combining information from the `sales`, `menu`, and `members` tables.
+- It retrieves data from the `sales` table and joins it with the `menu` table on matching `product_id` to include the product name (`product_name`) and price (`price`) for each order.
+- A `LEFT JOIN` is used to connect the `sales` table with the `members` table on `customer_id`, allowing access to the `join_date` for each customer while including non-member customers.
+- A `CASE` statement is used to determine the membership status (`member`) for each order:
+  - Returns `'Y'` if the `order_date` is greater than or equal to the `join_date`.
+  - Returns `'N'` if the `order_date` is before the `join_date` or the customer is not a member.
+- The query results are ordered by `customer_id`, `order_date`, and `product_name` to match the desired output structure.
+
 </details>
 
-<details>
-  <summary><em><strong>show answer</strong></em></summary>
-
+***answer:***
 | customer_id | order_date | product_name | price | member |
 | ----------- | ---------- | ------------ | ----- | ------ |
 | A           | 2021-01-01 | curry        | 15    | N      |
@@ -540,7 +517,7 @@ ORDER BY s.customer_id, s.order_date, m.product_name;
 | C           | 2021-01-01 | ramen        | 12    | N      |
 | C           | 2021-01-07 | ramen        | 12    | N      |
 
-</details>
+---
 
 ### 2. Rank All The Things
 
@@ -570,27 +547,21 @@ ORDER BY s.customer_id, s.order_date, m.product_name;
 
 <details>
   <summary><em><strong>show description</strong></em></summary>
-  <p>The SQL query calculates the ranking of products purchased by customers, but only for purchases made after they joined the loyalty program, leaving non-member purchases unranked (`NULL`).</p>
-  <ui>
-    <li>It retrieves data from the `sales` table and joins it with the `menu` table on matching `product_id` to include `product_name` and `price`.</li>
-    <li>A `LEFT JOIN` is used to connect the `sales` table with the `members` table on `customer_id`, enabling access to the `join_date` for each customer.</li>
-    <li>A `CASE` statement determines the membership status (`member`):</li>
-    <ui>
-        <li>Returns `'Y'` if the `order_date` is greater than or equal to the `join_date`.</li>
-        <li>Returns `'N'` otherwise.</li>
-    </ui>
-    <li>Another `CASE` statement applies the ranking logic:</li>
-        <ui>
-        <li>If the `order_date` is on or after the `join_date`, the `RANK()` function is applied, partitioning by `customer_id` and ordering by `order_date` to assign sequential ranks for purchases.</li>
-        <li>If the `order_date` is before the `join_date`, the ranking is set to `NULL`.</li>
-    </ui>
-    <li>The query groups the results by `customer_id` and `order_date`, while the `ORDER BY` clause sorts the output by `customer_id`, `order_date`, and `product_name` for clear organization.</li>
-  </ui>
+
+The SQL query calculates the ranking of products purchased by customers, but only for purchases made after they joined the loyalty program, leaving non-member purchases unranked (`NULL`).
+- It retrieves data from the `sales` table and joins it with the `menu` table on matching `product_id` to include `product_name` and `price`.
+- A `LEFT JOIN` is used to connect the `sales` table with the `members` table on `customer_id`, enabling access to the `join_date` for each customer.
+- A `CASE` statement determines the membership status (`member`):
+  - Returns `'Y'` if the `order_date` is greater than or equal to the `join_date`.
+  - Returns `'N'` otherwise.
+- Another `CASE` statement applies the ranking logic:
+  - If the `order_date` is on or after the `join_date`, the `RANK()` function is applied, partitioning by `customer_id` and ordering by `order_date` to assign sequential ranks for purchases.
+   - If the `order_date` is before the `join_date`, the ranking is set to `NULL`.
+- The query groups the results by `customer_id` and `order_date`, while the `ORDER BY` clause sorts the output by `customer_id`, `order_date`, and `product_name` for clear organization.
+
 </details>
 
-<details>
-  <summary><em><strong>show answer</strong></em></summary>
-
+***answer:***
 | customer_id | order_date | product_name | price | member | ranking |
 | ----------- | ---------- | ------------ | ----- | ------ | ------- |
 | A           | 2021-01-01 | curry        | 15    | N      | null    |
@@ -608,5 +579,3 @@ ORDER BY s.customer_id, s.order_date, m.product_name;
 | C           | 2021-01-01 | ramen        | 12    | N      | null    |
 | C           | 2021-01-01 | ramen        | 12    | N      | null    |
 | C           | 2021-01-07 | ramen        | 12    | N      | null    |
-
-</details>
