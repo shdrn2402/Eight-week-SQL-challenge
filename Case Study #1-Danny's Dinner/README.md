@@ -81,11 +81,15 @@ VALUES
   ('B', '2021-01-09');
 ```
 
-**\*Note**: Primary keys are not explicitly defined in the tables, likely due to the educational nature of the project.
-- The data is artificially generated and static, minimizing the risk of integrity violations.
-- In real-world scenarios, defining primary keys is essential to ensure data integrity and uniqueness.
-- Some inserted values do not match the expected data types (e.g., INTEGER columns receiving string inputs). This works because PostgreSQL can implicitly convert values, but such practice is discouraged in production systems where explicit type casting ensures data consistency.
-- Inconsistencies in data representation should be addressed to align with real-world practices.
+**\*Note**:
+- Primary keys are not explicitly defined in the tables. This might be intentional due to the educational nature of the project:  
+  - The data is artificially generated and static, minimizing the risk of integrity violations.  
+  - In real-world scenarios, primary keys are essential to enforce data integrity and uniqueness.  
+
+- Data type mismatches are present in the inserted values:  
+  - For example, string values are being inserted into columns with numeric data types.  
+  - PostgreSQL implicitly converts these values, allowing the data to be stored. However, this practice is discouraged in production systems.  
+  - Explicit type casting should be used to ensure data consistency and to prevent unexpected errors.  
 
 </details>
 
