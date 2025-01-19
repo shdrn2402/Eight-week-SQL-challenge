@@ -322,8 +322,10 @@ ALTER COLUMN pickup_time TYPE TIMESTAMP USING pickup_time::TIMESTAMP;
 
 ***query:***
 ```SQL
-SELECT COUNT(*) AS pizzas_ordered
-FROM customer_orders;
+SELECT
+  COUNT(*) AS pizzas_ordered
+FROM
+  customer_orders;
 ```
 
 <details>
@@ -347,8 +349,10 @@ This query provides a simple and accurate total count of pizzas ordered, regardl
 
 ***query:***
 ```SQL
-SELECT COUNT(DISTINCT(order_id)) as unique_pizza_orders
-FROM customer_orders;
+SELECT
+  COUNT(DISTINCT(order_id)) as unique_pizza_orders
+FROM
+  customer_orders;
 ```
 <details>
   <summary><em><strong>show description</strong></em></summary>
@@ -369,11 +373,16 @@ The SQL query calculates the total number of unique customer orders made in the 
 
 ***query:***
 ```SQL
-SELECT runner_id, COUNT(*) AS orders_delivered
-FROM runner_orders
-WHERE cancellation IS NULL
-GROUP BY runner_id
-ORDER BY orders_delivered DESC;
+SELECT
+  runner_id, COUNT(*) AS orders_delivered
+FROM
+  runner_orders
+WHERE
+  cancellation IS NULL
+GROUP BY
+  runner_id
+ORDER BY
+  orders_delivered DESC;
 ```
 
 <details>
@@ -400,12 +409,19 @@ The SQL query retrieves the number of successful orders delivered by each runner
   
 ***query:***
 ```SQL
-SELECT pizza_name, COUNT(*) AS orders_delivered
-FROM customer_orders C
-JOIN runner_orders R ON C.order_id=R.order_id
-JOIN pizza_names PN ON C.pizza_id=PN.pizza_id
-WHERE cancellation IS NULL
-GROUP BY pizza_name;
+SELECT
+  pizza_name,
+  COUNT(*) AS orders_delivered
+FROM
+  customer_orders C
+JOIN
+  runner_orders R ON C.order_id=R.order_id
+JOIN
+  pizza_names PN ON C.pizza_id=PN.pizza_id
+WHERE
+  cancellation IS NULL
+GROUP BY
+  pizza_name;
 ```
 
 <details>
@@ -432,11 +448,16 @@ The SQL query retrieves the number of each type of pizza that was successfully d
   
 ***query:***
 ```SQL
-SELECT C.customer_id, PN.pizza_name, COUNT(*) AS orders_amount
-FROM customer_orders C
-JOIN pizza_names PN ON C.pizza_id=PN.pizza_id
-GROUP BY C.customer_id, PN.pizza_name
-ORDER BY C.customer_id
+SELECT
+  C.customer_id, PN.pizza_name, COUNT(*) AS orders_amount
+FROM
+  customer_orders C
+JOIN
+  pizza_names PN ON C.pizza_id=PN.pizza_id
+GROUP BY
+  C.customer_id, PN.pizza_name
+ORDER BY
+  C.customer_id
 ```
 
 <details>
