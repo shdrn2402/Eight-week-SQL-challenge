@@ -1,6 +1,6 @@
 ![Project Logo](../images/case3_logo.png)
 
-### Contents:
+## Contents:
 - [Introduction](#introduction)
 - [Entity Relationship Diagram](#entity-relationship-diagram)
 - [Case Study Questions & Solutions](#case-study-questions--solutions)
@@ -10,15 +10,14 @@
   - [D. Outside The Box Questions](#d-outside-the-box-questions)
 - [Analysis of Foodie-Fi's 2020 Performance](#analysis-of-foodie-fis-2020-performance)
 
-### Introduction
-
+## Introduction
 > Subscription based businesses are super popular and Danny realised that there was a large gap in the market - he wanted to create a new streaming service that only had food related content - something like Netflix but with only cooking shows!
 >
 >Danny finds a few smart friends to launch his new startup Foodie-Fi in 2020 and started selling monthly and annual subscriptions, giving their customers unlimited on-demand access to exclusive food videos from around the world!
 >
 >Danny created Foodie-Fi with a data driven mindset and wanted to ensure all future investment decisions and new features were decided using data. This case study focuses on using subscription style digital data to answer important business questions.
 
-### Entity Relationship Diagram
+## Entity Relationship Diagram
 <details>
   <summary><em>show database schema<b>*</b></em></summary>
 
@@ -32,29 +31,58 @@ CREATE TABLE plans (
   price DECIMAL(5,2)
 );
 
+INSERT INTO plans
+  (plan_id, plan_name, price)
+VALUES
+  ('0', 'trial', '0'),
+  ('1', 'basic monthly', '9.90'),
+  ('2', 'pro monthly', '19.90'),
+  ('3', 'pro annual', '199'),
+  ('4', 'churn', null);
+
+
+
 CREATE TABLE subscriptions (
   customer_id INTEGER,
   plan_id INTEGER,
   start_date DATE
 );
 
+INSERT INTO subscriptions
+  (customer_id, plan_id, start_date)
+VALUES
+  ('1', '0', '2020-08-01'),
+  ('1', '1', '2020-08-08'),
+  ('2', '0', '2020-09-20'),
+  ('2', '3', '2020-09-27'),
+  ('3', '0', '2020-01-13'),
+  ('3', '1', '2020-01-20'),
+  -- ...
+  ('1000', '0', '2020-03-19'),
+  ('1000', '2', '2020-03-26'),
+  ('1000', '4', '2020-06-04');
 ```
 
-**\*Note**: Primary keys are not explicitly defined in the tables, likely due to the educational nature of the project.
-- The data is artificially generated and static, minimizing the risk of integrity violations.
-- In real-world scenarios, defining primary keys is essential to ensure data integrity and uniqueness.
+**\*Note**:
+1. Primary keys are not explicitly defined in the tables. This might be intentional due to the educational nature of the project:  
+  - The data is artificially generated and static, minimizing the risk of integrity violations.  
+  - In real-world scenarios, primary keys are essential to enforce data integrity and uniqueness.  
+
+2. Data type mismatches are present in the inserted values:  
+  - For example, string values are being inserted into columns with numeric data types.  
+  - PostgreSQL implicitly converts these values, allowing the data to be stored. However, this practice is discouraged in production systems.  
+  - Explicit type casting should be used to ensure data consistency and to prevent unexpected errors. 
 
 </details>
 
 ![Project Logo](../images/case3_diagram.png)
 
 
-### Case Study Questions & Solutions
-#### A. Customer Journey
-**1. Based off the 8 sample customers provided in the sample from the subscriptions table, write a brief description about each customer’s onboarding journey.**
+## Case Study Questions & Solutions.
+## A. Customer Journey.
+### 1. Based off the 8 sample customers provided in the sample from the subscriptions table, write a brief description about each customer’s onboarding journey.
 
-*query:*
-
+***query:***
 ```SQL
 WITH basic_join AS (
   SELECT
@@ -62,9 +90,12 @@ WITH basic_join AS (
     S.start_date,
     P.plan_name,
     P.price
-  FROM subscriptions S
-  JOIN plans P USING(plan_id)
-  WHERE S.customer_id BETWEEN 1 AND 9
+  FROM
+    subscriptions S
+  JOIN
+    plans P USING(plan_id)
+  WHERE
+    S.customer_id BETWEEN 1 AND 9
 ),
 dated_plans AS (
   SELECT
@@ -73,7 +104,8 @@ dated_plans AS (
     plan_name,
     price,
     LEAD(start_date) OVER (PARTITION BY customer_id ORDER BY start_date) AS next_start_date
-  FROM basic_join
+  FROM
+    basic_join
 ),
 calculated_revenue AS (
   SELECT
@@ -110,12 +142,14 @@ SELECT
   price,
   plan_duration_days,
   revenue
-FROM calculated_revenue
-ORDER BY customer_id, start_date;
+FROM
+  calculated_revenue
+ORDER BY
+  customer_id, start_date;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 This SQL query calculates detailed subscription and revenue data for customers within a specific range of `customer_id`.
 
@@ -144,8 +178,7 @@ This SQL query calculates detailed subscription and revenue data for customers w
 
 </details>
 
-*answer:*
-
+***answer:***
 | customer_id | plan_name     | start_date | plan_duration_days | revenue_usd |
 | ----------- | ------------- | ---------- | ------------------ | ----------- |
 | 1           | trial         | 2020-08-01 | 7                  | 0           |
@@ -172,9 +205,9 @@ This SQL query calculates detailed subscription and revenue data for customers w
 | 9           | pro annual    | 2020-12-14 | 1478               | 796.00      |
 
 <details>
-  <summary><em>show customer onboarding analysis</em></summary>
+  <summary><em><strong>show customer onboarding analysis</strong></em></summary>
 
-**To ensure consistent results, a fixed date of `2024-12-31` was used to represent the current status of active customers. This prevents output changes over time.**
+**To ensure consistent results, a fixed date of `2024-12-31` was used to represent the current status of active customers. This prevents output changes over time
 
 Customer 1: Started with a 7-day trial, then switched to the basic monthly plan. The customer has been active for 1606 days, generating 524.70 USD in revenue.
 
@@ -196,20 +229,21 @@ Customer 9: Started with a trial and opted for the pro annual plan. The customer
 
 </details>
 
-#### B. Data Analysis Questions
+---
 
-**1. How many customers has Foodie-Fi ever had?**
+## B. Data Analysis Questions.
+### 1. How many customers has Foodie-Fi ever had?
 
-*query:*
-
+***query:***
 ```SQL
 SELECT
   COUNT(DISTINCT(customer_id)) AS customers_amount
-FROM subscriptions;
+FROM
+  subscriptions;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 This SQL query calculates the total number of unique customers Foodie-Fi has ever had by:
 
@@ -220,16 +254,15 @@ This query provides the total customer count, irrespective of their current subs
 
 </details>
 
-*answer:*
+***answer:***
 
 | customers_amount |
 |------------------|
 | 1000             |
 
-**2. What is the monthly distribution of trial plan start_date values for our dataset - use the start of the month as the group by value.**
+### 2. What is the monthly distribution of trial plan start_date values for our dataset - use the start of the month as the group by value?
 
-*query:*
-
+***query:***
 ```SQL
 SELECT
   DATE_TRUNC('month', start_date)::DATE AS month,
@@ -241,7 +274,7 @@ ORDER BY month;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 This SQL query calculates the monthly distribution of trial plan `start_date` values using `plan_id` instead of `plan_name` for filtering.
 
@@ -265,8 +298,7 @@ This SQL query calculates the monthly distribution of trial plan `start_date` va
 
 </details>
 
-*answer:*
-
+***answer:***
 | month      | trials_started |
 | ---------- | -------------- |
 | 2020-01-01 | 88             |
@@ -282,23 +314,29 @@ This SQL query calculates the monthly distribution of trial plan `start_date` va
 | 2020-11-01 | 75             |
 | 2020-12-01 | 84             |
 
-**3. What plan start_date values occur after the year 2020 for our dataset? Show the breakdown by count of events for each plan_name.**
+---
 
-*query:*
+### 3. What plan start_date values occur after the year 2020 for our dataset? Show the breakdown by count of events for each plan_name?
 
+***query:***
 ```SQL
 SELECT
   plan_name,
   COUNT(*) AS events_count
-FROM subscriptions
-JOIN plans USING(plan_id)
-WHERE start_date > '2020-12-31'
-GROUP BY plan_name
-ORDER BY events_count DESC;
+FROM
+  subscriptions
+JOIN
+  plans USING(plan_id)
+WHERE
+  start_date > '2020-12-31'
+GROUP BY
+  plan_name
+ORDER BY
+  events_count DESC;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The query calculates the count of `start_date` events after the year 2020 for each `plan_name` in the dataset.
 
@@ -319,8 +357,7 @@ The query calculates the count of `start_date` events after the year 2020 for ea
 
 </details>
 
-*answer:*
-
+***answer:***
 | plan_name     | events_count |
 | ------------- | ------------ |
 | churn         | 71           |
@@ -328,31 +365,37 @@ The query calculates the count of `start_date` events after the year 2020 for ea
 | pro monthly   | 60           |
 | basic monthly | 8            |
 
-**4. What is the customer count and percentage of customers who have churned rounded to 1 decimal place?**
+---
 
-*query:*
+### 4. What is the customer count and percentage of customers who have churned rounded to 1 decimal place?
 
+***query:***
 ```SQL
-WITH 
-total_customers AS (
-    SELECT COUNT(DISTINCT customer_id) AS total_count
-    FROM subscriptions
+WITH total_customers AS (
+  SELECT
+    COUNT(DISTINCT customer_id) AS total_count
+  FROM
+    subscriptions
 ),
 churned_customers AS (
-    SELECT COUNT(DISTINCT customer_id) AS churned_count
-    FROM subscriptions
-    WHERE plan_id = 4
+  SELECT
+    COUNT(DISTINCT customer_id) AS churned_count
+  FROM
+    subscriptions
+  WHERE
+    plan_id = 4
 )
 
 SELECT 
-    churned_customers.churned_count,
-    ROUND((churned_customers.churned_count::DECIMAL / total_customers.total_count) * 100, 1) AS churn_percentage
+  churned_customers.churned_count,
+  ROUND((churned_customers.churned_count::DECIMAL / total_customers.total_count) * 100, 1) AS churn_percentage
 FROM 
-    churned_customers, total_customers;
+  churned_customers, total_customers;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
+
 This SQL query calculates the count and percentage of customers who have churned, rounded to 1 decimal place.
 
 `total_customers` CTE:
@@ -375,16 +418,16 @@ Main Query:
 This approach ensures readability and logical separation of the calculations.
 </details>
 
-*answer:*
-
+***answer:***
 | churned_count | churn_percentage |
 | ------------- | ---------------- |
 | 307           | 30.7             |
 
-**5. How many customers have churned straight after their initial free trial - what percentage is this rounded to the nearest whole number?**
+---
 
-*query:*
+### 5. How many customers have churned straight after their initial free trial - what percentage is this rounded to the nearest whole number?
 
+***query:***
 ```SQL
 WITH plan_transitions AS (
   SELECT 
@@ -394,21 +437,23 @@ WITH plan_transitions AS (
       PARTITION BY s.customer_id
       ORDER BY s.start_date
     ) AS next_plan
-  FROM subscriptions s
-  JOIN plans p 
-    ON s.plan_id = p.plan_id
+  FROM
+    subscriptions s
+  JOIN
+    plans p ON s.plan_id = p.plan_id
 )
 SELECT 
   COUNT(customer_id) AS churned_customers,
   ROUND(100.0 * COUNT(customer_id) / (SELECT COUNT(DISTINCT customer_id) FROM subscriptions), 0) AS churned_percentage
-FROM plan_transitions
-WHERE current_plan = 'trial' 
+FROM
+  plan_transitions
+WHERE
+  current_plan = 'trial' 
   AND next_plan = 'churn';
-
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 - `trial_to_churn_transitions` CTE:
    - Retrieves each customer's `current_plan` and the `next_plan` using the `LEAD` window function.
@@ -434,16 +479,16 @@ WHERE current_plan = 'trial'
 
 </details>
 
-*answer:*
-
+***answer:***
 | churned_customers | churned_percentage |
 | ----------------- | ------------------ |
 | 92                | 9                  |
 
-**6. What is the number and percentage of customer plans after their initial free trial?**
+---
 
-*query:*
+### 6. What is the number and percentage of customer plans after their initial free trial?
 
+***query:***
 ```SQL
 WITH plan_transitions AS (
   SELECT 
@@ -453,26 +498,35 @@ WITH plan_transitions AS (
       PARTITION BY S.customer_id 
       ORDER BY S.start_date
      ) AS next_plan
-  FROM subscriptions S
-  JOIN plans P USING(plan_id)
+  FROM
+    subscriptions S
+  JOIN
+    plans P USING(plan_id)
 )
 
 SELECT
-    next_plan AS plan_after_trial, 
-    COUNT(customer_id) AS customer_count, 
-    ROUND(
-        100.0 * COUNT(customer_id) / 
-        (SELECT COUNT(DISTINCT customer_id) FROM subscriptions), 
-        1
+  next_plan AS plan_after_trial, 
+  COUNT(customer_id) AS customer_count, 
+  ROUND(
+    100.0 * COUNT(customer_id) / 
+    (SELECT
+      COUNT(DISTINCT customer_id)
+    FROM
+      subscriptions), 1
     ) AS percentage
-FROM plan_transitions
-WHERE next_plan IS NOT NULL AND plan_name = 'trial'
-GROUP BY next_plan
-ORDER BY percentage DESC;
+FROM
+  plan_transitions
+WHERE
+  next_plan IS NOT NULL
+  AND plan_name = 'trial'
+GROUP BY
+  next_plan
+ORDER BY
+  percentage DESC;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 - `WITH plan_transitions AS (...)`:
   - Creates a Common Table Expression (CTE) `plan_transitions` to calculate transitions between customer plans.
@@ -501,8 +555,7 @@ ORDER BY percentage DESC;
 
 </details>
 
-*answer:*
-
+***answer:***
 | plan_after_trial | customer_count | percentage |
 | ---------------- | -------------- | ---------- |
 | basic monthly    | 546            | 54.6       |
@@ -510,16 +563,21 @@ ORDER BY percentage DESC;
 | churn            | 92             | 9.2        |
 | pro annual       | 37             | 3.7        |
 
-**7. What is the customer count and percentage breakdown of all 5 plan_name values at 2020-12-31?**
+---
 
-*query:*
+### 7. What is the customer count and percentage breakdown of all 5 plan_name values at 2020-12-31?
 
+***query:***
 ```SQL
 WITH filtered_subscriptions AS (
-  SELECT *
-  FROM subscriptions
-  WHERE start_date <= '2020-12-31'
+  SELECT
+    *
+  FROM
+    subscriptions
+  WHERE
+    start_date <= '2020-12-31'
 )
+
 SELECT
   P.plan_name,
   COUNT(DISTINCT FS.customer_id) AS customers_amount,
@@ -537,11 +595,10 @@ GROUP BY
   P.plan_name
 ORDER BY
   percentage DESC;
-
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 - The query begins by defining a Common Table Expression (CTE) named `filtered_subscriptions`. This CTE selects all rows from the `subscriptions` table where the `start_date` is on or before `2020-12-31`.
 
@@ -559,8 +616,7 @@ ORDER BY
 
 </details>
 
-*answer:*
-
+***answer:***
 | plan_name     | customers_amount | percentage |
 | ------------- | ---------------- | ---------- |
 | trial         | 1000             | 100.00     |
@@ -569,12 +625,13 @@ ORDER BY
 | churn         | 236              | 23.60      |
 | pro annual    | 195              | 19.50      |
 
-**8. How many customers have upgraded to an annual plan in 2020?\***
+---
+
+### 8. How many customers have upgraded to an annual plan in 2020?\*
 
 **\*** The original question aimed to determine how many customers upgraded to an annual plan in 2020. However, this solution extends the analysis to include the previous plans that customers were on before upgrading. This was done out of interest in understanding the customer journey leading to the annual plan transition.
 
-*query:*
-
+***query:***
 ```SQL
 WITH year_filtered_table AS(
   SELECT
@@ -584,7 +641,8 @@ WITH year_filtered_table AS(
     S.start_date
   FROM
     subscriptions S
-  JOIN plans P USING(plan_id)
+  JOIN
+    plans P USING(plan_id)
   )
 SELECT
  previous_plan AS upgraded_from_plan,
@@ -593,12 +651,14 @@ FROM
   year_filtered_table
 WHERE 
   plan_name LIKE '%annual%' AND EXTRACT(year FROM start_date) = 2020
-GROUP BY previous_plan
-ORDER BY customers_amount DESC;
+GROUP BY
+  previous_plan
+ORDER BY
+  customers_amount DESC;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 - `year_filtered_table`: This Common Table Expression (CTE) retrieves all relevant subscription data, including the `customer_id`, the `plan_name`, and the previous plan (`previous_plan`) for each customer. The previous plan is calculated using the `LAG()` window function, partitioned by `customer_id` and ordered by `start_date`.
 
@@ -608,18 +668,18 @@ ORDER BY customers_amount DESC;
 
 </details>
 
-*answer:*
-
+***answer:***
 | upgraded_from_plan | customers_amount |
 | ------------------ | ---------------- |
 | basic monthly      | 88               |
 | pro monthly        | 70               |
 | trial              | 37               |
 
-**9. How many days on average does it take for a customer to an annual plan from the day they join Foodie-Fi?**
+---
 
-*query:*
+### 9. How many days on average does it take for a customer to an annual plan from the day they join Foodie-Fi?
 
+***query:***
 ```SQL
 WITH customer_transitions AS (
   SELECT
@@ -628,8 +688,10 @@ WITH customer_transitions AS (
     MIN(CASE WHEN P.plan_name LIKE '%annual%' THEN S.start_date END) AS annual_plan_date -- First annual plan date
   FROM
     subscriptions S
-  JOIN plans P USING(plan_id)
-  GROUP BY S.customer_id
+  JOIN
+    plans P USING(plan_id)
+  GROUP BY
+    S.customer_id
 ),
 days_to_annual_plan AS (
   SELECT
@@ -637,7 +699,8 @@ days_to_annual_plan AS (
     annual_plan_date - join_date AS days_to_annual
   FROM
     customer_transitions
-  WHERE annual_plan_date IS NOT NULL -- Only include customers who upgraded to an annual plan
+  WHERE
+    annual_plan_date IS NOT NULL -- Only include customers who upgraded to an annual plan
 )
 SELECT
   ROUND(AVG(days_to_annual), 0) AS avg_days_to_annual
@@ -646,7 +709,7 @@ FROM
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 - `customer_transitions`: This Common Table Expression (CTE) identifies two key dates for each customer:
   - `join_date`: The earliest `start_date` recorded in the `subscriptions` table, representing when the customer first joined Foodie-Fi.
@@ -663,15 +726,16 @@ FROM
 
 </details>
 
-*answer:*
-
+***answer:***
 | avg_days_to_annual |
 | ------------------ |
 | 105                |
 
-**10. Can you further breakdown this average value into 30 day periods (i.e. 0-30 days, 31-60 days etc)**
+---
 
-*query:*
+### 10. Can you further breakdown this average value into 30 day periods (i.e. 0-30 days, 31-60 days etc)?
+
+***query:***
 
 ```SQL
 WITH days_to_annual_plan AS (
@@ -730,7 +794,7 @@ ORDER BY
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
   
 - `days_to_annual_plan`:
   - This Common Table Expression (CTE) retrieves the initial subscription (`join_date`) and the first date the customer upgrades to an annual plan (`annual_plan_date`) for each customer.
@@ -759,8 +823,7 @@ ORDER BY
 
 </details>
 
-*answer:*
-
+***answer:***
 | time_period | customers_count |
 | ----------- | --------------- |
 | 0-30 days   | 49              |
@@ -769,10 +832,11 @@ ORDER BY
 | 91-120 days | 35              |
 | 120+ days   | 116             |
 
-**11. How many customers downgraded from a pro monthly to a basic monthly plan in 2020?**
+---
 
-*query:*
+### 11. How many customers downgraded from a pro monthly to a basic monthly plan in 2020?
 
+***query:***
 ```SQL
 WITH year_filtered_table AS (
   SELECT
@@ -795,7 +859,7 @@ WHERE
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 - `WITH year_filtered_table`: A Common Table Expression (CTE) is created to add a column that tracks the previous subscription plan for each customer using the `LAG` window function. This allows us to compare the current plan with the previous one for each customer. The CTE also includes the `start_date` column to filter data by year.
 
@@ -811,23 +875,21 @@ WHERE
 
 </details>
 
-*answer:*
-
+***answer:***
 | customers_downgraded |
 | -------------------- |
 | 0                    |
 
-#### C. Challenge Payment Question
+---
 
-**The Foodie-Fi team wants you to create a new payments table for the year 2020 that includes amounts paid by each customer in the subscriptions table with the following requirements:**
+## C. Challenge Payment Question.
+### The Foodie-Fi team wants you to create a new payments table for the year 2020 that includes amounts paid by each customer in the subscriptions table with the following requirements:
+**- monthly payments always occur on the same day of month as the original start_date of any monthly paid plan**
+**- upgrades from basic to monthly or pro plans are reduced by the current paid amount in that month and start immediately**
+**- upgrades from pro monthly to pro annual are paid at the end of the current billing period and also starts at the end of the month period**
+**- once a customer churns they will no longer make payments**
 
-- monthly payments always occur on the same day of month as the original start_date of any monthly paid plan
-- upgrades from basic to monthly or pro plans are reduced by the current paid amount in that month and start immediately
-- upgrades from pro monthly to pro annual are paid at the end of the current billing period and also starts at the end of the month period
-- once a customer churns they will no longer make payments
-
-*query:*
-
+***query:***
 ```SQL
 CREATE TABLE payments (
     customer_id INTEGER,
@@ -838,7 +900,6 @@ CREATE TABLE payments (
     payment_order INTEGER
 );
 
-
 WITH payment_schedule AS (
   SELECT
     s.customer_id,
@@ -846,9 +907,12 @@ WITH payment_schedule AS (
     p.plan_name,
     p.price AS amount,
     s.start_date
-  FROM subscriptions s
-  JOIN plans p USING(plan_id)
-  WHERE s.start_date BETWEEN '2020-01-01' AND '2020-12-31'
+  FROM
+    subscriptions s
+  JOIN
+    plans p USING(plan_id)
+  WHERE
+    s.start_date BETWEEN '2020-01-01' AND '2020-12-31'
     AND p.plan_name NOT IN ('trial', 'churn') -- Exclude 'trial' and 'churn'
 ),
 monthly_payments AS (
@@ -858,13 +922,15 @@ monthly_payments AS (
     plan_name,
     payment_date::DATE,
     amount
-  FROM payment_schedule,
-  LATERAL generate_series(
-    start_date,
-    '2020-12-31'::DATE,
-    INTERVAL '1 month'
-  ) AS payment_date
-  WHERE plan_name LIKE '%monthly%'
+  FROM
+    payment_schedule,
+    LATERAL generate_series(
+      start_date,
+      '2020-12-31'::DATE,
+      INTERVAL '1 month'
+    ) AS payment_date
+  WHERE
+    plan_name LIKE '%monthly%'
 ),
 annual_payments AS (
   SELECT
@@ -873,9 +939,12 @@ annual_payments AS (
     plan_name,
     start_date AS payment_date,
     amount
-  FROM payment_schedule
-  WHERE plan_name LIKE '%annual%'
+  FROM
+    payment_schedule
+  WHERE
+    plan_name LIKE '%annual%'
 )
+
 INSERT INTO payments (customer_id, plan_id, plan_name, payment_date, amount, payment_order)
 SELECT
   customer_id,
@@ -899,7 +968,7 @@ LIMIT 20;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 This query creates a `payments` table for the year 2020 based on customer subscriptions and the corresponding payment logic. The solution differentiates between monthly and annual plans and ensures that payments align with the requirements outlined in the task.
 
@@ -943,8 +1012,7 @@ This query creates a `payments` table for the year 2020 based on customer subscr
 
 </details>
 
-*answer:*
-
+***answer:***
 | customer_id | plan_id | plan_name     | payment_date | amount | payment_order |
 | ----------- | ------- | ------------- | ------------ | ------ | ------------- |
 | 1           | 1       | basic monthly | 2020-08-08   | 9.90   | 1             |
@@ -968,12 +1036,13 @@ This query creates a `payments` table for the year 2020 based on customer subscr
 | 4           | 1       | basic monthly | 2020-01-24   | 9.90   | 1             |
 | 4           | 1       | basic monthly | 2020-02-24   | 9.90   | 2             |
 
-#### D. Outside The Box Questions
+---
 
-**1. How would you calculate the rate of growth for Foodie-Fi?**
+## D. Outside The Box Questions.
 
-*answer:*
+### 1. How would you calculate the rate of growth for Foodie-Fi?
 
+***answer:***
 Annual growth of the company can be measured through metrics such as:
 
 - clients churn rate (calculated as a percentage of customers who churned relative to the total customer base for the year),
@@ -982,10 +1051,9 @@ Annual growth of the company can be measured through metrics such as:
 
 We limit the analysis to the year 2020 to focus on complete data for a full calendar year. This approach avoids the influence of partial data from 2021, ensuring a more accurate and consistent representation of the company's growth dynamics.
 
-**a. clients churn rate**
+#### a. clients churn rate.
 
-*query:*
-
+***query:***
 ```SQL
 SELECT
   ROUND((COUNT(DISTINCT customer_id) FILTER (WHERE plan_id = 4) * 100.0) / -- id 4 represents churned customers
@@ -997,7 +1065,7 @@ WHERE
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 This query calculates the churn rate percentage (`churn_rate_percentage`) for customers who subscribed in the year 2020. The churn rate measures the percentage of customers who churned by subscribing to a specific plan (`plan_id = 4`) relative to the total number of distinct customers.
 
@@ -1018,16 +1086,16 @@ The query produces a single value, `churn_rate_percentage`, representing the pro
 
 </details>
 
-*table:*
-
+***table:***
 | churn_rate_percentage |
 | --------------------- |
 | 23.60                 |
 
-**b. subscribers amount change**
+---
 
-*query:*
+#### b. subscribers amount change.
 
+***query:***
 ```SQL
 SELECT 
   COUNT(DISTINCT customer_id) AS annual_customers_growth
@@ -1046,7 +1114,7 @@ WHERE
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 This query calculates the annual growth of unique customers.
 
@@ -1068,20 +1136,20 @@ Key components:
 
 </details>
 
-*table:*
-
+***table:***
 | annual_customers_growth |
 | ----------------------- |
 | 764                     |
 
 **\*** The calculated annual growth metric reflects the net addition of 764 unique customers during 2020. Since no prior data exists, this figure establishes a baseline for tracking future customer growth trends.
 
-**c. revenue calculation**
+---
+
+#### c. revenue calculation.
 
 **\*** The following query will utilize the `payments` table created during the "C. Challenge Payment Question" section.
 
-*query:*
-
+***query:***
 ```SQL
 SELECT
   plan_name,
@@ -1095,7 +1163,7 @@ ORDER BY
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 This query calculates the total revenue (`total_revenue_usd`) generated by each subscription plan (`plan_name`) and sorts the results in descending order of revenue.
 
@@ -1120,17 +1188,18 @@ This query provides insight into which subscription plans contribute the most to
 
 </details>
 
-*table:*
-
+***table:***
 | plan_name     | total_revenue_usd |
 | ------------- | ----------------- |
 | pro monthly   | 57351.80          |
 | pro annual    | 38805.00          |
 | basic monthly | 33679.80          |
 
-**2. What key metrics would you recommend Foodie-Fi management to track over time to assess performance of their overall business?**
+---
 
-*answer:*
+### 2. What key metrics would you recommend Foodie-Fi management to track over time to assess performance of their overall business?
+
+***answer:***
 
 To effectively analyze Foodie-Fi's business performance, it is important to track key metrics that provide insights into different aspects of the business, including profitability, customer dynamics, and retention.
 
@@ -1141,11 +1210,11 @@ To effectively analyze Foodie-Fi's business performance, it is important to trac
 
 These metrics collectively provide a comprehensive analysis, enabling Foodie-Fi to make informed decisions to enhance customer retention, boost revenue, and refine user acquisition strategies.
 
-**a. monthly revenue growth**
+#### a. monthly revenue growth
 
 **\*** The following query will utilize the `payments` table created during the "C. Challenge Payment Question" section.
 
-*query:*
+***query:***
 
 ```SQL
 WITH monthly_revenue AS (
@@ -1172,7 +1241,7 @@ FROM
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 This query calculates the monthly revenue for Foodie-Fi in 2020, along with the revenue changes compared to the previous month.
 
@@ -1199,7 +1268,7 @@ The query generates a table with the following columns:
 
 </details>
 
-*table:*
+***table:***
 | payment_year | payment_month | total_revenue_usd | previous_month_revenue | revenue_change |
 | ------------ | ------------- | ----------------- | ---------------------- | -------------- |
 | 2020         | 2020-01-01    | 1282.00           |                        | 1282.00        |
@@ -1217,9 +1286,9 @@ The query generates a table with the following columns:
 
 
 
-**b. monthly customer growth**
+#### b. monthly customer growth
 
-*query:*
+***query:***
 
 ```SQL
 WITH trial_plans_analysis AS (
@@ -1246,7 +1315,7 @@ ORDER BY start_month;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
   This query calculates the monthly growth of new customers for Foodie-Fi by focusing on trial plan subscriptions (`plan_id = 0`), which represent new customer sign-ups. The results include the total number of new customers for each month and the change in the number of new customers compared to the previous month.
 
@@ -1274,7 +1343,7 @@ ORDER BY start_month;
 
 </details>
 
-*table:*
+***table:***
 | start_month | new_customers_amount | previous_month_new_customers_amount | new_customers_amount_changes |
 | ----------- | -------------------- | ----------------------------------- | ---------------------------- |
 | 2020-01-01  | 88                   |                                     | 88                           |
@@ -1291,9 +1360,9 @@ ORDER BY start_month;
 | 2020-12-01  | 84                   | 75                                  | 9                            |
 
 
-**c. monthly churn rate**
+#### c. monthly churn rate
 
-*query:*
+***query:***
 
 ```SQL
 WITH new_customers AS (
@@ -1351,26 +1420,22 @@ ORDER BY
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 This query calculates the cumulative number of active customers and the monthly churn rate percentage for the year 2020. It uses a step-by-step approach with Common Table Expressions (CTEs) for better readability and modular calculations.
 
 - `WITH new_customers`:
   - Extracts the number of new customers (`new_customers`) who subscribed to the trial plan (`plan_id = 0`) for each month.
   - Groups the data by month and limits the scope to the year 2020.
-
 - `WITH churned_customers`:
   - Calculates the number of customers who churned (`churned_customers`) by subscribing to the churn plan (`plan_id = 4`) for each month.
   - Groups the data by month and filters for the year 2020.
-
 - `WITH combined_data`:
   - Joins `new_customers` and `churned_customers` on the `month` column using a `LEFT JOIN`.
   - Adds the column `previous_month_churned_customers`, which shifts the churned customer count to the next month using the `LAG` function. This reflects the churn impact on the subsequent month's active customer count.
-
 - `WITH cumulative_data`:
   - Adds the cumulative number of active customers (`cumulative_customers`) using a running total of `new_customers` minus `previous_month_churned_customers` with a `SUM` window function.
   - Handles `NULL` values in `previous_month_churned_customers` by treating them as 0 with `COALESCE`.
-
 - Final `SELECT`:
   - Outputs:
     - `month`: The month being calculated.
@@ -1383,8 +1448,7 @@ This query provides a detailed monthly view of customer retention and churn rate
 
 </details>
 
-*table:*
-
+***table:***
 | month      | cumulative_customers | churn_rate_percentage |
 | ---------- | -------------------- | --------------------- |
 | 2020-01-01 | 88                   | 0.00                  |
@@ -1400,11 +1464,11 @@ This query provides a detailed monthly view of customer retention and churn rate
 | 2020-11-01 | 737                  | 3.53                  |
 | 2020-12-01 | 789                  | 4.06                  |
 
-**d. average revenue per user (ARPU)**
+#### d. average revenue per user (ARPU)
 
 **\*** The following query will utilize the `payments` table created during the "C. Challenge Payment Question" section.
 
-*query:*
+***query:***
 
 ```SQL
 SELECT
@@ -1421,7 +1485,7 @@ FROM
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 This query calculates the Average Revenue Per User (ARPU) by aggregating the total revenue per customer and then averaging it across all customers.
 
@@ -1439,23 +1503,24 @@ The query produces a single value, `avg_revenue`, representing the average reven
 
 </details>
 
-*table:*
-
+***table:***
 | avg_revenue_usd |
 | --------------- |
 | 145.72          |
 
-### Analysis of Foodie-Fi's 2020 Performance
+---
 
+### Analysis of Foodie-Fi's 2020 Performance
+***answer:***
 Assuming 2020 was the first year of operation due to the absence of data from previous years, and based on the data processed and analyzed through our queries, we can draw the following insights about Foodie-Fi's performance:
 
-#### **Overall Customer Base and Churn:**
+#### a. Overall Customer Base and Churn:
 - In 2020, the company attracted 1,000 unique subscribers. Of these:
   - 90 customers did not continue beyond the trial period.
   - 146 customers churned after transitioning to paid plans.
 - The churn rate was 23.6% (236 customers), leaving an active customer base of 764 by the end of the year.
 
-#### **Revenue:**
+#### b. Revenue:
 - **Revenue breakdown by plan:**
   | Plan            | Revenue (USD)  |
   |-----------------|----------------|
@@ -1465,12 +1530,12 @@ Assuming 2020 was the first year of operation due to the absence of data from pr
 - Monthly revenue consistently increased, except in November, which saw a decline of 1,266.10 USD. The highest monthly revenue growth occurred in October (2,783.70 USD).
 - The average revenue per user (ARPU) for the year was 145.72 USD.
 
-#### **Customer Growth and Churn Dynamics:**
+#### c. Customer Growth and Churn Dynamics:
 - The highest influx of new customers occurred in April (94 new users), while the lowest was in March (68 users).
 - The growth rate of new customers gradually decreased by 1–9 users per month.
 - Monthly churn rates ranged from 2.06% (September) to 6.12% (February).
 
-#### **Churn Analysis:**
+#### d. Churn Analysis:
 - Most churn occurred within the first 180 days after transitioning to paid plans:
   | Time Interval   | Basic Monthly | Pro Monthly |
   |-----------------|---------------|-------------|
@@ -1558,14 +1623,14 @@ ORDER BY
 
 ---
 
-### **What are some key customer journeys or experiences that you would analyse further to improve customer retention?**
+### 3. What are some key customer journeys or experiences that you would analyse further to improve customer retention?
 1. Customers who churned immediately after the trial period (90 users): Why didn't they transition to paid plans?
 2. Users who churned within the first 180 days of paid plans: What were the primary reasons for leaving?
 3. Seasonal trends: Investigate the April customer influx and September churn reduction to understand potential external influences.
 
 ---
 
-### **If the Foodie-Fi team were to create an exit survey shown to customers who wish to cancel their subscription, what questions would you include in the survey?**
+### 4. If the Foodie-Fi team were to create an exit survey shown to customers who wish to cancel their subscription, what questions would you include in the survey?
 1. What were the main reasons for canceling your subscription?
 2. Did our service meet your expectations? Why or why not?
 3. Were there any challenges in using the service?
@@ -1574,18 +1639,18 @@ ORDER BY
 
 ---
 
-### **What business levers could the Foodie-Fi team use to reduce the customer churn rate? How would you validate the effectiveness of your ideas?**
-#### **Churn Reduction Strategies:**
+### 5. What business levers could the Foodie-Fi team use to reduce the customer churn rate? How would you validate the effectiveness of your ideas?
+#### Churn Reduction Strategies:
 1. Highlight the value of the service through periodic reminders, especially within the first six months.
 2. Offer loyalty programs, discounts, or bonuses after 3–6 months to encourage long-term engagement.
 3. Enhance the service with new features or exclusive content to increase perceived value.
 4. Conduct targeted promotions or cross-selling opportunities to drive additional engagement.
 
-#### **ARPU Growth Strategies:**
+#### ARPU Growth Strategies:
 1. Introduce premium features or content to encourage upgrades.
 2. Experiment with price increases, coupled with added value, and validate through A/B testing.
 
-#### **Validation Methods:**
+#### Validation Methods:
 - A/B testing: Compare churn rates or ARPU between control groups and those exposed to interventions.
 - Surveys: Collect direct feedback from customers about new features, loyalty programs, or pricing changes.
 - Retention analytics: Monitor the lifetime value (LTV) and average subscription duration to evaluate the impact of new initiatives.
