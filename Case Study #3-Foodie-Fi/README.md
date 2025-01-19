@@ -1046,6 +1046,7 @@ This query creates a `payments` table for the year 2020 based on customer subscr
 #### 1. How would you calculate the rate of growth for Foodie-Fi?
 
 ***answer:***
+
 Annual growth of the company can be measured through metrics such as:
 
 - clients churn rate (calculated as a percentage of customers who churned relative to the total customer base for the year),
