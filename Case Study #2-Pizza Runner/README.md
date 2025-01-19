@@ -619,9 +619,12 @@ This query provides the count of pizzas that had both exclusions and extras and 
 SELECT 
   EXTRACT(HOUR FROM order_time) AS order_hour,
   COUNT(*) AS total_pizzas_ordered
-FROM customer_orders
-GROUP BY order_hour
-ORDER BY order_hour;
+FROM
+  customer_orders
+GROUP BY
+  order_hour
+ORDER BY
+  order_hour;
 ```
 
 <details>
@@ -652,10 +655,15 @@ This query provides the total number of pizzas ordered for each hour of the day 
   
 ***query:***
 ```SQL
-SELECT TO_CHAR(order_time, 'Day')AS order_day, COUNT(*) AS total_orders
-FROM customer_orders
-GROUP BY order_day
-ORDER BY total_orders DESC;
+SELECT
+  TO_CHAR(order_time, 'Day')AS order_day,
+  COUNT(*) AS total_orders
+FROM
+  customer_orders
+GROUP BY
+  order_day
+ORDER BY
+  total_orders DESC;
 ```
 
 <details>
@@ -967,10 +975,10 @@ Upon reviewing the results, the following trends and observations can be noted:
 ***query:***
 ```SQL
 SELECT 
-    runner_id,
-    ROUND(
-        (COUNT(*) FILTER (WHERE cancellation IS NULL) / COUNT(*)::NUMERIC) * 100, 2
-    ) AS successful_delivery_percentage
+  runner_id,
+  ROUND(
+    (COUNT(*) FILTER (WHERE cancellation IS NULL) / COUNT(*)::NUMERIC) * 100, 2
+  ) AS successful_delivery_percentage
 FROM
   runner_orders
 GROUP BY
@@ -1015,12 +1023,12 @@ SELECT
   string_agg(PT.topping_name, ', ') AS toppings
 FROM
   (SELECT
-     PN.pizza_name,
-     string_to_table(toppings, ', ')::INT topping_id
-   FROM
-     pizza_recipes
-   JOIN
-     pizza_names PN USING(pizza_id)
+    PN.pizza_name,
+    string_to_table(toppings, ', ')::INT topping_id
+  FROM
+    pizza_recipes
+  JOIN
+    pizza_names PN USING(pizza_id)
   ) subquery
 JOIN
   pizza_toppings PT USING (topping_id)
