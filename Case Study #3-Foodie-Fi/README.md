@@ -1514,6 +1514,7 @@ The query produces a single value, `avg_revenue`, representing the average reven
 ---
 
 ### Analysis of Foodie-Fi's 2020 Performance
+
 ***answer:***
 Assuming 2020 was the first year of operation due to the absence of data from previous years, and based on the data processed and analyzed through our queries, we can draw the following insights about Foodie-Fi's performance:
 
