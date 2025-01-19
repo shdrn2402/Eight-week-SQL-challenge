@@ -1214,7 +1214,7 @@ To effectively analyze Foodie-Fi's business performance, it is important to trac
 
 These metrics collectively provide a comprehensive analysis, enabling Foodie-Fi to make informed decisions to enhance customer retention, boost revenue, and refine user acquisition strategies.
 
-##### a. monthly revenue growth
+#### a. monthly revenue growth
 
 **\*** The following query will utilize the `payments` table created during the "C. Challenge Payment Question" section.
 
@@ -1290,7 +1290,7 @@ The query generates a table with the following columns:
 
 
 
-##### b. monthly customer growth
+#### b. monthly customer growth
 
 ***query:***
 
@@ -1364,7 +1364,7 @@ ORDER BY start_month;
 | 2020-12-01  | 84                   | 75                                  | 9                            |
 
 
-##### c. monthly churn rate
+#### c. monthly churn rate
 
 ***query:***
 
@@ -1468,7 +1468,7 @@ This query provides a detailed monthly view of customer retention and churn rate
 | 2020-11-01 | 737                  | 3.53                  |
 | 2020-12-01 | 789                  | 4.06                  |
 
-##### d. average revenue per user (ARPU)
+#### d. average revenue per user (ARPU)
 
 **\*** The following query will utilize the `payments` table created during the "C. Challenge Payment Question" section.
 
