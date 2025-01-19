@@ -108,7 +108,7 @@ FROM
 ```
 
 <details>
-  <summary><em><strong>show database schema*</strong></em></summary>
+  <summary><em><strong>show description:</strong></em></summary>
 
 The SQL query calculates the total number of unique `node_id` values in the `customer_nodes` table.
 
@@ -143,7 +143,7 @@ ORDER BY
 ```
 
 <details>
-  <summary><em><strong>show database schema*</strong></em></summary>
+  <summary><em><strong>show description:</strong></em></summary>
 
 The SQL query calculates the number of unique nodes (`node_id`) in each region (`region_name`) and sorts the results in descending order of the node count, with a secondary sort by region name in ascending order.
 
@@ -193,7 +193,7 @@ ORDER BY
 ```
 
 <details>
-  <summary><em><strong>show database schema*</strong></em></summary>
+  <summary><em><strong>show description:</strong></em></summary>
 
 The SQL query calculates the number of unique customers allocated to each region.
 
@@ -245,7 +245,7 @@ FROM
 ```
 
 <details>
-  <summary><em><strong>show database schema*</strong></em></summary>
+  <summary><em><strong>show description:</strong></em></summary>
 
 The query calculates the average number of days customers spend on a specific node, excluding records with an `end_date` of `'9999-12-31'`, which is assumed to represent active records.
 
@@ -304,7 +304,7 @@ ORDER BY
 ```
 
 <details>
-  <summary><em><strong>show database schema*</strong></em></summary>
+  <summary><em><strong>show description:</strong></em></summary>
 
 This query calculates the median, 80th percentile, and 95th percentile of the days customers are reallocated to different nodes, grouped by region, while considering both the node and the region level.
 
@@ -355,7 +355,7 @@ ORDER BY
 ```
 
 <details>
-  <summary><em><strong>show database schema*</strong></em></summary>
+  <summary><em><strong>show description:</strong></em></summary>
 
 The SQL query calculates metrics related to transaction types from the `customer_transactions` table.
 
@@ -404,7 +404,7 @@ FROM
 ```
 
 <details>
-  <summary><em><strong>show database schema*</strong></em></summary>
+  <summary><em><strong>show description:</strong></em></summary>
 
 This query calculates the average total deposit counts and amounts for all customers.
 
@@ -489,7 +489,7 @@ ORDER BY
 ```
 
 <details>
-  <summary><em><strong>show database schema*</strong></em></summary>
+  <summary><em><strong>show description:</strong></em></summary>
 
 This query calculates the number of Data Bank customers who, in a single month, made more than 1 deposit and at least 1 purchase or withdrawal.
 
@@ -564,7 +564,7 @@ ORDER BY
 ```
 
 <details>
-  <summary><em><strong>show database schema*</strong></em></summary>
+  <summary><em><strong>show description:</strong></em></summary>
 
 The query calculates the closing balance for each customer at the end of each month based on transaction data.
 
@@ -608,7 +608,7 @@ The query calculates the closing balance for each customer at the end of each mo
 ```
 
 <details>
-  <summary><em><strong>show database schema*</strong></em></summary>
+  <summary><em><strong>show description:</strong></em></summary>
 
 
 </details>
