@@ -1095,8 +1095,6 @@ The query produces a single value, `churn_rate_percentage`, representing the pro
 | --------------------- |
 | 23.60                 |
 
----
-
 #### b. subscribers amount change.
 
 ***query:***
@@ -1146,8 +1144,6 @@ Key components:
 | 764                     |
 
 **\*** The calculated annual growth metric reflects the net addition of 764 unique customers during 2020. Since no prior data exists, this figure establishes a baseline for tracking future customer growth trends.
-
----
 
 #### c. revenue calculation.
 
@@ -1288,8 +1284,6 @@ The query generates a table with the following columns:
 | 2020         | 2020-11-01    | 17457.40          | 18723.50               | -1266.10       |
 | 2020         | 2020-12-01    | 18838.30          | 17457.40               | 1380.90        |
 
-
-
 #### b. monthly customer growth
 
 ***query:***
@@ -1362,7 +1356,6 @@ ORDER BY start_month;
 | 2020-10-01  | 79                   | 87                                  | -8                           |
 | 2020-11-01  | 75                   | 79                                  | -4                           |
 | 2020-12-01  | 84                   | 75                                  | 9                            |
-
 
 #### c. monthly churn rate
 
@@ -1517,6 +1510,7 @@ The query produces a single value, `avg_revenue`, representing the average reven
 ### Analysis of Foodie-Fi's 2020 Performance
 
 ***answer:***
+
 Assuming 2020 was the first year of operation due to the absence of data from previous years, and based on the data processed and analyzed through our queries, we can draw the following insights about Foodie-Fi's performance:
 
 #### a. Overall Customer Base and Churn:
