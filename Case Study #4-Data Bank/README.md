@@ -1,6 +1,6 @@
 ![Project Logo](../images/case4_logo.png)
 
-### Contents:
+## Contents:
 - [Introduction](#introduction)
 - [Entity Relationship Diagram](#entity-relationship-diagram)
 - [Case Study Questions & Solutions](#case-study-questions--solutions)
@@ -10,18 +10,15 @@
   - [D. Extra Challenge](#d-extra-challenge)
 - [Extension Request](#extantion-request)
 
-
-
-### Introduction
-
+## Introduction
 > Data Bank is a cutting-edge initiative that merges the worlds of digital-only neo-banks, cryptocurrency, and secure data storage. Unlike traditional banks, Data Bank provides its customers not only with financial services but also with highly secure, distributed cloud storage directly tied to their account balances.
 >
 >The goal of this case study is to explore customer data, calculate key metrics, and analyze trends to help the management team improve customer growth strategies and optimize data storage forecasting for future scalability.
 
-### Entity Relationship Diagram
+## Entity Relationship Diagram
 
 <details>
-  <summary><em>show database schema <b>*</b></em></summary>
+  <summary><em><strong>show database schema*</strong></em></summary>
 
 ```SQL
 CREATE SCHEMA data_bank;
@@ -83,25 +80,26 @@ VALUES
   ('189', '2020-01-27', 'withdrawal', '861');
 ```
 
-**\*Note**: Primary keys are not explicitly defined in the tables, likely due to the educational nature of the project.
-- The data is artificially generated and static, minimizing the risk of integrity violations.
-- In real-world scenarios, defining primary keys is essential to ensure data integrity and uniqueness.
-- Some inserted values do not match the expected data types (e.g., INTEGER columns receiving string inputs). This works because PostgreSQL can implicitly convert values, but such practice is discouraged in production systems where explicit type casting ensures data consistency.
-- Inconsistencies in data representation should be addressed to align with real-world practices.
+**\*Note**:
+1. Primary keys are not explicitly defined in the tables. This might be intentional due to the educational nature of the project:  
+  - The data is artificially generated and static, minimizing the risk of integrity violations.  
+  - In real-world scenarios, primary keys are essential to enforce data integrity and uniqueness.  
+
+2. Data type mismatches are present in the inserted values:  
+  - For example, string values are being inserted into columns with numeric data types.  
+  - PostgreSQL implicitly converts these values, allowing the data to be stored. However, this practice is discouraged in production systems.  
+  - Explicit type casting should be used to ensure data consistency and to prevent unexpected errors.  
 
 </details>
-
 
 ![Project Logo](../images/case4_diagram.png)
 
 
-### Case Study Questions & Solutions
-#### A. Customer Nodes Exploration
+## Case Study Questions & Solutions
+### A. Customer Nodes Exploration
+#### 1. How many unique nodes are there on the Data Bank system?
 
-**1. How many unique nodes are there on the Data Bank system?**
-
-*query:*
-
+***query:***
 ```SQL
 SELECT
   COUNT(DISTINCT node_id) AS unique_nodes_amount
@@ -110,7 +108,7 @@ FROM
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show database schema*</strong></em></summary>
 
 The SQL query calculates the total number of unique `node_id` values in the `customer_nodes` table.
 
@@ -119,18 +117,16 @@ The SQL query calculates the total number of unique `node_id` values in the `cus
 
 </details>
 
-*answer:*
-
+***answer:***
 | unique_nodes_amount |
 | -------------------- |
 | 5                    |
 
 ---
 
-**2. What is the number of nodes per region?**
+#### 2. What is the number of nodes per region?
 
-*query:*
-
+***query:***
 ```SQL
 SELECT
   R.region_name,
@@ -139,12 +135,15 @@ FROM
   customer_nodes CN
 JOIN
   regions R USING(region_id)
-GROUP BY region_name
-ORDER BY unique_nodes_amount DESC, region_name ASC;
+GROUP BY
+  region_name
+ORDER BY
+  unique_nodes_amount DESC,
+  region_name ASC;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show database schema*</strong></em></summary>
 
 The SQL query calculates the number of unique nodes (`node_id`) in each region (`region_name`) and sorts the results in descending order of the node count, with a secondary sort by region name in ascending order.
 
@@ -164,7 +163,7 @@ The query provides a list of regions and the number of unique nodes they contain
 
 </details>
 
-*answer:*
+***answer:***
 | region_name | unique_nodes_amount |
 | ----------- | -------------------- |
 | Africa      | 5                    |
@@ -175,10 +174,9 @@ The query provides a list of regions and the number of unique nodes they contain
 
 ---
 
-**3. How many customers are allocated to each region?**
+#### 3. How many customers are allocated to each region?
 
-*query:*
-
+***query:***
 ```SQL
 SELECT
   R.region_name,
@@ -190,11 +188,12 @@ JOIN
 GROUP BY
   region_name
 ORDER BY
-  customers_amount DESC, region_name ASC;
+  customers_amount DESC,
+  region_name ASC;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show database schema*</strong></em></summary>
 
 The SQL query calculates the number of unique customers allocated to each region.
 
@@ -212,7 +211,7 @@ The SQL query calculates the number of unique customers allocated to each region
 
 </details>
 
-*answer:*
+***answer:***
 | region_name | customers_amount |
 | ----------- | ---------------- |
 | Australia   | 110              |
@@ -223,10 +222,9 @@ The SQL query calculates the number of unique customers allocated to each region
 
 ---
 
-**4. How many days on average are customers reallocated to a different node?**
+#### 4. How many days on average are customers reallocated to a different node?
 
-*query:*
-
+***query:***
 ```SQL
 WITH days_on_node_count AS (
   SELECT
@@ -247,7 +245,7 @@ FROM
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show database schema*</strong></em></summary>
 
 The query calculates the average number of days customers spend on a specific node, excluding records with an `end_date` of `'9999-12-31'`, which is assumed to represent active records.
 
@@ -264,17 +262,16 @@ Final Query:
 
 </details>
 
-*answer:*
+***answer:***
 | avg_days_on_node |
 | ---------------- |
 | 23               |
 
 ---
 
-**5. What is the median, 80th and 95th percentile for this same reallocation days metric for each region?**
+#### 5. What is the median, 80th and 95th percentile for this same reallocation days metric for each region?
 
-*query:*
-
+***query:***
 ```SQL
 WITH days_on_node_count AS (
   SELECT
@@ -307,7 +304,7 @@ ORDER BY
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show database schema*</strong></em></summary>
 
 This query calculates the median, 80th percentile, and 95th percentile of the days customers are reallocated to different nodes, grouped by region, while considering both the node and the region level.
 
@@ -329,7 +326,7 @@ This approach accounts for detailed node-level data while providing insights at 
 
 </details>
 
-*answer:*
+***answer:***
 | region_name | median | percentile_80 | percentile_95 |
 | ----------- | ------ | ------------- | ------------- |
 | Africa      | 22     | 35            | 54            |
@@ -340,12 +337,10 @@ This approach accounts for detailed node-level data while providing insights at 
 
 ---
 
-#### B. Customer Transactions
+### B. Customer Transactions
+#### 1. What is the unique count and total amount for each transaction type?
 
-**1. What is the unique count and total amount for each transaction type?**
-
-*query:*
-
+***query:***
 ```SQL
 SELECT
   txn_type,
@@ -360,7 +355,7 @@ ORDER BY
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show database schema*</strong></em></summary>
 
 The SQL query calculates metrics related to transaction types from the `customer_transactions` table.
 
@@ -375,8 +370,7 @@ The query returns a table with each transaction type, the count of unique transa
 
 </details>
 
-*answer:*
-
+***answer:***
 | txn_type   | unique_txn_amount | total_txn_amount |
 | ---------- | ----------------- | ---------------- |
 | deposit    | 929               | 1359168          |
@@ -385,10 +379,9 @@ The query returns a table with each transaction type, the count of unique transa
 
 ---
 
-**2. What is the average total historical deposit counts and amounts for all customers?**
+#### 2. What is the average total historical deposit counts and amounts for all customers?
 
-*query:*
-
+***query:***
 ```SQL
 WITH totals AS (
   SELECT
@@ -411,7 +404,7 @@ FROM
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show database schema*</strong></em></summary>
 
 This query calculates the average total deposit counts and amounts for all customers.
 
@@ -431,18 +424,16 @@ This query calculates the average total deposit counts and amounts for all custo
 
 </details>
 
-*answer:*
-
+***answer:***
 | avg_deposits_amount | avg_deposits_sum |
 | ------------------- | ---------------- |
 | 5                   | 2718             |
 
 ---
 
-**3. For each month - how many Data Bank customers make more than 1 deposit and either 1 purchase or 1 withdrawal in a single month?**
+#### 3. For each month - how many Data Bank customers make more than 1 deposit and either 1 purchase or 1 withdrawal in a single month?
 
-*query:*
-
+***query:***
 ```SQL
 WITH monthly_activity AS (
   SELECT
@@ -498,7 +489,7 @@ ORDER BY
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show database schema*</strong></em></summary>
 
 This query calculates the number of Data Bank customers who, in a single month, made more than 1 deposit and at least 1 purchase or withdrawal.
 
@@ -525,7 +516,7 @@ This query methodically filters, joins, and aggregates data to provide the requi
 
 </details>
 
-*answer:*
+***answer:***
 | current_month | customer_count |
 | ------------- | -------------- |
 | 2020-01-01    | 115            |
@@ -535,10 +526,9 @@ This query methodically filters, joins, and aggregates data to provide the requi
 
 ---
 
-**4. What is the closing balance for each customer at the end of the month?**
+#### 4. What is the closing balance for each customer at the end of the month?
 
-*query:*
-
+***query:***
 ```SQL
 WITH current_month_balance AS (
   SELECT
@@ -574,7 +564,7 @@ ORDER BY
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show database schema*</strong></em></summary>
 
 The query calculates the closing balance for each customer at the end of each month based on transaction data.
 
@@ -591,8 +581,7 @@ The query calculates the closing balance for each customer at the end of each mo
 
 </details>
 
-*answer:*
-
+***answer:***
 | customer_id | current_month | closing_balance |
 | ----------- | ------------- | --------------- |
 | 1           | 2020-01-01    | 312             |
@@ -610,26 +599,26 @@ The query calculates the closing balance for each customer at the end of each mo
 
 ---
 
-**5. What is the percentage of customers who increase their closing balance by more than 5%?**
+#### 5. What is the percentage of customers who increase their closing balance by more than 5%?
 
-*query:*
+***query:***
 
 ```SQL
 
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show database schema*</strong></em></summary>
 
 
 </details>
 
-*answer:*
+***answer:***
 
-#### C. Data Allocation Challenge
+### C. Data Allocation Challenge
 ...
 
-#### D. Extra Challenge
+### D. Extra Challenge
 ...
 
 ### Extension Request
