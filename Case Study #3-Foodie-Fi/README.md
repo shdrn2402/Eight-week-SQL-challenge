@@ -1055,7 +1055,7 @@ Annual growth of the company can be measured through metrics such as:
 
 We limit the analysis to the year 2020 to focus on complete data for a full calendar year. This approach avoids the influence of partial data from 2021, ensuring a more accurate and consistent representation of the company's growth dynamics.
 
-##### a. clients churn rate.
+#### a. clients churn rate.
 
 ***query:***
 ```SQL
@@ -1097,7 +1097,7 @@ The query produces a single value, `churn_rate_percentage`, representing the pro
 
 ---
 
-##### b. subscribers amount change.
+#### b. subscribers amount change.
 
 ***query:***
 ```SQL
@@ -1149,7 +1149,7 @@ Key components:
 
 ---
 
-##### c. revenue calculation.
+#### c. revenue calculation.
 
 **\*** The following query will utilize the `payments` table created during the "C. Challenge Payment Question" section.
 
