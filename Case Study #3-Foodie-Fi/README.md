@@ -79,8 +79,8 @@ VALUES
 
 
 ## Case Study Questions & Solutions.
-## A. Customer Journey.
-### 1. Based off the 8 sample customers provided in the sample from the subscriptions table, write a brief description about each customer’s onboarding journey.
+### A. Customer Journey.
+#### 1. Based off the 8 sample customers provided in the sample from the subscriptions table, write a brief description about each customer’s onboarding journey.
 
 ***query:***
 ```SQL
@@ -231,8 +231,8 @@ Customer 9: Started with a trial and opted for the pro annual plan. The customer
 
 ---
 
-## B. Data Analysis Questions.
-### 1. How many customers has Foodie-Fi ever had?
+### B. Data Analysis Questions.
+#### 1. How many customers has Foodie-Fi ever had?
 
 ***query:***
 ```SQL
@@ -260,7 +260,9 @@ This query provides the total customer count, irrespective of their current subs
 |------------------|
 | 1000             |
 
-### 2. What is the monthly distribution of trial plan start_date values for our dataset - use the start of the month as the group by value?
+---
+
+#### 2. What is the monthly distribution of trial plan start_date values for our dataset - use the start of the month as the group by value?
 
 ***query:***
 ```SQL
@@ -316,7 +318,7 @@ This SQL query calculates the monthly distribution of trial plan `start_date` va
 
 ---
 
-### 3. What plan start_date values occur after the year 2020 for our dataset? Show the breakdown by count of events for each plan_name?
+#### 3. What plan start_date values occur after the year 2020 for our dataset? Show the breakdown by count of events for each plan_name?
 
 ***query:***
 ```SQL
@@ -367,7 +369,7 @@ The query calculates the count of `start_date` events after the year 2020 for ea
 
 ---
 
-### 4. What is the customer count and percentage of customers who have churned rounded to 1 decimal place?
+#### 4. What is the customer count and percentage of customers who have churned rounded to 1 decimal place?
 
 ***query:***
 ```SQL
@@ -425,7 +427,7 @@ This approach ensures readability and logical separation of the calculations.
 
 ---
 
-### 5. How many customers have churned straight after their initial free trial - what percentage is this rounded to the nearest whole number?
+#### 5. How many customers have churned straight after their initial free trial - what percentage is this rounded to the nearest whole number?
 
 ***query:***
 ```SQL
@@ -486,7 +488,7 @@ WHERE
 
 ---
 
-### 6. What is the number and percentage of customer plans after their initial free trial?
+#### 6. What is the number and percentage of customer plans after their initial free trial?
 
 ***query:***
 ```SQL
@@ -565,7 +567,7 @@ ORDER BY
 
 ---
 
-### 7. What is the customer count and percentage breakdown of all 5 plan_name values at 2020-12-31?
+#### 7. What is the customer count and percentage breakdown of all 5 plan_name values at 2020-12-31?
 
 ***query:***
 ```SQL
@@ -627,7 +629,7 @@ ORDER BY
 
 ---
 
-### 8. How many customers have upgraded to an annual plan in 2020?\*
+#### 8. How many customers have upgraded to an annual plan in 2020?\*
 
 **\*** The original question aimed to determine how many customers upgraded to an annual plan in 2020. However, this solution extends the analysis to include the previous plans that customers were on before upgrading. This was done out of interest in understanding the customer journey leading to the annual plan transition.
 
@@ -677,7 +679,7 @@ ORDER BY
 
 ---
 
-### 9. How many days on average does it take for a customer to an annual plan from the day they join Foodie-Fi?
+#### 9. How many days on average does it take for a customer to an annual plan from the day they join Foodie-Fi?
 
 ***query:***
 ```SQL
@@ -733,7 +735,7 @@ FROM
 
 ---
 
-### 10. Can you further breakdown this average value into 30 day periods (i.e. 0-30 days, 31-60 days etc)?
+#### 10. Can you further breakdown this average value into 30 day periods (i.e. 0-30 days, 31-60 days etc)?
 
 ***query:***
 
@@ -834,7 +836,7 @@ ORDER BY
 
 ---
 
-### 11. How many customers downgraded from a pro monthly to a basic monthly plan in 2020?
+#### 11. How many customers downgraded from a pro monthly to a basic monthly plan in 2020?
 
 ***query:***
 ```SQL
@@ -882,8 +884,8 @@ WHERE
 
 ---
 
-## C. Challenge Payment Question.
-### The Foodie-Fi team wants you to create a new payments table for the year 2020 that includes amounts paid by each customer in the subscriptions table with the following requirements:
+### C. Challenge Payment Question.
+#### The Foodie-Fi team wants you to create a new payments table for the year 2020 that includes amounts paid by each customer in the subscriptions table with the following requirements:
 **- monthly payments always occur on the same day of month as the original start_date of any monthly paid plan**
 **- upgrades from basic to monthly or pro plans are reduced by the current paid amount in that month and start immediately**
 **- upgrades from pro monthly to pro annual are paid at the end of the current billing period and also starts at the end of the month period**
@@ -1038,9 +1040,9 @@ This query creates a `payments` table for the year 2020 based on customer subscr
 
 ---
 
-## D. Outside The Box Questions.
+### D. Outside The Box Questions.
 
-### 1. How would you calculate the rate of growth for Foodie-Fi?
+#### 1. How would you calculate the rate of growth for Foodie-Fi?
 
 ***answer:***
 Annual growth of the company can be measured through metrics such as:
@@ -1051,7 +1053,7 @@ Annual growth of the company can be measured through metrics such as:
 
 We limit the analysis to the year 2020 to focus on complete data for a full calendar year. This approach avoids the influence of partial data from 2021, ensuring a more accurate and consistent representation of the company's growth dynamics.
 
-#### a. clients churn rate.
+##### a. clients churn rate.
 
 ***query:***
 ```SQL
@@ -1093,7 +1095,7 @@ The query produces a single value, `churn_rate_percentage`, representing the pro
 
 ---
 
-#### b. subscribers amount change.
+##### b. subscribers amount change.
 
 ***query:***
 ```SQL
@@ -1145,7 +1147,7 @@ Key components:
 
 ---
 
-#### c. revenue calculation.
+##### c. revenue calculation.
 
 **\*** The following query will utilize the `payments` table created during the "C. Challenge Payment Question" section.
 
@@ -1197,7 +1199,7 @@ This query provides insight into which subscription plans contribute the most to
 
 ---
 
-### 2. What key metrics would you recommend Foodie-Fi management to track over time to assess performance of their overall business?
+#### 2. What key metrics would you recommend Foodie-Fi management to track over time to assess performance of their overall business?
 
 ***answer:***
 
@@ -1210,7 +1212,7 @@ To effectively analyze Foodie-Fi's business performance, it is important to trac
 
 These metrics collectively provide a comprehensive analysis, enabling Foodie-Fi to make informed decisions to enhance customer retention, boost revenue, and refine user acquisition strategies.
 
-#### a. monthly revenue growth
+##### a. monthly revenue growth
 
 **\*** The following query will utilize the `payments` table created during the "C. Challenge Payment Question" section.
 
@@ -1286,7 +1288,7 @@ The query generates a table with the following columns:
 
 
 
-#### b. monthly customer growth
+##### b. monthly customer growth
 
 ***query:***
 
@@ -1360,7 +1362,7 @@ ORDER BY start_month;
 | 2020-12-01  | 84                   | 75                                  | 9                            |
 
 
-#### c. monthly churn rate
+##### c. monthly churn rate
 
 ***query:***
 
@@ -1464,7 +1466,7 @@ This query provides a detailed monthly view of customer retention and churn rate
 | 2020-11-01 | 737                  | 3.53                  |
 | 2020-12-01 | 789                  | 4.06                  |
 
-#### d. average revenue per user (ARPU)
+##### d. average revenue per user (ARPU)
 
 **\*** The following query will utilize the `payments` table created during the "C. Challenge Payment Question" section.
 
@@ -1623,14 +1625,14 @@ ORDER BY
 
 ---
 
-### 3. What are some key customer journeys or experiences that you would analyse further to improve customer retention?
+#### 3. What are some key customer journeys or experiences that you would analyse further to improve customer retention?
 1. Customers who churned immediately after the trial period (90 users): Why didn't they transition to paid plans?
 2. Users who churned within the first 180 days of paid plans: What were the primary reasons for leaving?
 3. Seasonal trends: Investigate the April customer influx and September churn reduction to understand potential external influences.
 
 ---
 
-### 4. If the Foodie-Fi team were to create an exit survey shown to customers who wish to cancel their subscription, what questions would you include in the survey?
+#### 4. If the Foodie-Fi team were to create an exit survey shown to customers who wish to cancel their subscription, what questions would you include in the survey?
 1. What were the main reasons for canceling your subscription?
 2. Did our service meet your expectations? Why or why not?
 3. Were there any challenges in using the service?
@@ -1639,7 +1641,7 @@ ORDER BY
 
 ---
 
-### 5. What business levers could the Foodie-Fi team use to reduce the customer churn rate? How would you validate the effectiveness of your ideas?
+#### 5. What business levers could the Foodie-Fi team use to reduce the customer churn rate? How would you validate the effectiveness of your ideas?
 #### Churn Reduction Strategies:
 1. Highlight the value of the service through periodic reminders, especially within the first six months.
 2. Offer loyalty programs, discounts, or bonuses after 3–6 months to encourage long-term engagement.
