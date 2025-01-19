@@ -1,6 +1,6 @@
 ![Project Logo](../images/case2_logo.png)
 
-### Contents:
+## Contents:
 - [Introduction](#introduction)
 - [Entity Relationship Diagram](#entity-relationship-diagram)
 - [Data Cleaning & Data Transformation](#data-cleaning--data-transformation)
@@ -10,15 +10,14 @@
   - [C. Ingredient Optimisation](#c-ingredient-optimisation)
   - [D. Pricing and Ratings](#d-pricing-and-ratings)
   
-### Introduction
-
+## Introduction
 > Did you know that over 115 million kilograms of pizza are consumed worldwide every day? (Well, at least according to Wikipedia!)
 > 
 > While scrolling through Instagram, Danny stumbled upon an intriguing trend: “80s Retro Styling and Pizza Is The Future!” Inspired by this idea, he realized that pizza alone wouldn’t be enough to attract seed funding for his ambitious vision of a Pizza Empire. That’s when Danny had his next big breakthrough – he decided to Uberize the experience. And so, Pizza Runner was born!
 > 
 > Danny began by recruiting a team of runners to deliver freshly made pizzas directly from Pizza Runner Headquarters (aka Danny’s house). To bring his idea to life, he maxed out his credit card to hire freelance developers to create a mobile app for taking customer orders.
 
-### Entity Relationship Diagram
+## Entity Relationship Diagram
 <details>
   <summary><em>show database schema<b>*</b></em></summary>
 
@@ -31,6 +30,14 @@ CREATE TABLE runners (
   "runner_id" INTEGER,
   "registration_date" DATE
 );
+INSERT INTO runners
+  ("runner_id", "registration_date")
+VALUES
+  (1, '2021-01-01'),
+  (2, '2021-01-03'),
+  (3, '2021-01-08'),
+  (4, '2021-01-15');
+
 
 DROP TABLE IF EXISTS customer_orders;
 CREATE TABLE customer_orders (
@@ -42,6 +49,25 @@ CREATE TABLE customer_orders (
   "order_time" TIMESTAMP
 );
 
+INSERT INTO customer_orders
+  ("order_id", "customer_id", "pizza_id", "exclusions", "extras", "order_time")
+VALUES
+  ('1', '101', '1', '', '', '2020-01-01 18:05:02'),
+  ('2', '101', '1', '', '', '2020-01-01 19:00:52'),
+  ('3', '102', '1', '', '', '2020-01-02 23:51:23'),
+  ('3', '102', '2', '', NULL, '2020-01-02 23:51:23'),
+  ('4', '103', '1', '4', '', '2020-01-04 13:23:46'),
+  ('4', '103', '1', '4', '', '2020-01-04 13:23:46'),
+  ('4', '103', '2', '4', '', '2020-01-04 13:23:46'),
+  ('5', '104', '1', 'null', '1', '2020-01-08 21:00:29'),
+  ('6', '101', '2', 'null', 'null', '2020-01-08 21:03:13'),
+  ('7', '105', '2', 'null', '1', '2020-01-08 21:20:29'),
+  ('8', '102', '1', 'null', 'null', '2020-01-09 23:54:33'),
+  ('9', '103', '1', '4', '1, 5', '2020-01-10 11:22:59'),
+  ('10', '104', '1', 'null', 'null', '2020-01-11 18:34:49'),
+  ('10', '104', '1', '2, 6', '1, 4', '2020-01-11 18:34:49');
+
+
 DROP TABLE IF EXISTS runner_orders;
 CREATE TABLE runner_orders (
   "order_id" INTEGER,
@@ -52,38 +78,86 @@ CREATE TABLE runner_orders (
   "cancellation" VARCHAR(23)
 );
 
+INSERT INTO runner_orders
+  ("order_id", "runner_id", "pickup_time", "distance", "duration", "cancellation")
+VALUES
+  ('1', '1', '2020-01-01 18:15:34', '20km', '32 minutes', ''),
+  ('2', '1', '2020-01-01 19:10:54', '20km', '27 minutes', ''),
+  ('3', '1', '2020-01-03 00:12:37', '13.4km', '20 mins', NULL),
+  ('4', '2', '2020-01-04 13:53:03', '23.4', '40', NULL),
+  ('5', '3', '2020-01-08 21:10:57', '10', '15', NULL),
+  ('6', '3', 'null', 'null', 'null', 'Restaurant Cancellation'),
+  ('7', '2', '2020-01-08 21:30:45', '25km', '25mins', 'null'),
+  ('8', '2', '2020-01-10 00:15:02', '23.4 km', '15 minute', 'null'),
+  ('9', '2', 'null', 'null', 'null', 'Customer Cancellation'),
+  ('10', '1', '2020-01-11 18:50:20', '10km', '10minutes', 'null');
+
+
 DROP TABLE IF EXISTS pizza_names;
 CREATE TABLE pizza_names (
   "pizza_id" INTEGER,
   "pizza_name" TEXT
 );
+INSERT INTO pizza_names
+  ("pizza_id", "pizza_name")
+VALUES
+  (1, 'Meatlovers'),
+  (2, 'Vegetarian');
+
 
 DROP TABLE IF EXISTS pizza_recipes;
 CREATE TABLE pizza_recipes (
   "pizza_id" INTEGER,
   "toppings" TEXT
 );
+INSERT INTO pizza_recipes
+  ("pizza_id", "toppings")
+VALUES
+  (1, '1, 2, 3, 4, 5, 6, 8, 10'),
+  (2, '4, 6, 7, 9, 11, 12');
+
 
 DROP TABLE IF EXISTS pizza_toppings;
 CREATE TABLE pizza_toppings (
   "topping_id" INTEGER,
   "topping_name" TEXT
 );
+INSERT INTO pizza_toppings
+  ("topping_id", "topping_name")
+VALUES
+  (1, 'Bacon'),
+  (2, 'BBQ Sauce'),
+  (3, 'Beef'),
+  (4, 'Cheese'),
+  (5, 'Chicken'),
+  (6, 'Mushrooms'),
+  (7, 'Onions'),
+  (8, 'Pepperoni'),
+  (9, 'Peppers'),
+  (10, 'Salami'),
+  (11, 'Tomatoes'),
+  (12, 'Tomato Sauce');
 ```
-**\*Note**: Primary keys are not explicitly defined in the tables, likely due to the educational nature of the project.
-- The data is artificially generated and static, minimizing the risk of integrity violations.
-- In real-world scenarios, defining primary keys is essential to ensure data integrity and uniqueness.
+
+**\*Note**:
+1. Primary keys are not explicitly defined in the tables. This might be intentional due to the educational nature of the project:  
+  - The data is artificially generated and static, minimizing the risk of integrity violations.  
+  - In real-world scenarios, primary keys are essential to enforce data integrity and uniqueness.  
+
+2. Data type mismatches are present in the inserted values:  
+  - For example, string values are being inserted into columns with numeric data types.  
+  - PostgreSQL implicitly converts these values, allowing the data to be stored. However, this practice is discouraged in production systems.  
+  - Explicit type casting should be used to ensure data consistency and to prevent unexpected errors.  
 
 </details>
 
 ![Project Logo](../images/case2_diagram.png)
 
-### Data Cleaning & Data Transformation
-
-#### A. Cleaning Missing Data in `customer_orders` Table
+## Data Cleaning & Data Transformation
+### A. Cleaning Missing Data in `customer_orders` Table
 
 <details>
-  <summary><em>show original table</em></summary>
+  <summary><em><strong>show original table</strong></em></summary>
 
 | order_id | customer_id | pizza_id | exclusions | extras | order_time          |
 | -------- | ----------- | -------- | ---------- | ------ | ------------------- |
@@ -104,7 +178,7 @@ CREATE TABLE pizza_toppings (
 
 </details>
 
-*description:*
+***description:***
 
 > As seen in the [database schema](#entity-relationship-diagram), the **`exclusions`** and **`extras`** columns in the **`customer_orders`** table contain missing values represented in various forms:
 > - empty strings `('')`
@@ -117,7 +191,7 @@ CREATE TABLE pizza_toppings (
 > 
 > Standardizing these values to `NULL` will improve the accuracy of future queries and ensure a clearer logic for data analysis.
 
-*query:*
+*****query:*****
 ```SQL
 UPDATE customer_orders
 SET 
@@ -132,7 +206,7 @@ SET
 ;
 ```
 <details>
-  <summary><em>show table after data cleaning</em></summary>
+  <summary><em><strong>show table after data cleaning</strong></em></summary>
 
 | order_id | customer_id | pizza_id | exclusions | extras | order_time          |
 | -------- | ----------- | -------- | ---------- | ------ | ------------------- |
@@ -153,10 +227,12 @@ SET
 
 </details>
 
-#### B. Cleaning Missing Data in `runner_orders` Table
+---
+
+### B. Cleaning Missing Data in `runner_orders` Table
 
 <details>
-  <summary><em>show original table</em></summary>
+  <summary><em><strong>show original table</strong></em></summary>
 
 | order_id | runner_id | pickup_time         | distance | duration   | cancellation            |
 | -------- | --------- | ------------------- | -------- | ---------- | ----------------------- |
@@ -173,7 +249,7 @@ SET
 
 </details>
 
-*description:*
+***description:***
 
 > As seen in the [database schema](#entity-relationship-diagram), the `runner_orders` table contains inconsistencies in several columns, such as > `pickup_time`, `distance`, `duration`, and `cancellation`:
 > 
@@ -193,7 +269,7 @@ SET
 > 
 > These transformations will ensure data consistency, simplify future analysis, and reduce the risk of errors when running SQL queries.
 
-*query:*
+*****query:*****
 ```SQL
 UPDATE runner_orders
 SET 
@@ -221,7 +297,7 @@ ALTER COLUMN pickup_time TYPE TIMESTAMP USING pickup_time::TIMESTAMP;
 ```
 
 <details>
-  <summary><em>show table after data cleaning</em></summary>
+  <summary><em><strong>show table after data cleaning</strong></em></summary>
 
 | order_id | runner_id | pickup_time         | distance | duration | cancellation            |
 | -------- | --------- | ------------------- | -------- | -------- | ----------------------- |
@@ -238,61 +314,60 @@ ALTER COLUMN pickup_time TYPE TIMESTAMP USING pickup_time::TIMESTAMP;
 
 </details>
 
-### Case Study Questions & Solutions
-#### A. Pizza Metrics
-**1. How many pizzas were ordered?**
+---
 
-*query:*
+## Case Study Questions & Solutions
+### A. Pizza Metrics
+#### 1. How many pizzas were ordered?
 
+***query:***
 ```SQL
 SELECT COUNT(*) AS pizzas_ordered
 FROM customer_orders;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query calculates the total number of pizzas ordered across all entries in the `customer_orders` table.
-
 - The `COUNT(*)` function is used to count all rows in the `customer_orders` table, with each row representing an individual pizza order.
 - The result is labeled as `pizzas_ordered` for clarity.
-
 This query provides a simple and accurate total count of pizzas ordered, regardless of any additional details such as exclusions or extras.
 
 </details>
 
-*answer*
-
+***answer***
 | pizzas_ordered |
 | -------------- |
 | 14             |
 
-**2. How many unique customer orders were made?**
+---
 
-*query:*
+#### 2. How many unique customer orders were made?
 
+***query:***
 ```SQL
 SELECT COUNT(DISTINCT(order_id)) as unique_pizza_orders
 FROM customer_orders;
 ```
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query calculates the total number of unique customer orders made in the customer_orders table.
-
 - The DISTINCT(order_id) function ensures that only unique order_id values are considered in the count, effectively ignoring duplicate entries
 
 </details>
 
-*answer*
-
+***answer***
 | unique_pizza_orders |
 | ------------------- |
 | 10                  |
 
-**3. How many successful orders were delivered by each runner?**
+---
 
-*query:*
+#### 3. How many successful orders were delivered by each runner?
+
+***query:***
 ```SQL
 SELECT runner_id, COUNT(*) AS orders_delivered
 FROM runner_orders
@@ -300,11 +375,11 @@ WHERE cancellation IS NULL
 GROUP BY runner_id
 ORDER BY orders_delivered DESC;
 ```
+
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query retrieves the number of successful orders delivered by each runner.
-
 - It selects the `runner_id` and calculates the count of successful deliveries (`orders_delivered`) using the `COUNT(*)` function.
 - The `WHERE cancellation IS NULL` clause filters out any canceled orders, ensuring only completed deliveries are included in the results.
 - The `GROUP BY runner_id` groups the data by each `runner_id` to calculate the total successful orders for each runner.
@@ -312,15 +387,18 @@ The SQL query retrieves the number of successful orders delivered by each runner
 
 </details>
 
+***answer***
 | runner_id | orders_delivered |
 | --------- | ---------------- |
 | 1         | 4                |
 | 2         | 3                |
 | 3         | 1                |
 
-**4. How many of each type of pizza was delivered?**
+---
+
+#### 4. How many of each type of pizza was delivered?
   
-*query:*
+***query:***
 ```SQL
 SELECT pizza_name, COUNT(*) AS orders_delivered
 FROM customer_orders C
@@ -329,11 +407,11 @@ JOIN pizza_names PN ON C.pizza_id=PN.pizza_id
 WHERE cancellation IS NULL
 GROUP BY pizza_name;
 ```
+
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query retrieves the number of each type of pizza that was successfully delivered.
-
 - It selects the `pizza_name` and calculates the count of successful deliveries (`orders_delivered`) using the `COUNT(*)` function.
 - The `customer_orders` table (`C`) is joined with the `runner_orders` table (`R`) on the `order_id` column to link pizza orders with their delivery information.
 - The `customer_orders` table (`C`) is also joined with the `pizza_names` table (`PN`) on the `pizza_id` column to map the pizza types to their names.
@@ -342,16 +420,17 @@ The SQL query retrieves the number of each type of pizza that was successfully d
 
 </details>
 
-*answer*
-
+***answer***
 | pizza_name     | orders_delivered |
 | -------------- | ---------------- |
 | Meatlovers     | 9                |
 | Vegetarian     | 4                |
 
-**5. How many Vegetarian and Meatlovers were ordered by each customer?**
+---
+
+#### 5. How many Vegetarian and Meatlovers were ordered by each customer?
   
-*query:*
+***query:***
 ```SQL
 SELECT C.customer_id, PN.pizza_name, COUNT(*) AS orders_amount
 FROM customer_orders C
@@ -361,21 +440,18 @@ ORDER BY C.customer_id
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query calculates how many `Vegetarian` and `Meatlovers` pizzas were ordered by each customer.
-
 - It retrieves data from the `customer_orders` table and joins it with the `pizza_names` table using the `pizza_id` column.
 - The `GROUP BY` clause is used to group the results by `customer_id` and `pizza_name`, ensuring separate counts for each type of pizza for every customer.
 - The `COUNT(*)` function calculates the total number of pizzas of each type ordered by each customer.
 - The results are sorted by `customer_id` in ascending order for clarity.
-
 This query correctly determines the number of orders for both `Vegetarian` and `Meatlovers` pizzas placed by each customer, providing a detailed breakdown.
 
 </details>
 
-*answer*
-
+***answer***
 | customer_id | pizza_name | orders_amount |
 | ----------- | ---------- | ------------- |
 | 101         | Meatlovers | 2             |
@@ -387,62 +463,73 @@ This query correctly determines the number of orders for both `Vegetarian` and `
 | 104         | Meatlovers | 3             |
 | 105         | Vegetarian | 1             |
 
-**6. What was the maximum number of pizzas delivered in a single order?**
+---
+
+#### 6. What was the maximum number of pizzas delivered in a single order?
   
-*query:*
+***query:***
 
 ```SQL
-SELECT MAX(order_count) AS max_pizzas_delivered
+SELECT
+  MAX(order_count) AS max_pizzas_delivered
 FROM (
-  SELECT C.order_id, COUNT(*) AS order_count
-  FROM customer_orders C
-  JOIN runner_orders R ON C.order_id = R.order_id
-  WHERE R.cancellation IS NULL
-  GROUP BY C.order_id
+  SELECT
+    C.order_id,
+    COUNT(*) AS order_count
+  FROM
+    customer_orders C
+  JOIN
+    runner_orders R ON C.order_id = R.order_id
+  WHERE
+    R.cancellation IS NULL
+  GROUP BY
+    C.order_id
 ) subquery;
-
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query calculates the maximum number of pizzas delivered in a single order.
-
 - A subquery is used to determine the total number of pizzas (`order_count`) associated with each `order_id` in the `customer_orders` table.
 - The `JOIN` clause connects the `customer_orders` table with the `runner_orders` table on the `order_id` column to filter only valid, delivered orders. This is ensured by the condition `R.cancellation IS NULL`.
 - The `COUNT(*)` function within the subquery counts the number of rows (pizzas) for each `order_id`.
 - The `GROUP BY` clause groups the results by `order_id`, calculating the pizza count for each individual order.
 - The outer query applies the `MAX()` function to identify the largest pizza count (`order_count`) among all grouped results.
-
 This query efficiently identifies the single order with the highest number of pizzas delivered.
 
 </details>
 
-*answer*
-
+***answer***
 | max_pizzas_delivered |
 | -------------------- |
 | 3                    |
 
-**7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?**
+---
+
+#### 7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
   
-*query:*
+***query:***
 ```SQL
 SELECT 
-C.customer_id,
+  C.customer_id,
   SUM(CASE WHEN C.exclusions IS NOT NULL OR C.extras IS NOT NULL THEN 1 ELSE 0 END) AS pizzas_with_changes,
   SUM(CASE WHEN C.exclusions IS NULL AND C.extras IS NULL THEN 1 ELSE 0 END) AS pizzas_without_changes
-FROM customer_orders C
-JOIN runner_orders R ON C.order_id = R.order_id
-WHERE R.cancellation IS NULL
-GROUP BY C.customer_id
-ORDER BY C.customer_id;
+FROM
+  customer_orders C
+JOIN
+  runner_orders R ON C.order_id = R.order_id
+WHERE
+  R.cancellation IS NULL
+GROUP BY
+  C.customer_id
+ORDER BY
+  C.customer_id;
 ```
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query calculates, for each customer, the number of delivered pizzas with at least one change (exclusions or extras) and those with no changes, accounting for data that has already been cleaned.
-
 - The `JOIN` clause connects the `customer_orders` table (`C`) with the `runner_orders` table (`R`) using the `order_id` column to include only valid deliveries, determined by the condition `R.cancellation IS NULL`.
 - Two `SUM(CASE ... END)` expressions are used:
   - The first expression checks for pizzas with changes:
@@ -453,13 +540,11 @@ The SQL query calculates, for each customer, the number of delivered pizzas with
     - A value of `1` is added to the sum for such pizzas; otherwise, `0` is added.
 - The results are grouped by `customer_id` to calculate totals for each customer.
 - The `ORDER BY C.customer_id` clause sorts the results in ascending order of `customer_id`.
-
 This query leverages the cleaned data to accurately determine the count of pizzas with and without changes for each customer.
 
 </details>
 
-*answer*
-
+***answer***
 | customer_id | pizzas_with_changes | pizzas_without_changes |
 | ----------- | ------------------- | ---------------------- |
 | 101         | 0                   | 2                      |
@@ -468,41 +553,47 @@ This query leverages the cleaned data to accurately determine the count of pizza
 | 104         | 2                   | 1                      |
 | 105         | 1                   | 0                      |
 
-**8. How many pizzas were delivered that had both exclusions and extras?**
-  
-*query:*
+---
+
+#### 8. How many pizzas were delivered that had both exclusions and extras?
+
+***query:***
 ```SQL
 SELECT 
   COUNT(*) AS pizzas_with_both_changes
-FROM customer_orders C
-JOIN runner_orders R ON C.order_id = R.order_id
-WHERE R.cancellation IS NULL
+FROM
+  customer_orders C
+JOIN
+  runner_orders R ON C.order_id = R.order_id
+WHERE
+  R.cancellation IS NULL 
   AND C.exclusions IS NOT NULL
   AND C.extras IS NOT NULL
 ```
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query calculates the total number of pizzas that were delivered with both exclusions and extras.
-
 - The `JOIN` clause connects the `customer_orders` table (`C`) with the `runner_orders` table (`R`) using the `order_id` column to include only valid deliveries.
 - The `WHERE` clause includes three conditions:
   - `R.cancellation IS NULL` ensures only successfully delivered pizzas are considered.
   - `C.exclusions IS NOT NULL` checks that exclusions were specified for the pizza.
   - `C.extras IS NOT NULL` checks that extras were specified for the pizza.
 - The `COUNT(*)` function counts the total number of rows that satisfy all the conditions.
-
 This query provides the count of pizzas that had both exclusions and extras and were successfully delivered.
 
 </details>
 
+***answer***
 | pizzas_with_both_changes |
 | ------------------------ |
 | 1                        |
 
-**9. What was the total volume of pizzas ordered for each hour of the day?**
+---
+
+#### 9. What was the total volume of pizzas ordered for each hour of the day?
   
-*query:*
+***query:***
 ```SQL
 SELECT 
   EXTRACT(HOUR FROM order_time) AS order_hour,
@@ -511,22 +602,20 @@ FROM customer_orders
 GROUP BY order_hour
 ORDER BY order_hour;
 ```
+
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query calculates the total number of pizzas ordered for each hour of the day.
-
 - The `EXTRACT(HOUR FROM order_time)` function extracts the hour from the `order_time` column, grouping orders by the hour they were placed.
 - The `COUNT(*)` function counts the total number of pizzas ordered within each hour.
 - The `GROUP BY order_hour` groups the results by each unique hour value to calculate the totals for each hour.
 - The `ORDER BY order_hour` sorts the results in ascending order of the hour for clear representation.
-
 This query provides the total number of pizzas ordered for each hour of the day based on the `order_time` column.
 
 </details>
 
-*answer*
-
+***answer***
 | order_hour | total_pizzas_ordered |
 | ---------- | -------------------- |
 | 11         | 1                    |
@@ -536,17 +625,20 @@ This query provides the total number of pizzas ordered for each hour of the day 
 | 21         | 3                    |
 | 23         | 3                    |
 
-**10. What was the volume of orders for each day of the week?**
+---
+
+#### 10. What was the volume of orders for each day of the week?
   
-*query:*
+***query:***
 ```SQL
 SELECT TO_CHAR(order_time, 'Day')AS order_day, COUNT(*) AS total_orders
 FROM customer_orders
 GROUP BY order_day
 ORDER BY total_orders DESC;
 ```
+
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query retrieves the total number of pizza orders (`total_orders`) for each day of the week (`order_day`) and sorts the results in descending order of the total orders.
 
@@ -559,8 +651,7 @@ This query provides insights into which days of the week had the most pizza orde
 
 </details>
 
-*answer*
-
+***answer***
 | order_day | total_orders |
 | --------- | ------------ |
 | Friday    | 1            |
@@ -568,22 +659,26 @@ This query provides insights into which days of the week had the most pizza orde
 | Saturday  | 5            |
 | Wednesday | 5            |
 
-#### B. Runner and Customer Experience
-**1. How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01)**
+---
 
-*query:*
+### B. Runner and Customer Experience
+#### 1. How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01)
 
+***query:***
 ```SQL
 SELECT 
   DATE_TRUNC('week', registration_date) AS week_start,
   COUNT(runner_id) AS runners_signed_up
-FROM runners
-GROUP BY week_start
-ORDER BY week_start;
+FROM
+  runners
+GROUP BY
+  week_start
+ORDER BY
+  week_start;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query calculates the number of runners who signed up during each one-week period starting from `2021-01-01`.
 
@@ -596,29 +691,37 @@ This query helps identify how many runners signed up during each week, providing
 
 </details>
 
+***answer***
 | week_start             | runners_signed_up |
 | ---------------------- | ----------------- |
 | 2020-12-28 00:00:00+00 | 2                 |
 | 2021-01-04 00:00:00+00 | 1                 |
 | 2021-01-11 00:00:00+00 | 1                 |
 
-**2. What was the average time in minutes it took for each runner to arrive at the Pizza Runner HQ to pickup the order?**
+---
 
-*query:*
+#### 2. What was the average time in minutes it took for each runner to arrive at the Pizza Runner HQ to pickup the order?
+
+***query:***
 
 ```SQL
 SELECT 
-    runner_id,
-    ROUND(AVG(EXTRACT(EPOCH FROM (pickup_time - order_time)) / 60)::NUMERIC, 2) AS avg_pickup_time_minutes
-FROM runner_orders
-JOIN customer_orders USING(order_id)
-WHERE pickup_time IS NOT NULL
-GROUP BY runner_id
-ORDER BY avg_pickup_time_minutes;
+  runner_id,
+  ROUND(AVG(EXTRACT(EPOCH FROM (pickup_time - order_time)) / 60)::NUMERIC, 2) AS avg_pickup_time_minutes
+FROM
+  runner_orders
+JOIN
+  customer_orders USING(order_id)
+WHERE
+  pickup_time IS NOT NULL
+GROUP BY
+  runner_id
+ORDER BY
+  avg_pickup_time_minutes;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query calculates the average time (in minutes) it took for each runner to arrive at the Pizza Runner HQ to pick up orders, rounded to two decimal places.
 
@@ -635,39 +738,48 @@ This query ensures accurate computation of the average pickup times for runners,
 
 </details>
 
-*answer*
-
+***answer***
 | runner_id | avg_pickup_time_minutes |
 | --------- | ----------------------- |
 | 3         | 10.47                   |
 | 1         | 15.68                   |
 | 2         | 23.72                   |
 
-**3. Is there any relationship between the number of pizzas and how long the order takes to prepare?**
+---
 
-*query:*
+#### 3. Is there any relationship between the number of pizzas and how long the order takes to prepare?
 
+***query:***
 ```SQL
 WITH pizza_count_per_order AS (
-    SELECT 
-        order_id,
-        COUNT(pizza_id) AS pizzas_ordered
-    FROM customer_orders
-    GROUP BY order_id
+  SELECT 
+    order_id,
+    COUNT(pizza_id) AS pizzas_ordered
+  FROM
+    customer_orders
+  GROUP BY
+    order_id
 )
+
 SELECT 
-    pco.pizzas_ordered,
-    ROUND(AVG(EXTRACT(EPOCH FROM (ro.pickup_time - co.order_time)) / 60)::NUMERIC, 2) AS avg_preparation_time_minutes
-FROM runner_orders ro
-JOIN customer_orders co USING(order_id)
-JOIN pizza_count_per_order pco ON co.order_id = pco.order_id
-WHERE ro.pickup_time IS NOT NULL
-GROUP BY pco.pizzas_ordered
-ORDER BY pco.pizzas_ordered;
+  pco.pizzas_ordered,
+  ROUND(AVG(EXTRACT(EPOCH FROM (ro.pickup_time - co.order_time)) / 60)::NUMERIC, 2) AS avg_preparation_time_minutes
+FROM
+  runner_orders ro
+JOIN
+  customer_orders co USING(order_id)
+JOIN
+  pizza_count_per_order pco ON co.order_id = pco.order_id
+WHERE
+  ro.pickup_time IS NOT NULL
+GROUP BY
+  pco.pizzas_ordered
+ORDER BY
+  pco.pizzas_ordered;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query determines if there is a relationship between the number of pizzas in an order (`pizzas_ordered`) and the average preparation time (`avg_preparation_time_minutes`) required for the order.
 
@@ -684,31 +796,36 @@ This query provides insight into whether the number of pizzas in an order affect
 
 </details>
 
-*answer*
-
+***answer***
 | pizzas_ordered | avg_preparation_time_minutes |
 | -------------- | ---------------------------- |
 | 1              | 12.36                        |
 | 2              | 18.38                        |
 | 3              | 29.28                        |
 
-**4. What was the average distance travelled for each customer?**
+---
 
-*query:*
+#### 4. What was the average distance travelled for each customer?
 
+***query:***
 ```SQL
 SELECT 
-    customer_id,
-    ROUND(AVG(distance), 2) AS avg_distance_km
-FROM runner_orders
-JOIN customer_orders USING(order_id)
-WHERE distance IS NOT NULL
-GROUP BY customer_id
-ORDER BY avg_distance_km;
+  customer_id,
+  ROUND(AVG(distance), 2) AS avg_distance_km
+FROM
+  runner_orders
+JOIN
+  customer_orders USING(order_id)
+WHERE
+  distance IS NOT NULL
+GROUP BY
+  customer_id
+ORDER BY
+  avg_distance_km;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query calculates the average distance in kilometers (`avg_distance_km`) traveled for each customer (`customer_id`) and orders the results by customer ID.
 
@@ -721,8 +838,7 @@ The SQL query calculates the average distance in kilometers (`avg_distance_km`) 
 
 </details>
 
-*answer*
-
+***answer***
 | customer_id | avg_distance_km |
 | ----------- | --------------- |
 | 104         | 10.00           |
@@ -731,18 +847,20 @@ The SQL query calculates the average distance in kilometers (`avg_distance_km`) 
 | 103         | 23.40           |
 | 105         | 25.00           |
 
-**5. What was the difference between the longest and shortest delivery times for all orders?**
+---
 
-*query:*
+#### 5. What was the difference between the longest and shortest delivery times for all orders?
 
+***query:***
 ```SQL
 SELECT 
-    MAX(duration) - MIN(duration) AS max_delivery_time_difference
-FROM runner_orders;
+  MAX(duration) - MIN(duration) AS max_delivery_time_difference
+FROM
+  runner_orders;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query calculates the difference between the longest (`MAX(duration)`) and shortest (`MIN(duration)`) delivery times for all orders in the `runner_orders` table.
 
@@ -755,29 +873,33 @@ This query provides a straightforward measure of the range of delivery times, he
 
 </details>
 
-*answer*
-
+***answer***
 | max_delivery_time_difference |
 | ---------------------------- |
 | 30                           |
 
-**6. What was the average speed for each runner for each delivery and do you notice any trend for these values?**
+---
 
-*query:*
+#### 6. What was the average speed for each runner for each delivery and do you notice any trend for these values?
 
+***query:***
 ```SQL
 SELECT 
   runner_id, 
   distance, 
   duration, 
   ROUND((distance / duration) * 60, 2) AS speed_km_per_hr
-FROM runner_orders
-WHERE duration IS NOT NULL AND distance IS NOT NULL
-ORDER BY speed_km_per_hr DESC;
+FROM
+  runner_orders
+WHERE
+  duration IS NOT NULL
+  AND distance IS NOT NULL
+ORDER BY
+  speed_km_per_hr DESC;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query calculates the average speed (`speed_km_per_hr`) for each delivery made by runners, using the distance traveled and the delivery duration.
 
@@ -805,8 +927,7 @@ Upon reviewing the results, the following trends and observations can be noted:
 
 </details>
 
-*answer*
-
+***answer***
 | runner_id | distance | duration | speed_km_per_hr |
 | --------- | -------- | -------- | --------------- |
 | 2         | 23.4     | 15       | 93.60           |
@@ -818,23 +939,27 @@ Upon reviewing the results, the following trends and observations can be noted:
 | 1         | 20       | 32       | 37.50           |
 | 2         | 23.4     | 40       | 35.10           |
 
-**7. What is the successful delivery percentage for each runner?**
+---
 
-*query:*
+#### 7. What is the successful delivery percentage for each runner?
 
+***query:***
 ```SQL
 SELECT 
     runner_id,
     ROUND(
         (COUNT(*) FILTER (WHERE cancellation IS NULL) / COUNT(*)::NUMERIC) * 100, 2
     ) AS successful_delivery_percentage
-FROM runner_orders
-GROUP BY runner_id
-ORDER BY runner_id;
+FROM
+  runner_orders
+GROUP BY
+  runner_id
+ORDER BY
+  runner_id;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query calculates the percentage of successful deliveries for each runner.
 
@@ -849,7 +974,7 @@ This query provides an overview of how many deliveries each runner completed suc
 
 </details>
 
-*answer*
+***answer***
 
 | runner_id | successful_delivery_percentage |
 | --------- | ------------------------------ |
@@ -857,11 +982,12 @@ This query provides an overview of how many deliveries each runner completed suc
 | 2         | 75.00                          |
 | 3         | 50.00                          |
 
-#### C. Ingredient Optimisation
-**1. What are the standard ingredients for each pizza?**
+---
 
-*query:*
+### C. Ingredient Optimisation
+#### 1. What are the standard ingredients for each pizza?
 
+***query:***
 ```SQL
 SELECT
   subquery.pizza_name,
@@ -870,15 +996,19 @@ FROM
   (SELECT
      PN.pizza_name,
      string_to_table(toppings, ', ')::INT topping_id
-   FROM pizza_recipes
-   JOIN pizza_names PN USING(pizza_id)
+   FROM
+     pizza_recipes
+   JOIN
+     pizza_names PN USING(pizza_id)
   ) subquery
-JOIN pizza_toppings PT USING (topping_id)
-GROUP BY pizza_name;
+JOIN
+  pizza_toppings PT USING (topping_id)
+GROUP BY
+  pizza_name;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query retrieves the standard ingredients for each type of pizza by combining information from the `pizza_recipes`, `pizza_names`, and `pizza_toppings` tables.
 
@@ -897,17 +1027,17 @@ This query effectively lists the standard ingredients for each pizza type in a r
 
 </details>
 
-*answer*
-
+***answer***
 | pizza_name | toppings                                                              |
 | ---------- | --------------------------------------------------------------------- |
 | Meatlovers | Bacon, BBQ Sauce, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami |
 | Vegetarian | Cheese, Mushrooms, Onions, Peppers, Tomatoes, Tomato Sauce            |
 
-**2. What was the most commonly added extra?**
+---
 
-*query:*
+#### 2. What was the most commonly added extra?
 
+***query:***
 ```SQL
 WITH toppings_counts AS (
   SELECT
@@ -916,21 +1046,30 @@ WITH toppings_counts AS (
   FROM
     (SELECT
       string_to_table(extras, ', ')::INT AS topping_id
-    FROM customer_orders
+    FROM
+      customer_orders
     ) subquery
-  JOIN pizza_toppings PT USING(topping_id)
+  JOIN
+    pizza_toppings PT USING(topping_id)
   GROUP BY PT.topping_name
 )
 
 SELECT
   topping_name,
   was_added_times
-FROM toppings_counts
-WHERE was_added_times = (SELECT MAX(was_added_times) FROM toppings_counts);
+FROM
+  toppings_counts
+WHERE
+  was_added_times = (
+    SELECT
+      MAX(was_added_times)
+    FROM
+      toppings_counts
+      );
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query identifies the most frequently added topping as an extra by leveraging a Common Table Expression (CTE) to calculate counts for each topping and then filtering for the maximum count.
 
@@ -948,38 +1087,49 @@ This query provides the name(s) of the topping(s) most frequently added as extra
 
 </details>
 
-*answer*
-
+***answer***
 | topping_name | was_added_times |
 | ------------ | --------------- |
 | Bacon        | 4               |
 
-**3. What was the most common exclusion?**
+---
 
-*query:*
+#### 3. What was the most common exclusion?
 
+***query:***
 ```SQL
 WITH exclusions_counts AS (
-    SELECT
-        PT.topping_name,
-        COUNT(*) AS was_excluded_times
+  SELECT
+    PT.topping_name,
+    COUNT(*) AS was_excluded_times
+  FROM
+    (SELECT
+      string_to_table(exclusions, ', ')::INT AS topping_id
     FROM
-        (SELECT
-            string_to_table(exclusions, ', ')::INT AS topping_id
-         FROM customer_orders
-        ) subquery
-    JOIN pizza_toppings PT USING(topping_id)
-    GROUP BY PT.topping_name
+      customer_orders
+    ) subquery
+  JOIN
+    pizza_toppings PT USING(topping_id)
+  GROUP BY
+    PT.topping_name
 )
+
 SELECT
-    topping_name,
-    was_excluded_times
-FROM exclusions_counts
-WHERE was_excluded_times = (SELECT MAX(was_excluded_times) FROM exclusions_counts);
+  topping_name,
+  was_excluded_times
+FROM
+  exclusions_counts
+WHERE
+  was_excluded_times = (
+    SELECT
+      MAX(was_excluded_times)
+    FROM
+      exclusions_counts
+    );
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query determines the most frequently excluded topping by counting exclusions for each topping and identifying the one(s) with the highest count.
 
@@ -997,48 +1147,57 @@ This query provides the name(s) of the topping(s) that were excluded the most fr
 
 </details>
 
-*answer*
-
+***answer***
 | topping_name | was_excluded_times |
 | ------------ | ------------------ |
 | Cheese       | 4                  |
 
-**4. Generate an order item for each record in the customers_orders table in the format of one of the following:**
-  - Meat Lovers
-  - Meat Lovers - Exclude Beef
-  - Meat Lovers - Extra Bacon
-  - Meat Lovers - Exclude Cheese, Bacon - Extra Mushroom, Peppers
+---
 
-*query:*
+#### 4. Generate an order item for each record in the customers_orders table in the format of one of the following:
+**- Meat Lovers**
+**- Meat Lovers - Exclude Beef**
+**- Meat Lovers - Extra Bacon**
+**- Meat Lovers - Exclude Cheese, Bacon - Extra Mushroom, Peppers**
 
+***query:***
 ```SQL
 SELECT
 	ROW_NUMBER() OVER(ORDER BY order_time) AS id,
-    order_id,
-    pizza_name ||
-    CASE
-        WHEN exclusions IS NOT NULL THEN ' - Exclude ' || (
-            SELECT string_agg(topping_name, ', ')
-            FROM pizza_toppings
-            WHERE topping_id = ANY(string_to_array(exclusions, ',')::INT[])
-        )
-        ELSE ''
-    END ||
-    CASE
-        WHEN extras IS NOT NULL THEN ' - Extra ' || (
-            SELECT string_agg(topping_name, ', ')
-            FROM pizza_toppings
-            WHERE topping_id = ANY(string_to_array(extras, ',')::INT[])
-        )
-        ELSE ''
-    END AS order_items
-FROM customer_orders
-JOIN pizza_names USING (pizza_id)
-;
+  order_id,
+  pizza_name ||
+  CASE
+    WHEN exclusions IS NOT NULL
+    THEN ' - Exclude ' || (
+      SELECT
+        string_agg(topping_name, ', ')
+      FROM
+        pizza_toppings
+      WHERE
+        topping_id = ANY(string_to_array(exclusions, ',')::INT[])
+      )
+    ELSE ''
+  END ||
+  CASE
+    WHEN extras IS NOT NULL
+    THEN ' - Extra ' || (
+      SELECT
+        string_agg(topping_name, ', ')
+      FROM
+        pizza_toppings
+      WHERE
+        topping_id = ANY(string_to_array(extras, ',')::INT[])
+      )
+    ELSE ''
+  END AS order_items
+FROM
+  customer_orders
+JOIN
+  pizza_names USING (pizza_id);
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query generates a unique order item (`order_items`) for each record in the `customer_orders` table, formatted to include the pizza name and any exclusions or extras applied to the order. Additionally, the query assigns a unique row identifier (`id`) to each result, providing sequential numbering for the output.
 
@@ -1054,8 +1213,7 @@ This query outputs a formatted `order_items` string for each record in the `cust
 
 </details>
 
-*answer*
-
+***answer***
 | id  | order_id | order_items                                                     |
 | --- | -------- | --------------------------------------------------------------- |
 | 1   | 1        | Meatlovers                                                      |
@@ -1073,43 +1231,47 @@ This query outputs a formatted `order_items` string for each record in the `cust
 | 13  | 10       | Meatlovers - Exclude BBQ Sauce, Mushrooms - Extra Bacon, Cheese |
 | 14  | 10       | Meatlovers                                                      |
 
+---
 
-**5. Generate an alphabetically ordered comma separated ingredient list for each pizza order from the customer_orders table and add a 2x in front of any relevant ingredients**
-- For example: "Meat Lovers: 2xBacon, Beef, ... , Salami"
+#### 5. Generate an alphabetically ordered comma separated ingredient list for each pizza order from the customer_orders table and add a 2x in front of any relevant ingredients.
+**- For example: "Meat Lovers: 2xBacon, Beef, ... , Salami"**
 
-*query:*
-
+***query:***
 ```SQL
 SELECT
-    ROW_NUMBER() OVER(ORDER BY order_time) AS id,
-    order_id,
-    pizza_name || ': ' ||
-    (
-      SELECT
+  ROW_NUMBER() OVER(ORDER BY order_time) AS id,
+  order_id,
+  pizza_name || ': ' || (
+    SELECT
       string_agg(
-        CASE
-          WHEN topping_id = ANY(string_to_array(extras, ',')::INT[])
-          THEN '2x' || topping_name
-          ELSE topping_name
-        END, ', ' ORDER BY topping_name
-        )
-      FROM pizza_toppings
-      WHERE topping_id = ANY(
+      CASE
+        WHEN topping_id = ANY(string_to_array(extras, ',')::INT[])
+        THEN '2x' || topping_name
+        ELSE topping_name
+      END, ', ' ORDER BY topping_name
+      )
+    FROM
+      pizza_toppings
+    WHERE
+      topping_id = ANY(
         array(
           SELECT unnest(string_to_array(pr.toppings, ',')::INT[]) 
-          EXCEPT 
-          SELECT unnest(string_to_array(exclusions, ',')::INT[])
+          EXCEPT SELECT unnest(string_to_array(exclusions, ',')::INT[])
           )
-          ) OR topping_id = ANY(string_to_array(extras, ',')::INT[])
+        ) OR topping_id = ANY(string_to_array(extras, ',')::INT[])
     ) AS order_items
-FROM customer_orders
-JOIN pizza_names USING (pizza_id)
-JOIN pizza_recipes pr USING (pizza_id)
-ORDER BY id;
+FROM
+  customer_orders
+JOIN
+  pizza_names USING (pizza_id)
+JOIN
+  pizza_recipes pr USING (pizza_id)
+ORDER BY
+  id;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query generates an ordered list of ingredients for each pizza order, handling standard toppings, exclusions, and extras:
 
@@ -1126,8 +1288,7 @@ The SQL query generates an ordered list of ingredients for each pizza order, han
 This query provides a detailed and well-structured list of ingredients for each order, incorporating exclusions and extras accurately.
 </details>
 
-*answer*
-
+***answer***
 | id  | order_id | order_items                                                                         |
 | --- | -------- | ----------------------------------------------------------------------------------- |
 | 1   | 1        | Meatlovers: BBQ Sauce, Bacon, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami   |
@@ -1145,10 +1306,11 @@ This query provides a detailed and well-structured list of ingredients for each 
 | 13  | 10       | Meatlovers: 2xBacon, Beef, 2xCheese, Chicken, Pepperoni, Salami                     |
 | 14  | 10       | Meatlovers: BBQ Sauce, Bacon, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami   |
 
-**6.What is the total quantity of each ingredient used in all delivered pizzas sorted by most frequent first?**
+---
 
-*query:*
+#### 6.What is the total quantity of each ingredient used in all delivered pizzas sorted by most frequent first?
 
+***query:***
 ```SQL
 WITH delivered AS (
   SELECT 
@@ -1157,10 +1319,14 @@ WITH delivered AS (
     CO.exclusions, 
     CO.extras, 
     PR.toppings
-  FROM runner_orders RO
-  JOIN customer_orders CO USING(order_id)
-  JOIN pizza_recipes PR USING(pizza_id)
-  WHERE RO.cancellation IS NULL
+  FROM
+    runner_orders RO
+  JOIN
+    customer_orders CO USING(order_id)
+  JOIN
+    pizza_recipes PR USING(pizza_id)
+  WHERE
+    RO.cancellation IS NULL
 ),
 final_toppings_calculated AS (
   SELECT 
@@ -1185,14 +1351,19 @@ ingredient_totals AS (
 SELECT 
   pt.topping_name,
   COUNT(*) AS total_count
-FROM ingredient_totals it
-JOIN pizza_toppings pt ON it.topping_id = pt.topping_id
-GROUP BY pt.topping_name
-ORDER BY total_count DESC, pt.topping_name;
+FROM
+  ingredient_totals it
+JOIN
+  pizza_toppings pt ON it.topping_id = pt.topping_id
+GROUP BY
+  pt.topping_name
+ORDER BY
+  total_count DESC,
+  pt.topping_name;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query calculates the total quantity of each ingredient used in all delivered pizzas, sorted by most frequent first.
 
@@ -1215,8 +1386,7 @@ This query provides a precise count of each topping used in all delivered pizzas
 
 </details>
 
-*answer*
-
+***answer***
 | topping_name | total_count |
 | ------------ | ----------- |
 | Bacon        | 12          |
@@ -1232,12 +1402,12 @@ This query provides a precise count of each topping used in all delivered pizzas
 | Tomato Sauce | 3           |
 | Tomatoes     | 3           |
 
-#### D. Pricing and Ratings
+---
 
-**1. If a Meat Lovers pizza costs $12 and Vegetarian costs $10 and there were no charges for changes - how much money has Pizza Runner made so far if there are no delivery fees?**
+### D. Pricing and Ratings
+#### 1. If a Meat Lovers pizza costs $12 and Vegetarian costs $10 and there were no charges for changes - how much money has Pizza Runner made so far if there are no delivery fees?
 
-*query:*
-
+***query:***
 ```SQL
 SELECT
   PN.pizza_name,
@@ -1246,20 +1416,27 @@ SELECT
     THEN total_sold*12
     ELSE total_sold*10
   END AS total_earned_usd
-FROM
-  (SELECT
+FROM (
+  SELECT
     CO.pizza_id,
     COUNT(*) AS total_sold
-  FROM runner_orders RO
-  JOIN customer_orders CO USING(order_id)
-  WHERE cancellation IS NULL
-  GROUP BY pizza_id) SQ
-  JOIN pizza_names PN USING(pizza_id)
-  ORDER BY total_earned_usd DESC;
+  FROM
+    runner_orders RO
+  JOIN
+    customer_orders CO USING(order_id)
+  WHERE
+    cancellation IS NULL
+  GROUP BY
+    pizza_id
+  ) SQ
+JOIN
+  pizza_names PN USING(pizza_id)
+ORDER BY
+  total_earned_usd DESC;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query calculates the total revenue generated from each type of pizza.
 
@@ -1281,18 +1458,18 @@ This query provides insights into which type of pizza generates the most revenue
 
 </details>
 
-*answer*
-
+***answer***
 | pizza_name | total_earned_usd |
 | ---------- | ---------------- |
 | Meatlovers | 108              |
 | Vegetarian | 30               |
 
-**2. What if there was an additional $1 charge for any pizza extras?**
-- Add cheese is $1 extra.
+---
 
-*query:*
+#### 2. What if there was an additional $1 charge for any pizza extras?
+**- Add cheese is $1 extra**
 
+***query:***
 ```SQL
 WITH extras_count AS (
   SELECT
@@ -1305,10 +1482,14 @@ WITH extras_count AS (
         ELSE 0
       END
     ) AS cheese_added
-  FROM runner_orders
-  JOIN customer_orders CO USING(order_id)
-  WHERE cancellation IS NULL
-  GROUP BY CO.pizza_id
+  FROM
+    runner_orders
+  JOIN
+    customer_orders CO USING(order_id)
+  WHERE
+    cancellation IS NULL
+  GROUP BY
+    CO.pizza_id
 )
 SELECT
   PN.pizza_name,
@@ -1317,13 +1498,16 @@ SELECT
     THEN total_sold * 12 + cheese_added
     ELSE total_sold * 10 + cheese_added
   END AS total_earned_usd
-FROM extras_count
-JOIN pizza_names PN USING(pizza_id)
-ORDER BY total_earned_usd DESC;
+FROM
+  extras_count
+JOIN
+  pizza_names PN USING(pizza_id)
+ORDER BY
+  total_earned_usd DESC;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query calculates the total revenue for Pizza Runner, considering the base price of each pizza and additional charges for cheese. 
 
@@ -1347,17 +1531,17 @@ This query efficiently calculates the total revenue while considering additional
 
 </details>
 
-*answer*
-
+***answer***
 | pizza_name | total_earned_usd |
 | ---------- | ---------------- |
 | Meatlovers | 109              |
 | Vegetarian | 30               |
 
-**3. The Pizza Runner team now wants to add an additional ratings system that allows customers to rate their runner, how would you design an additional table for this new dataset - generate a schema for this new table and insert your own data for ratings for each successful customer order between 1 to 5.**
+---
 
-*query:*
+#### 3. The Pizza Runner team now wants to add an additional ratings system that allows customers to rate their runner, how would you design an additional table for this new dataset - generate a schema for this new table and insert your own data for ratings for each successful customer order between 1 to 5.**
 
+***query:***
 ```SQL
 DROP TABLE IF EXISTS runners_raiting;
 CREATE TABLE runners_raiting (
@@ -1373,9 +1557,12 @@ WITH successful_delivery AS (
     DISTINCT CO.order_id,
     CO.customer_id,
     RO.runner_id
-  FROM runner_orders RO
-  JOIN customer_orders CO USING(order_id)
-  WHERE RO.cancellation IS NULL
+  FROM
+    runner_orders RO
+  JOIN
+    customer_orders CO USING(order_id)
+  WHERE
+    RO.cancellation IS NULL
 )
 
 INSERT INTO runners_raiting(order_id, customer_id, runner_id, runner_rating)
@@ -1384,15 +1571,19 @@ SELECT
   SD.customer_id,
   SD.runner_id,
   (floor(random() * (5 - 1 + 1)) + 1) AS runner_rating
-FROM successful_delivery SD
-ORDER BY SD.order_id;
+FROM
+  successful_delivery SD
+ORDER BY
+  SD.order_id;
 
-SELECT *
-FROM runners_raiting;
+SELECT
+  *
+FROM
+  runners_raiting;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The query creates a new table for storing ratings and inserts random ratings for each successful order. The process includes generating random ratings between 1 and 5 for all successful deliveries and saving this information.
 
@@ -1422,8 +1613,7 @@ This query fulfills the task requirements by defining the schema, generating dat
 
 </details>
 
-*answer*
-
+***answer***
 | order_id | customer_id | runner_id | runner_rating |
 | -------- | ----------- | --------- | ------------- |
 | 1        | 101         | 1         | 4             |
@@ -1435,20 +1625,21 @@ This query fulfills the task requirements by defining the schema, generating dat
 | 8        | 102         | 2         | 5             |
 | 10       | 104         | 1         | 5             |
 
-**4. Using your newly generated table - can you join all of the information together to form a table which has the following information for successful deliveries?**
-- customer_id
-- order_id
-- runner_id
-- rating
-- order_time
-- pickup_time
-- Time between order and pickup
-- Delivery duration
-- Average speed
-- Total number of pizzas
+---
 
-*query:*
+#### 4. Using your newly generated table - can you join all of the information together to form a table which has the following information for successful deliveries?
+**- customer_id**
+**- order_id**
+**- runner_id**
+**- rating**
+**- order_time**
+**- pickup_time**
+**- Time between order and pickup**
+**- Delivery duration**
+**- Average speed**
+**- Total number of pizzas**
 
+***query:***
 ```SQL
 WITH CTE AS (
   SELECT
@@ -1462,9 +1653,12 @@ WITH CTE AS (
   	(RO.duration * INTERVAL '1 minute') AS time_between_pickup_and_delivery,
     ROUND(RO.distance::NUMERIC / RO.duration, 2)*60 AS average_speed_km_per_hour,
     COUNT(CO.pizza_id) AS total_number_of_pizzas
-  FROM customer_orders CO
-  JOIN runner_orders RO USING(order_id)
-  JOIN runners_raiting RR USING(order_id)
+  FROM
+    customer_orders CO
+  JOIN
+    runner_orders RO USING(order_id)
+  JOIN
+    runners_raiting RR USING(order_id)
   GROUP BY 
     CO.customer_id, CO.order_id, RO.runner_id, RR.runner_rating,
     CO.order_time, RO.pickup_time, RO.duration, RO.distance
@@ -1482,12 +1676,14 @@ SELECT
   (CTE.time_between_order_and_pickup + time_between_pickup_and_delivery) AS total_delivery_duration,
   CTE.average_speed_km_per_hour AS average_speed,
   CTE.total_number_of_pizzas
-FROM CTE
-ORDER BY CTE.order_id;
+FROM
+  CTE
+ORDER BY
+  CTE.order_id;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query generates a comprehensive table for successful deliveries, including the following columns:
 - `customer_id`: The ID of the customer who placed the order.
@@ -1518,8 +1714,7 @@ This query ensures all required details for successful deliveries are displayed 
 
 </details>
 
-*answer*
-
+***answer***
 | customer_id | order_id | runner_id | rating | order_time          | pickup_time         | time_between_order_and_pickup | time_between_pickup_and_delivery | total_delivery_duration | average_speed | total_number_of_pizzas |
 | ----------- | -------- | --------- | ------ | ------------------- | ------------------- | ----------------------------- | -------------------------------- | ----------------------- | ------------- | ---------------------- |
 | 101         | 1        | 1         | 2      | 2020-01-01 18:05:02 | 2020-01-01 18:15:34 | 00:10:32                      | 00:32:00                         | 00:42:32                | 37.80         | 1                      |
@@ -1531,10 +1726,11 @@ This query ensures all required details for successful deliveries are displayed 
 | 102         | 8        | 2         | 2      | 2020-01-09 23:54:33 | 2020-01-10 00:15:02 | 00:20:29                      | 00:15:00                         | 00:35:29                | 93.60         | 1                      |
 | 104         | 10       | 1         | 2      | 2020-01-11 18:34:49 | 2020-01-11 18:50:20 | 00:15:31                      | 00:10:00                         | 00:25:31                | 60.00         | 2                      |
 
-**5. If a Meat Lovers pizza was $12 and Vegetarian $10 fixed prices with no cost for extras and each runner is paid $0.30 per kilometre traveled - how much money does Pizza Runner have left over after these deliveries?**
+---
 
-*query:*
+#### 5. If a Meat Lovers pizza was $12 and Vegetarian $10 fixed prices with no cost for extras and each runner is paid $0.30 per kilometre traveled - how much money does Pizza Runner have left over after these deliveries?
 
+***query:***
 ```SQL
 WITH pizza_earnings AS (
   SELECT
@@ -1542,27 +1738,39 @@ WITH pizza_earnings AS (
       WHEN pizza_id = 1 THEN COUNT(*) * 12
       ELSE COUNT(*) * 10
     END AS total_earned_usd
-  FROM runner_orders RO
-  JOIN customer_orders CO USING(order_id)
-  WHERE cancellation IS NULL
-  GROUP BY pizza_id
+  FROM
+    runner_orders RO
+  JOIN
+    customer_orders CO USING(order_id)
+  WHERE
+    cancellation IS NULL
+  GROUP BY
+    pizza_id
 ),
 delivery_costs AS (
   SELECT
     SUM(RO.distance::NUMERIC * 0.30) AS total_delivery_cost
-  FROM runner_orders RO
-  WHERE cancellation IS NULL
+  FROM
+    runner_orders RO
+  WHERE
+    cancellation IS NULL
 )
 
 SELECT
   ROUND(
-    (SELECT SUM(total_earned_usd) FROM pizza_earnings) - 
-    (SELECT total_delivery_cost FROM delivery_costs), 2
-    )AS net_income_usd;
+    (SELECT
+      SUM(total_earned_usd)
+    FROM
+      pizza_earnings) - 
+    (SELECT
+      total_delivery_cost
+    FROM
+      delivery_costs), 2
+  )AS net_income_usd;
 ```
 
 <details>
-  <summary><em>show description</em></summary>
+  <summary><em><strong>show description</strong></em></summary>
 
 The SQL query calculates the net income for Pizza Runner by subtracting the total delivery costs from the total pizza earnings for all successful deliveries. 
 
@@ -1582,13 +1790,11 @@ The SQL query calculates the net income for Pizza Runner by subtracting the tota
   - Uses `ROUND` to format the result to two decimal places for clarity.
   - Outputs the final `net_income_usd` as the net income.
 
-**Output:**
 The query provides the net income after deducting delivery costs from pizza sales revenue for all successful deliveries.
 
 </details>
 
-*answer*
-
+***answer***
 | net_income_usd |
 | -------------- |
 | 94.44          |
