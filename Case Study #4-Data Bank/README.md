@@ -599,21 +599,114 @@ The query calculates the closing balance for each customer at the end of each mo
 
 ---
 
-#### 5. What is the percentage of customers who increase their closing balance by more than 5%?
+#### 5. What is the percentage of customers who increase their closing balance by more than 5% *?
+
+**\*Note**:
+>The phrasing of the question allows for ambiguous interpretation.  
+>If we consider it in conjunction with the previous one — *What is the percentage of customers who increase their closing balance by more than 5%?* — the calculation would need to be performed for each month.  
+>On the other hand, the question itself does not specify a monthly comparison of closing balances.  
+>
+>In addition, the result depends on whether the first month is included in the calculation. In that case, the closing balance would be compared to $0.00, as there is no closing balance for the previous month.  
+>
+>In my calculations, I will use the following methodology:  
+>- comparison based on the closing balance on the last date for all customer records;  
+>- the first month will not be counted as growth; however, its closing balance will be used for the calculations in subsequent months.
 
 ***query:***
-
 ```SQL
-
+WITH monthly_txn_summary AS (
+  SELECT
+    customer_id,
+    DATE_TRUNC('month', txn_date)::DATE AS current_month,
+    SUM(
+      CASE
+        WHEN
+          txn_type = 'deposit'
+        THEN
+          txn_amount
+        ELSE
+          -txn_amount
+      END
+    ) AS txn_amount_with_sign
+  FROM
+    customer_transactions
+  GROUP BY
+    customer_id,
+    DATE_TRUNC('month', txn_date)::DATE
+  ),
+customer_closing_balances AS (
+  SELECT
+    customer_id,
+    current_month,
+    SUM(txn_amount_with_sign) 
+      OVER (PARTITION BY customer_id ORDER BY current_month) AS closing_balance,
+    ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY current_month ASC) AS row_num_start,
+    ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY current_month DESC) AS row_num_end
+  FROM
+    monthly_txn_summary
+),
+growth_calculation AS (
+  SELECT
+    start_balances.customer_id,
+    ROUND(((end_balances.closing_balance - start_balances.closing_balance) / 
+      ABS(start_balances.closing_balance)) * 100, 2) AS growth_percentage
+  FROM
+    customer_closing_balances start_balances
+  JOIN
+    customer_closing_balances end_balances USING(customer_id)
+  WHERE
+    start_balances.row_num_start = 1 AND end_balances.row_num_end = 1
+),
+filtered_growth AS (
+  SELECT
+    customer_id
+  FROM
+    growth_calculation
+  WHERE
+    growth_percentage > 5
+)
+SELECT
+  ROUND((COUNT(DISTINCT filtered_growth.customer_id) * 100.0) /
+  (SELECT COUNT(DISTINCT customer_id) FROM customer_transactions), 2) AS percentage_of_customers
+FROM
+  filtered_growth;
 ```
 
 <details>
   <summary><em><strong>show description:</strong></em></summary>
 
+The query calculates the percentage of customers whose closing balance increased by more than 5% over the entire observation period.
+
+- CTE `monthly_txn_summary`:
+  - Computes the net transaction amount (`txn_amount_with_sign`) for each customer for each month.
+  - Uses `DATE_TRUNC('month', txn_date)::DATE` to truncate transaction dates to the start of the month.
+  - Calculates the net transaction amount by summing deposits and subtracting withdrawals using `SUM(CASE ... END)`.
+  - Groups results by `customer_id` and `current_month`.
+
+- CTE `customer_closing_balances`:
+  - Calculates the cumulative closing balance for each customer using `SUM(txn_amount_with_sign) OVER (PARTITION BY customer_id ORDER BY current_month)`.
+  - Adds `row_num_start` and `row_num_end` using `ROW_NUMBER` to identify the first and last rows for each customer.
+
+- CTE `growth_calculation`:
+  - Joins the first and last rows for each customer based on `row_num_start` and `row_num_end`.
+  - Calculates the percentage growth of the closing balance as `(end_balance - start_balance) / ABS(start_balance) * 100`.
+  - Rounds the growth percentage to two decimal places.
+
+- CTE `filtered_growth`:
+  - Filters customers whose growth percentage is greater than 5%.
+
+- Final query:
+  - Calculates the percentage of customers with growth > 5% by dividing the count of filtered customers by the total number of unique customers (`COUNT(DISTINCT customer_id)`).
+  - Rounds the result to two decimal places.
 
 </details>
 
 ***answer:***
+| percentage_of_customers |
+| ----------------------- |
+| 33.20                   |
+
+---
 
 ### C. Data Allocation Challenge
 ...
