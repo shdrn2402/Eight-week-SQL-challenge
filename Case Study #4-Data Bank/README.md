@@ -602,7 +602,7 @@ The query calculates the closing balance for each customer at the end of each mo
 #### 5. What is the percentage of customers who increase their closing balance by more than 5% *?
 
 <details>
-  <summary><em><strong>*</strong></em></summary>
+  <summary><em><strong>* show note:</strong></em></summary>
 
 >The phrasing of the question allows for ambiguous interpretation.  
 >If we consider it in conjunction with the previous one — *What is the percentage of customers who increase their closing balance by more than 5%?* — the calculation would need to be performed for each month.  
