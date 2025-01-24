@@ -719,8 +719,7 @@ The query calculates the percentage of customers whose closing balance increased
 >- customer balance at the end of each month  
 >- minimum, average and maximum values of the running balance for each customer  
 >- running customer balance column that includes the impact of each transaction  
->
->**Using all of the data available - how much data would have been required for each option on a monthly basis?**
+
 
 Since the task does not specify rules for calculating storage volumes based on balances, we will define these rules ourselves.
 
