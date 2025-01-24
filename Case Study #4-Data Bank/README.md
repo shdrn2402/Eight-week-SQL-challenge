@@ -734,7 +734,7 @@ Since the task does not specify rules for calculating storage volumes based on b
     - for a positive balance: Storage volume (GB) = (End-of-month balance / 10) + 100
     - for a negative balance: Storage volume (GB) = abs(End-of-month balance) / 8 + 100
 
-<u><em><strong>Additional rules depending on the storage calculation model:</em></strong></u>
+<em><strong><u>Additional rules depending on the storage calculation model:</u></em></strong>
 
 **1. Storage volume is allocated based on the end-of-month balance:**
 
