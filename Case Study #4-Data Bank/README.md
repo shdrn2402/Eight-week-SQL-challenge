@@ -738,10 +738,14 @@ The query calculates the percentage of customers whose closing balance increased
 <details>
   <summary><em><strong>show examples:</strong></em></summary>
 
+---
+
 > 1. Positive balance: 500.
 > Storage volume = (500 / 10) + 100 = 50 + 100 = **150 GB**.
 > 2. Negative balance: -400.  
 > Storage volume = abs(-400) / 8 + 100 = 50 + 100 = **150 GB**.
+
+---
 
 </details>
 
