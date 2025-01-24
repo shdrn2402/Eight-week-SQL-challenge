@@ -711,36 +711,38 @@ The query calculates the percentage of customers whose closing balance increased
 ### C. Data Allocation Challenge
 
 >To test out a few different hypotheses - the Data Bank team wants to run an experiment where different groups of customers would be allocated data using 3 different options:
->- option 1: data is allocated based off the amount of money at the end of the previous month  
->- option 2: data is allocated on the average amount of money kept in the account in the previous 30 days  
->- option 3: data is updated real-time  
+- option 1: data is allocated based off the amount of money at the end of the previous month  
+- option 2: data is allocated on the average amount of money kept in the account in the previous 30 days  
+- option 3: data is updated real-time  
 >
 >For this multi-part challenge question - you have been requested to generate the following data elements to help the Data Bank team estimate how much data will need to be provisioned for each option:
->- customer balance at the end of each month  
->- minimum, average and maximum values of the running balance for each customer  
->- running customer balance column that includes the impact of each transaction  
+- customer balance at the end of each month  
+- minimum, average and maximum values of the running balance for each customer  
+- running customer balance column that includes the impact of each transaction  
 >
 >**Using all of the data available - how much data would have been required for each option on a monthly basis?**
+>
 >Since the task does not specify rules for calculating storage volumes based on balances, we will define these rules ourselves.
 >
 >**General Rules:**
->- each customer receives 100 GB of cloud storage upon starting to use our services. This 100 GB remains with the customer permanently.
->- a negative balance is considered a credit and does not decrease the storage volume. Moreover, an increasing coefficient is applied to calculate the storage volume, as the bank benefits from the customer’s use of borrowed funds.
->- basic formula for storage calculation:
->  - for a positive balance: Storage volume (GB) = (End-of-month balance / 10) + 100
->  - for a negative balance: Storage volume (GB) = abs(End-of-month balance) / 8 + 100
+- each customer receives 100 GB of cloud storage upon starting to use our services. This 100 GB remains with the customer permanently.
+- a negative balance is considered a credit and does not decrease the storage volume. Moreover, an increasing coefficient is applied to calculate the storage volume, as the bank benefits from the customer’s use of borrowed funds.
+- basic formula for storage calculation:
+  - for a positive balance: Storage volume (GB) = (End-of-month balance / 10) + 100
+  - for a negative balance: Storage volume (GB) = abs(End-of-month balance) / 8 + 100
 >
 >#### Rules Depending on the Storage Calculation Model:
 >
 >1. **Storage volume is allocated based on the end-of-month balance:**
 >The basic formula is applied.
-><details>
+<details>
   <summary><em><strong>show examples:</strong></em></summary>
 
 1. Positive balance: 500.  
    Storage volume = (500 / 10) + 100 = 50 + 100 = **150 GB**.
 2. Negative balance: -400.  
    Storage volume = abs(-400) / 8 + 100 = 50 + 100 = **150 GB**.
+
 </details>
 <!-- 2. **Storage volume is allocated based on the average balance over the previous 30 days:**
    A modified basic formula with a higher divisor is used for this calculation. This accounts for the fact that the average balance already smooths fluctuations, thereby compensating for less variance compared to the end-of-month balance.
