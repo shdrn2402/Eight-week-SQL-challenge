@@ -599,11 +599,9 @@ The query calculates the closing balance for each customer at the end of each mo
 
 ---
 
-#### 5. What is the percentage of customers who increase their closing balance by more than 5% *?
+#### 5. What is the percentage of customers who increase their closing balance by more than 5%?
 
-<details>
-  <summary><em><strong>* show note:</strong></em></summary>
-
+>**\*Note**:
 >The phrasing of the question allows for ambiguous interpretation.  
 >If we consider it in conjunction with the previous one — *What is the percentage of customers who increase their closing balance by more than 5%?* — the calculation would need to be performed for each month.  
 >On the other hand, the question itself does not specify a monthly comparison of closing balances.  
@@ -613,8 +611,6 @@ The query calculates the closing balance for each customer at the end of each mo
 >In my calculations, I will use the following methodology:  
 >- comparison based on the closing balance on the last date for all customer records;  
 >- the first month will not be counted as growth; however, its closing balance will be used for the calculations in subsequent months.
-
-</details>
 
 ***query:***
 ```SQL
