@@ -709,7 +709,75 @@ The query calculates the percentage of customers whose closing balance increased
 ---
 
 ### C. Data Allocation Challenge
-...
+
+>To test out a few different hypotheses - the Data Bank team wants to run an experiment where different groups of customers would be allocated data using 3 different options:
+>- option 1: data is allocated based off the amount of money at the end of the previous month  
+>- option 2: data is allocated on the average amount of money kept in the account in the previous 30 days  
+>- option 3: data is updated real-time  
+>
+>For this multi-part challenge question - you have been requested to generate the following data elements to help the Data Bank team estimate how much data will need to be provisioned for each option:
+>- customer balance at the end of each month  
+>- minimum, average and maximum values of the running balance for each customer  
+>- running customer balance column that includes the impact of each transaction  
+>
+>**Using all of the data available - how much data would have been required for each option on a monthly basis?**
+>Since the task does not specify rules for calculating storage volumes based on balances, we will define these rules ourselves.
+>
+>**General Rules:**
+>- each customer receives 100 GB of cloud storage upon starting to use our services. This 100 GB remains with the customer permanently.
+>- a negative balance is considered a credit and does not decrease the storage volume. Moreover, an increasing coefficient is applied to calculate the storage volume, as the bank benefits from the customer’s use of borrowed funds.
+>- basic formula for storage calculation:
+>  - for a positive balance: Storage volume (GB) = (End-of-month balance / 10) + 100
+>  - for a negative balance: Storage volume (GB) = abs(End-of-month balance) / 8 + 100
+>
+>#### Rules Depending on the Storage Calculation Model:
+>
+>1. **Storage volume is allocated based on the end-of-month balance:**
+>The basic formula is applied.
+><details>
+  <summary><em><strong>show examples:</strong></em></summary>
+
+1. Positive balance: 500.  
+   Storage volume = (500 / 10) + 100 = 50 + 100 = **150 GB**.
+2. Negative balance: -400.  
+   Storage volume = abs(-400) / 8 + 100 = 50 + 100 = **150 GB**.
+</details>
+<!-- 2. **Storage volume is allocated based on the average balance over the previous 30 days:**
+   A modified basic formula with a higher divisor is used for this calculation. This accounts for the fact that the average balance already smooths fluctuations, thereby compensating for less variance compared to the end-of-month balance.
+
+   - For a positive average balance: Storage volume (GB) = (30-day average balance / 12) + 100
+   - For a negative average balance: Storage volume (GB) = abs(30-day average balance) / 9 + 100
+
+   **Examples:**
+   1. Positive average balance: 360.  
+      Storage volume = (360 / 12) + 100 = 30 + 100 = **130 GB**.
+   2. Negative average balance: -270.  
+      Storage volume = abs(-270) / 9 + 100 = 30 + 100 = **130 GB**.
+
+3. **Storage volume is updated in real time:**
+   After each transaction, the storage volume is recalculated using the basic formula.
+
+   **Additional conditions for cash withdrawals:**
+   - For a negative balance, a penalty applies: Reduction (GB) = min(10, Transaction amount / 25)
+   - For a positive balance, cash withdrawals do not affect the storage volume.
+
+   **Examples:**
+   1. Purchase of $200 with a balance of 500.  
+      - Storage volume = (500 / 10) + 100 = 50 + 100 = **150 GB**.  
+      - Addition: 200 / 20 = **10 GB**.  
+      - Total: **160 GB**.
+   2. Cash withdrawal of $100 with a balance of -400.  
+      - Basic calculation: abs(-400) / 8 + 100 = 50 + 100 = **150 GB**.  
+      - Penalty: min(10, 100 / 25) = **4 GB**.  
+      - Total: 150 - 4 = **146 GB**.
+   3. Cash withdrawal of $150 with a balance of 300.  
+      - Storage volume = (300 / 10) + 100 = 30 + 100 = **130 GB**.  
+      - Cash withdrawal does not affect storage. Total remains: **130 GB**.
+   4. Cash withdrawal of $500 with a balance of -1000.  
+      - Basic calculation: abs(-1000) / 8 + 100 = 125 + 100 = **225 GB**.  
+      - Penalty: min(10, 500 / 25) = **10 GB**.  
+      - Total: 225 - 10 = **215 GB**.
+> -->
 
 ### D. Extra Challenge
 ...
