@@ -740,9 +740,9 @@ The query calculates the percentage of customers whose closing balance increased
 
 ---
 
-> 1. Positive balance: 500.
+> a. Positive balance: 500.
 > Storage volume = (500 / 10) + 100 = 50 + 100 = **150 GB**.
-> 2. Negative balance: -400.  
+> b. Negative balance: -400.  
 > Storage volume = abs(-400) / 8 + 100 = 50 + 100 = **150 GB**.
 
 ---
@@ -757,10 +757,14 @@ The query calculates the percentage of customers whose closing balance increased
 <details>
   <summary><em><strong>show examples:</strong></em></summary>
 
-> 1. Positive average balance: 360.  
-> - Storage volume = (360 / 12) + 100 = 30 + 100 = **130 GB**.
-> 2. Negative average balance: -270.  
-> - Storage volume = abs(-270) / 9 + 100 = 30 + 100 = **130 GB**.
+---
+
+> a. Positive average balance: 360.  
+> Storage volume = (360 / 12) + 100 = 30 + 100 = **130 GB**.
+> b. Negative average balance: -270.  
+> Storage volume = abs(-270) / 9 + 100 = 30 + 100 = **130 GB**.
+
+---
 
 </details>
 
@@ -772,17 +776,19 @@ The query calculates the percentage of customers whose closing balance increased
 <details>
   <summary><em><strong>show examples:</strong></em></summary>
 
-> 1. Purchase of $200 with a balance of 500.
+---
+
+> a. Purchase of $200 with a balance of 500.
 > Storage volume = (500 / 10) + 100 = 50 + 100 = 150 GB.
 > Total: 150 GB (no additional adjustments beyond the basic formula).
-> 2. Cash withdrawal of $100 with a balance of -400.
+> b. Cash withdrawal of $100 with a balance of -400.
 > Basic calculation: abs(-400) / 8 + 100 = 50 + 100 = 150 GB.
 > Penalty: min(10, 100 / 25) = 4 GB.
 > Total: 150 - 4 = 146 GB.
-> 3. Cash withdrawal of $150 with a balance of 300.
+> c. Cash withdrawal of $150 with a balance of 300.
 > Storage volume = (300 / 10) + 100 = 30 + 100 = 130 GB.
 > Total: 130 GB (cash withdrawal does not affect storage volume).
-> 4. Cash withdrawal of $500 with a balance of -1000.
+> d. Cash withdrawal of $500 with a balance of -1000.
 > Basic calculation: abs(-1000) / 8 + 100 = 125 + 100 = 225 GB.
 > Penalty: min(10, 500 / 25) = 10 GB.
 > Total: 225 - 10 = 215 GB.
