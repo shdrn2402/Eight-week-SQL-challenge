@@ -741,8 +741,11 @@ The query calculates the percentage of customers whose closing balance increased
 ---
 
 > a. Positive balance: 500.
+> 
 > Storage volume = (500 / 10) + 100 = 50 + 100 = **150 GB**.
-> b. Negative balance: -400.  
+>
+> b. Negative balance: -400.
+> 
 > Storage volume = abs(-400) / 8 + 100 = 50 + 100 = **150 GB**.
 
 ---
@@ -759,9 +762,12 @@ The query calculates the percentage of customers whose closing balance increased
 
 ---
 
-> a. Positive average balance: 360.  
+> a. Positive average balance: 360.
+>   
 > Storage volume = (360 / 12) + 100 = 30 + 100 = **130 GB**.
-> b. Negative average balance: -270.  
+>
+> b. Negative average balance: -270.
+> 
 > Storage volume = abs(-270) / 9 + 100 = 30 + 100 = **130 GB**.
 
 ---
@@ -779,48 +785,131 @@ The query calculates the percentage of customers whose closing balance increased
 ---
 
 > a. Purchase of $200 with a balance of 500.
+> 
 > Storage volume = (500 / 10) + 100 = 50 + 100 = 150 GB.
+> 
 > Total: 150 GB (no additional adjustments beyond the basic formula).
+> 
 > b. Cash withdrawal of $100 with a balance of -400.
+> 
 > Basic calculation: abs(-400) / 8 + 100 = 50 + 100 = 150 GB.
+> 
 > Penalty: min(10, 100 / 25) = 4 GB.
+> 
 > Total: 150 - 4 = 146 GB.
+> 
 > c. Cash withdrawal of $150 with a balance of 300.
+> 
 > Storage volume = (300 / 10) + 100 = 30 + 100 = 130 GB.
+> 
 > Total: 130 GB (cash withdrawal does not affect storage volume).
+> 
 > d. Cash withdrawal of $500 with a balance of -1000.
+> 
 > Basic calculation: abs(-1000) / 8 + 100 = 125 + 100 = 225 GB.
+> 
 > Penalty: min(10, 500 / 25) = 10 GB.
+> 
 > Total: 225 - 10 = 215 GB.
 
 </details>
 
 ---
 
-#### 1. How much data would have been required for each option on a monthly basis??
+#### 1. How much data would be required on a monthly basis, based on the customer's balance at the end of each month?
 
 ***query:***
 ```SQL
+WITH current_month_balance AS (
+  SELECT
+    customer_id,
+    DATE_TRUNC('month', txn_date)::DATE AS current_month,
+    SUM(
+      CASE
+        WHEN
+          txn_type = 'deposit'
+        THEN
+          txn_amount
+        ELSE
+          -txn_amount
+      END
+    ) AS txn_amount_with_sign
+  FROM
+    customer_transactions
+  GROUP BY
+    customer_id,
+    DATE_TRUNC('month', txn_date)::DATE
+  ),
+closing_balance_counting AS (
+  SELECT
+    customer_id,
+    current_month,
+    SUM(txn_amount_with_sign) 
+      OVER (PARTITION BY customer_id ORDER BY current_month) AS closing_balance
+  FROM
+    current_month_balance
+)
+
 SELECT
-  COUNT(DISTINCT node_id) AS unique_nodes_amount
+  *,
+  CASE
+    WHEN closing_balance >= 0
+    THEN ROUND((closing_balance / 10) + 100, 0)
+    ELSE ROUND(abs(closing_balance) / 8 + 100, 0)
+  END AS storage_volume_Gb
 FROM
-  customer_nodes;
+  closing_balance_counting
+ORDER BY
+  customer_id,
+  current_month
 ```
 
 <details>
   <summary><em><strong>show description:</strong></em></summary>
 
-The SQL query calculates the total number of unique `node_id` values in the `customer_nodes` table.
+The SQL query calculates the closing balance for each customer at the end of each month and determines the corresponding storage volume based on predefined rules.
 
-- `COUNT(DISTINCT node_id)`: Counts only the distinct (unique) `node_id` values, ensuring duplicates are not included in the result.
-- `AS unique_nodes_amount`: Assigns an alias to the resulting column for better readability.
+- CTE `current_month_balance`:
+  - Aggregates transaction data for each customer on a monthly basis.
+  - Uses `DATE_TRUNC('month', txn_date)::DATE` to group transactions by the start of the month.
+  - Calculates the net transaction amount (`txn_amount_with_sign`) by summing deposits and subtracting withdrawals for each month and customer.
+
+- CTE `closing_balance_counting`:
+  - Calculates the cumulative closing balance for each customer.
+  - Uses `SUM(txn_amount_with_sign) OVER (PARTITION BY customer_id ORDER BY current_month)` to compute the running total of transaction amounts for each customer, ensuring chronological order by month.
+  - Includes the `current_month` column for monthly grouping.
+
+- Main `SELECT` statement:
+  - Adds a computed column for storage volume (`storage_volume_Gb`):
+    - For positive balances: `(closing_balance / 10) + 100`.
+    - For negative balances: `abs(closing_balance) / 8 + 100`.
+    - The `ROUND` function ensures the storage volume is rounded to the nearest whole number.
+  - Displays all columns, including `customer_id`, `current_month`, `closing_balance`, and the calculated `storage_volume_Gb`.
+
+- `ORDER BY customer_id, current_month`:
+  - Ensures the results are sorted by `customer_id` and then by `current_month`.
+
+This query provides a detailed monthly view of closing balances and their corresponding storage volumes for all customers. The use of CTEs simplifies the logical steps by isolating the transaction aggregation and running balance calculations.
 
 </details>
 
 ***answer:***
-| unique_nodes_amount |
-| -------------------- |
-| 5                    |
+| customer_id | current_month | closing_balance | storage_volume_gb |
+| ----------- | ------------- | --------------- | ----------------- |
+| 1           | 2020-01-01    | 312             | 131               |
+| 1           | 2020-03-01    | -640            | 180               |
+| 2           | 2020-01-01    | 549             | 155               |
+| 2           | 2020-03-01    | 610             | 161               |
+| 3           | 2020-01-01    | 144             | 114               |
+| 3           | 2020-02-01    | -821            | 203               |
+| 3           | 2020-03-01    | -1222           | 253               |
+| 3           | 2020-04-01    | -729            | 191               |
+| 4           | 2020-01-01    | 848             | 185               |
+| 4           | 2020-03-01    | 655             | 166               |
+| ...         | ...           | ...             | ...               |
+|500	        | 2020-01-01	  | 1594	          | 259               |
+|500	        | 2020-02-01	  | 2981	          | 398               |
+|500	        | 2020-03-01	  | 2251	          | 325               |
 
 ---
 
