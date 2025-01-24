@@ -724,19 +724,21 @@ The query calculates the percentage of customers whose closing balance increased
 
 Since the task does not specify rules for calculating storage volumes based on balances, we will define these rules ourselves.
 
-<u><em><strong>General rules:</em></strong></u>
+**General rules:**
+
+---
 
 1. Each customer receives 100 GB of cloud storage upon starting to use our services. This 100 GB remains with the customer permanently.
-
 2. A negative balance is considered a credit and does not decrease the storage volume. Moreover, an increasing coefficient is applied to calculate the storage volume, as the bank benefits from the customer’s use of borrowed funds.
-
 3. Basic formula for storage calculation:
     - for a positive balance: Storage volume (GB) = (End-of-month balance / 10) + 100
     - for a negative balance: Storage volume (GB) = abs(End-of-month balance) / 8 + 100
 
-<em><strong><u>Additional rules depending on the storage calculation model:</u></em></strong>
+**Additional rules depending on the storage calculation model:**
 
-**1. Storage volume is allocated based on the end-of-month balance:**
+---
+
+1. Storage volume is allocated based on the end-of-month balance:
 
 The basic formula is applied.
 
@@ -750,11 +752,11 @@ Storage volume = abs(-400) / 8 + 100 = 50 + 100 = **150 GB**.
 
 </details>
 
-**2. Storage volume is allocated based on the average balance over the previous 30 days:**
+2. Storage volume is allocated based on the average balance over the previous 30 days:
 
 A modified basic formula with a higher divisor is used for this calculation. This accounts for the fact that the average balance already smooths fluctuations, thereby compensating for less variance compared to the end-of-month balance.
-    - for a positive average balance: Storage volume (GB) = (30-day average balance / 12) + 100
-    - for a negative average balance: Storage volume (GB) = abs(30-day average balance) / 9 + 100
+- for a positive average balance: Storage volume (GB) = (30-day average balance / 12) + 100
+- for a negative average balance: Storage volume (GB) = abs(30-day average balance) / 9 + 100
 
 <details>
   <summary><em><strong>show examples:</strong></em></summary>
@@ -769,8 +771,8 @@ Storage volume = abs(-270) / 9 + 100 = 30 + 100 = **130 GB**.
 **3. Storage volume is updated in real time:**
 
 After each transaction, the storage volume is recalculated using the basic formula with additional conditions for cash withdrawals:
-    - for a negative balance, a penalty applies: Reduction (GB) = min(10, Transaction amount / 25)
-    - for a positive balance, cash withdrawals do not affect the storage volume.
+- for a negative balance, a penalty applies: Reduction (GB) = min(10, Transaction amount / 25)
+- for a positive balance, cash withdrawals do not affect the storage volume.
 
 <details>
   <summary><em><strong>show examples:</strong></em></summary>
