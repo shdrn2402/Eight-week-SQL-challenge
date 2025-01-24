@@ -722,7 +722,7 @@ The query calculates the percentage of customers whose closing balance increased
 >
 >**Using all of the data available - how much data would have been required for each option on a monthly basis?**
 
-**Since the task does not specify rules for calculating storage volumes based on balances, we will define these rules ourselves.**
+Since the task does not specify rules for calculating storage volumes based on balances, we will define these rules ourselves.
 
 **General Rules:**
 1. Each customer receives 100 GB of cloud storage upon starting to use our services. This 100 GB remains with the customer permanently.
