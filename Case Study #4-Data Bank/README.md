@@ -736,7 +736,7 @@ The query calculates the percentage of customers whose closing balance increased
 > - The basic formula is applied.
 > 
 <details>
-  <summary><em><strong>show examples:</strong></em></summary>
+  <summary><em>show examples:</em></summary>
 
 ---
 
@@ -758,7 +758,7 @@ The query calculates the percentage of customers whose closing balance increased
 >   - for a negative average balance: Storage volume (GB) = abs(30-day average balance) / 9 + 100
 
 <details>
-  <summary><em><strong>show examples:</strong></em></summary>
+  <summary><em>show examples:</em></summary>
 
 ---
 
@@ -780,7 +780,7 @@ The query calculates the percentage of customers whose closing balance increased
 >   - for a positive balance, cash withdrawals do not affect the storage volume.
 
 <details>
-  <summary><em><strong>show examples:</strong></em></summary>
+  <summary><em>show examples:</em></summary>
 
 ---
 
