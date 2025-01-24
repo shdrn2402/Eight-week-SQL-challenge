@@ -719,14 +719,17 @@ The query calculates the percentage of customers whose closing balance increased
 >- customer balance at the end of each month  
 >- minimum, average and maximum values of the running balance for each customer  
 >- running customer balance column that includes the impact of each transaction  
->
->#### Task:
->**Using all of the data available - how much data would have been required for each option on a monthly basis?**
+
+#### Task:
+
+**Using all of the data available - how much data would have been required for each option on a monthly basis?**
 
 **Note:**
+
 Since the task does not specify rules for calculating storage volumes based on balances, we will define these rules ourselves.
 
 **General Rules:**
+
 - each customer receives 100 GB of cloud storage upon starting to use our services. This 100 GB remains with the customer permanently.
 - a negative balance is considered a credit and does not decrease the storage volume. Moreover, an increasing coefficient is applied to calculate the storage volume, as the bank benefits from the customer’s use of borrowed funds.
 - basic formula for storage calculation:
