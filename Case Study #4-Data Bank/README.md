@@ -720,9 +720,13 @@ The query calculates the percentage of customers whose closing balance increased
 >- minimum, average and maximum values of the running balance for each customer  
 >- running customer balance column that includes the impact of each transaction  
 
+---
+
 #### Task:
 
 **Using all of the data available - how much data would have been required for each option on a monthly basis?**
+
+---
 
 **Note:**
 
@@ -735,6 +739,8 @@ Since the task does not specify rules for calculating storage volumes based on b
 - basic formula for storage calculation:
   - for a positive balance: Storage volume (GB) = (End-of-month balance / 10) + 100
   - for a negative balance: Storage volume (GB) = abs(End-of-month balance) / 8 + 100
+
+---
 
 **Rules Depending on the Storage Calculation Model:**
 
@@ -790,6 +796,8 @@ After each transaction, the storage volume is recalculated using the basic formu
 - total: 225 - 10 = 215 GB.
 
 </details>
+
+---
 
 ### D. Extra Challenge
 ...
