@@ -725,11 +725,11 @@ The query calculates the percentage of customers whose closing balance increased
 >Since the task does not specify rules for calculating storage volumes based on balances, we will define these rules ourselves.
 >
 >**General Rules:**
-- each customer receives 100 GB of cloud storage upon starting to use our services. This 100 GB remains with the customer permanently.
-- a negative balance is considered a credit and does not decrease the storage volume. Moreover, an increasing coefficient is applied to calculate the storage volume, as the bank benefits from the customer’s use of borrowed funds.
-- basic formula for storage calculation:
-  - for a positive balance: Storage volume (GB) = (End-of-month balance / 10) + 100
-  - for a negative balance: Storage volume (GB) = abs(End-of-month balance) / 8 + 100
+>- each customer receives 100 GB of cloud storage upon starting to use our services. This 100 GB remains with the customer permanently.
+>- a negative balance is considered a credit and does not decrease the storage volume. Moreover, an increasing coefficient is applied to calculate the storage volume, as the bank benefits from the customer’s use of borrowed funds.
+>- basic formula for storage calculation:
+>  - for a positive balance: Storage volume (GB) = (End-of-month balance / 10) + 100
+>  - for a negative balance: Storage volume (GB) = abs(End-of-month balance) / 8 + 100
 >
 >#### Rules Depending on the Storage Calculation Model:
 >
@@ -738,10 +738,10 @@ The query calculates the percentage of customers whose closing balance increased
 <details>
   <summary><em><strong>show examples:</strong></em></summary>
 
-1. Positive balance: 500.  
-   Storage volume = (500 / 10) + 100 = 50 + 100 = **150 GB**.
-2. Negative balance: -400.  
-   Storage volume = abs(-400) / 8 + 100 = 50 + 100 = **150 GB**.
+>1. Positive balance: 500.  
+> Storage volume = (500 / 10) + 100 = 50 + 100 = **150 GB**.
+>2. Negative balance: -400.  
+> Storage volume = abs(-400) / 8 + 100 = 50 + 100 = **150 GB**.
 
 </details>
 <!-- 2. **Storage volume is allocated based on the average balance over the previous 30 days:**
