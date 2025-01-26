@@ -717,7 +717,7 @@ The query calculates the percentage of customers whose closing balance increased
 >
 > For this multi-part challenge question - you have been requested to generate the following data elements to help the Data Bank team estimate how much data will need to be provisioned for each option:
 > - customer balance at the end of each month  
-> - minimum, average and maximum values of the running balance for each customer  
+> - average values of the running balance for each customer  
 > - running customer balance column that includes the impact of each transaction  
 >
 > Since the task does not specify rules for calculating storage volumes based on balances, we will define these rules ourselves.
@@ -820,10 +820,10 @@ The query calculates the percentage of customers whose closing balance increased
 
 ***query:***
 ```SQL
-WITH current_month_balance AS (
+WITH month_balance_counting AS (
   SELECT
     customer_id,
-    DATE_TRUNC('month', txn_date)::DATE AS current_month,
+    DATE_TRUNC('month', txn_date)::DATE AS transaction_month,
     SUM(
       CASE
         WHEN
@@ -833,21 +833,21 @@ WITH current_month_balance AS (
         ELSE
           -txn_amount
       END
-    ) AS txn_amount_with_sign
+    ) AS month_balance
   FROM
     customer_transactions
   GROUP BY
     customer_id,
     DATE_TRUNC('month', txn_date)::DATE
   ),
-closing_balance_counting AS (
+сumulative_balance_counting AS (
   SELECT
     customer_id,
-    current_month,
-    SUM(txn_amount_with_sign) 
-      OVER (PARTITION BY customer_id ORDER BY current_month) AS closing_balance
+    transaction_month,
+    SUM(month_balance) 
+      OVER (PARTITION BY customer_id ORDER BY transaction_month) AS closing_balance
   FROM
-    current_month_balance
+    month_balance_counting
 )
 
 SELECT
@@ -858,10 +858,10 @@ SELECT
     ELSE ROUND(abs(closing_balance) / 8 + 100, 0)
   END AS storage_volume_Gb
 FROM
-  closing_balance_counting
+  сumulative_balance_counting
 ORDER BY
   customer_id,
-  current_month
+  transaction_month
 ```
 
 <details>
@@ -869,47 +869,67 @@ ORDER BY
 
 The SQL query calculates the closing balance for each customer at the end of each month and determines the corresponding storage volume based on predefined rules.
 
-- CTE `current_month_balance`:
+- CTE `month_balance_counting`:
   - Aggregates transaction data for each customer on a monthly basis.
   - Uses `DATE_TRUNC('month', txn_date)::DATE` to group transactions by the start of the month.
   - Calculates the net transaction amount (`txn_amount_with_sign`) by summing deposits and subtracting withdrawals for each month and customer.
 
 - CTE `closing_balance_counting`:
   - Calculates the cumulative closing balance for each customer.
-  - Uses `SUM(txn_amount_with_sign) OVER (PARTITION BY customer_id ORDER BY current_month)` to compute the running total of transaction amounts for each customer, ensuring chronological order by month.
-  - Includes the `current_month` column for monthly grouping.
+  - Uses `SUM(txn_amount_with_sign) OVER (PARTITION BY customer_id ORDER BY transaction_month)` to compute the running total of transaction amounts for each customer, ensuring chronological order by month.
+  - Includes the `transaction_month` column for monthly grouping.
 
 - Main `SELECT` statement:
   - Adds a computed column for storage volume (`storage_volume_Gb`):
     - For positive balances: `(closing_balance / 10) + 100`.
     - For negative balances: `abs(closing_balance) / 8 + 100`.
     - The `ROUND` function ensures the storage volume is rounded to the nearest whole number.
-  - Displays all columns, including `customer_id`, `current_month`, `closing_balance`, and the calculated `storage_volume_Gb`.
+  - Displays all columns, including `customer_id`, `transaction_month`, `closing_balance`, and the calculated `storage_volume_Gb`.
 
-- `ORDER BY customer_id, current_month`:
-  - Ensures the results are sorted by `customer_id` and then by `current_month`.
+- `ORDER BY customer_id, transaction_month`:
+  - Ensures the results are sorted by `customer_id` and then by `transaction_month`.
 
 This query provides a detailed monthly view of closing balances and their corresponding storage volumes for all customers. The use of CTEs simplifies the logical steps by isolating the transaction aggregation and running balance calculations.
 
 </details>
 
 ***answer:***
-| customer_id | current_month | closing_balance | storage_volume_gb |
-| ----------- | ------------- | --------------- | ----------------- |
-| 1           | 2020-01-01    | 312             | 131               |
-| 1           | 2020-03-01    | -640            | 180               |
-| 2           | 2020-01-01    | 549             | 155               |
-| 2           | 2020-03-01    | 610             | 161               |
-| 3           | 2020-01-01    | 144             | 114               |
-| 3           | 2020-02-01    | -821            | 203               |
-| 3           | 2020-03-01    | -1222           | 253               |
-| 3           | 2020-04-01    | -729            | 191               |
-| 4           | 2020-01-01    | 848             | 185               |
-| 4           | 2020-03-01    | 655             | 166               |
-| ...         | ...           | ...             | ...               |
-|500	        | 2020-01-01	  | 1594	          | 259               |
-|500	        | 2020-02-01	  | 2981	          | 398               |
-|500	        | 2020-03-01	  | 2251	          | 325               |
+| customer_id | transaction_month | closing_balance | storage_volume_gb |
+| ----------- | ----------------- | --------------- | ----------------- |
+| 1           | 2020-01-01        | 312             | 131               |
+| 1           | 2020-03-01        | -640            | 180               |
+| 2           | 2020-01-01        | 549             | 155               |
+| 2           | 2020-03-01        | 610             | 161               |
+| 3           | 2020-01-01        | 144             | 114               |
+| 3           | 2020-02-01        | -821            | 203               |
+| 3           | 2020-03-01        | -1222           | 253               |
+| 3           | 2020-04-01        | -729            | 191               |
+| 4           | 2020-01-01        | 848             | 185               |
+| 4           | 2020-03-01        | 655             | 166               |
+| ...         | ...               | ...             | ...               |
+|500	        | 2020-01-01	      | 1594	          | 259               |
+|500	        | 2020-02-01	      | 2981	          | 398               |
+|500	        | 2020-03-01	      | 2251	          | 325               |
+
+---
+
+#### 2. How much data would be required on a monthly basis, based on the customer's average monthly balance?
+
+>The original goal was formulated as 'data is allocated on the average amount of money kept in the account in the previous 30 days.' However, since the data in our database is limited to the year 2021 and no rules were specified regarding how often the storage volume should be recalculated, it is unclear from which date to count the 'previous 30 days.' In light of this, 'previous 30 days' is interpreted as the previous month.
+
+***query:***
+```SQL
+
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+
+
+</details>
+
+***answer:***
 
 ---
 
