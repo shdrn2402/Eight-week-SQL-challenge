@@ -729,12 +729,7 @@ The query calculates the percentage of customers whose closing balance increased
 > 3. Basic formula for storage calculation:
 > - for a positive balance: Storage volume (GB) = (End-of-month balance / 10) + 100
 > - for a negative balance: Storage volume (GB) = abs(End-of-month balance) / 8 + 100
-> 
-> **Additional rules depending on the storage calculation model:**
-> 
-> 1. Storage volume is allocated based on the end-of-month balance:
-> - The basic formula is applied.
-> 
+
 <details>
   <summary><em>show examples:</em></summary>
 
@@ -749,68 +744,6 @@ The query calculates the percentage of customers whose closing balance increased
 > Storage volume = abs(-400) / 8 + 100 = 50 + 100 = **150 GB**.
 
 ---
-
-</details>
-
-> 2. Storage volume is allocated based on the average balance over the previous 30 days:
-> - a modified basic formula with a higher divisor is used for this calculation. This accounts for the fact that the average balance already smooths fluctuations, thereby compensating for less variance compared to the end-of-month balance:
->   - for a positive average balance: Storage volume (GB) = (30-day average balance / 12) + 100
->   - for a negative average balance: Storage volume (GB) = abs(30-day average balance) / 9 + 100
-
-<details>
-  <summary><em>show examples:</em></summary>
-
----
-
-> a. Positive average balance: 360.
->   
-> Storage volume = (360 / 12) + 100 = 30 + 100 = **130 GB**.
->
-> b. Negative average balance: -270.
-> 
-> Storage volume = abs(-270) / 9 + 100 = 30 + 100 = **130 GB**.
-
----
-
-</details>
-
-> 3. Storage volume is updated in real time:
-> - after each transaction, the storage volume is recalculated using the basic formula with additional conditions for cash withdrawals:
->   - for a negative balance, a penalty applies: Reduction (GB) = min(10, Transaction amount / 25)
->   - for a positive balance, cash withdrawals do not affect the storage volume.
-
-<details>
-  <summary><em>show examples:</em></summary>
-
----
-
-> a. Purchase of $200 with a balance of 500.
-> 
-> Storage volume = (500 / 10) + 100 = 50 + 100 = 150 GB.
-> 
-> Total: 150 GB (no additional adjustments beyond the basic formula).
-> 
-> b. Cash withdrawal of $100 with a balance of -400.
-> 
-> Basic calculation: abs(-400) / 8 + 100 = 50 + 100 = 150 GB.
-> 
-> Penalty: min(10, 100 / 25) = 4 GB.
-> 
-> Total: 150 - 4 = 146 GB.
-> 
-> c. Cash withdrawal of $150 with a balance of 300.
-> 
-> Storage volume = (300 / 10) + 100 = 30 + 100 = 130 GB.
-> 
-> Total: 130 GB (cash withdrawal does not affect storage volume).
-> 
-> d. Cash withdrawal of $500 with a balance of -1000.
-> 
-> Basic calculation: abs(-1000) / 8 + 100 = 125 + 100 = 225 GB.
-> 
-> Penalty: min(10, 500 / 25) = 10 GB.
-> 
-> Total: 225 - 10 = 215 GB.
 
 </details>
 
@@ -830,7 +763,7 @@ WITH month_balance_counting AS (
         THEN txn_amount
         ELSE -txn_amount
       END
-    ) AS month_balance
+      ) AS month_balance
   FROM
     customer_transactions
   GROUP BY
@@ -916,18 +849,90 @@ This query provides a detailed monthly view of closing balances and their corres
 
 ***query:***
 ```SQL
+WITH apply_sign_to_tnx AS (
+  SELECT
+    customer_id,
+    DATE_TRUNC('month', txn_date)::DATE AS txn_month,
+    CASE
+      WHEN txn_type = 'deposit'
+      THEN txn_amount
+      ELSE -txn_amount
+    END AS txn_amount_signed
+  FROM
+    customer_transactions
+),
+avg_month_balance_counting AS (
+  SELECT
+    customer_id,
+    txn_month,
+    ROUND(AVG(txn_amount_signed), 2) AS avg_month_balance
+  FROM
+    apply_sign_to_tnx
+  GROUP BY
+    customer_id,
+    txn_month
+)
 
+SELECT
+  *,
+  CASE
+    WHEN avg_month_balance >= 0
+    THEN ROUND((avg_month_balance / 10) + 100, 0)
+    ELSE ROUND(abs(avg_month_balance) / 8 + 100, 0)
+  END AS storage_volume_Gb
+FROM
+  avg_month_balance_counting
+ORDER BY
+  customer_id,
+  txn_month
 ```
 
 <details>
   <summary><em><strong>show description:</strong></em></summary>
 
+The SQL query calculates the average monthly balance for each customer and determines the corresponding storage volume based on predefined rules.
 
+- CTE `apply_sign_to_tnx`:
+  - Processes transaction data by applying a positive or negative sign to transaction amounts based on their type.
+  - Groups transactions by `customer_id` and truncates the transaction date to the start of the month using `DATE_TRUNC('month', txn_date)::DATE`.
+  - Produces a signed transaction amount column (`txn_amount_signed`).
+
+- CTE `avg_month_balance_counting`:
+  - Aggregates the data from `apply_sign_to_tnx` to calculate the average transaction amount for each month and customer.
+  - Uses the `AVG` function to compute the monthly average balance and rounds the result to two decimal places (`ROUND(AVG(txn_amount_signed), 2)`).
+  - Groups data by `customer_id` and `txn_month`.
+
+- Main `SELECT` statement:
+  - Adds a computed column for storage volume (`storage_volume_Gb`):
+    - For positive average balances: `(avg_month_balance / 10) + 100`.
+    - For negative average balances: `abs(avg_month_balance) / 8 + 100`.
+    - The `ROUND` function ensures the storage volume is rounded to the nearest whole number.
+  - Displays all columns, including `customer_id`, `txn_month`, `avg_month_balance`, and the calculated `storage_volume_gb`.
+
+- `ORDER BY customer_id, txn_month`:
+  - Ensures the results are sorted by `customer_id` and then by `txn_month`.
+
+This query provides a detailed monthly view of average balances and their corresponding storage volumes for all customers. The use of CTEs organizes the process into logical steps, making the calculations and transformations more manageable.
 
 </details>
 
 ***answer:***
-
+| customer_id | txn_month  | avg_month_balance | storage_volume_gb |
+| ----------- | ---------- | ----------------- | ----------------- |
+| 1           | 2020-01-01 | 312.00            | 131               |
+| 1           | 2020-03-01 | -317.33           | 140               |
+| 2           | 2020-01-01 | 549.00            | 155               |
+| 2           | 2020-03-01 | 61.00             | 106               |
+| 3           | 2020-01-01 | 144.00            | 114               |
+| 3           | 2020-02-01 | -965.00           | 221               |
+| 3           | 2020-03-01 | -200.50           | 125               |
+| 3           | 2020-04-01 | 493.00            | 149               |
+| 4           | 2020-01-01 | 424.00            | 142               |
+| 4           | 2020-03-01 | -193.00           | 124               |
+| ...         | ...        | ...               | ...               |
+| 500         | 2020-01-01 | 265.67            | 127               |
+| 500         | 2020-02-01 | 462.33            | 146               |
+| 500         | 2020-03-01 | -104.29           | 113               |
 ---
 
 ### D. Extra Challenge
