@@ -826,12 +826,9 @@ WITH month_balance_counting AS (
     DATE_TRUNC('month', txn_date)::DATE AS transaction_month,
     SUM(
       CASE
-        WHEN
-          txn_type = 'deposit'
-        THEN
-          txn_amount
-        ELSE
-          -txn_amount
+        WHEN txn_type = 'deposit'
+        THEN txn_amount
+        ELSE -txn_amount
       END
     ) AS month_balance
   FROM
