@@ -710,18 +710,18 @@ The query calculates the percentage of customers whose closing balance increased
 
 ### C. Data Allocation Challenge
 
-> To test out a few different hypotheses - the Data Bank team wants to run an experiment where different groups of customers would be allocated data using 3 different options:
-> - option 1: data is allocated based off the amount of money at the end of the previous month  
-> - option 2: data is allocated on the average amount of money kept in the account in the previous 30 days  
-> - option 3: data is updated real-time  
->
-> For this multi-part challenge question - you have been requested to generate the following data elements to help the Data Bank team estimate how much data will need to be provisioned for each option:
-> - customer balance at the end of each month  
-> - average values of the running balance for each customer  
-> - running customer balance column that includes the impact of each transaction  
->
-> Since the task does not specify rules for calculating storage volumes based on balances, we will define these rules ourselves.
->
+To test out a few different hypotheses - the Data Bank team wants to run an experiment where different groups of customers would be allocated data using 3 different options:
+- option 1: data is allocated based off the amount of money at the end of the previous month  
+- option 2: data is allocated on the average amount of money kept in the account in the previous 30 days  
+- option 3: data is updated real-time  
+
+For this multi-part challenge question - you have been requested to generate the following data elements to help the Data Bank team estimate how much data will need to be provisioned for each option:
+- customer balance at the end of each month  
+- average values of the running balance for each customer  
+- running customer balance column that includes the impact of each transaction  
+
+Since the task does not specify rules for calculating storage volumes based on balances, we will define these rules ourselves.
+
 > **Storage volumes calculating rules:**
 >
 > 1. Each customer receives 100 GB of cloud storage upon starting to use our services. This 100 GB remains with the customer permanently.
