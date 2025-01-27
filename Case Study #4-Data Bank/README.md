@@ -933,6 +933,104 @@ This query provides a detailed monthly view of average balances and their corres
 | 500         | 2020-01-01 | 265.67            | 127               |
 | 500         | 2020-02-01 | 462.33            | 146               |
 | 500         | 2020-03-01 | -104.29           | 113               |
+
+---
+
+#### 3. How much data would be required based on the customer's transactional activity updated in real time?
+
+***query:***
+```SQL
+WITH apply_sign_to_tnx AS (
+  SELECT
+    customer_id,
+    txn_date,
+    CASE
+      WHEN txn_type = 'deposit'
+      THEN txn_amount
+      ELSE -txn_amount
+    END AS txn_amount_signed
+  FROM
+    customer_transactions
+)
+
+SELECT
+  *,
+  CASE
+    WHEN txn_amount_signed >= 0
+    THEN ROUND((txn_amount_signed / 10) + 100, 0)
+    ELSE ROUND(abs(txn_amount_signed) / 8 + 100, 0)
+  END AS storage_volume_Gb
+FROM
+  apply_sign_to_tnx
+ORDER BY
+  customer_id,
+  txn_date
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+The SQL query calculates the storage volume for each customer after every transaction, based on predefined rules. This corresponds to the real-time update scenario (Option 3).
+
+- CTE `apply_sign_to_tnx`:
+  - Processes each transaction for all customers by applying a sign to the transaction amount:
+    - Positive for deposits (`txn_type = 'deposit'`).
+    - Negative for withdrawals or purchases (`txn_type` other than `deposit`).
+  - Includes the transaction date (`txn_date`) for maintaining chronological order.
+
+- Main `SELECT` statement:
+  - Computes the storage volume (`storage_volume_Gb`) for each transaction:
+    - For positive transaction amounts: `(txn_amount_signed / 10) + 100`.
+    - For negative transaction amounts: `abs(txn_amount_signed) / 8 + 100`.
+    - Uses the `ROUND` function to ensure results are rounded to the nearest whole number.
+  - Displays all relevant columns, including:
+    - `customer_id`: Identifies the customer.
+    - `txn_date`: The date of the transaction.
+    - `txn_amount_signed`: The signed transaction amount.
+    - `storage_volume_Gb`: The calculated storage volume based on the transaction.
+
+- `ORDER BY customer_id, txn_date`:
+  - Ensures the output is sorted by customer and then by transaction date, maintaining chronological order.
+
+This query provides a detailed view of storage volume changes in real time, reflecting the immediate impact of each transaction. It simplifies the process by calculating the storage volume directly for each transaction without additional aggregation.
+
+</details>
+
+***answer:***
+| customer_id | txn_date   | txn_amount_signed | storage_volume_gb |
+| ----------- | ---------- | ----------------- | ----------------- |
+| 1           | 2020-01-02 | 312               | 131               |
+| 1           | 2020-03-05 | -612              | 176               |
+| 1           | 2020-03-17 | 324               | 132               |
+| 1           | 2020-03-19 | -664              | 183               |
+| 2           | 2020-01-03 | 549               | 154               |
+| 2           | 2020-03-24 | 61                | 106               |
+| 3           | 2020-01-27 | 144               | 114               |
+| 3           | 2020-02-22 | -965              | 220               |
+| 3           | 2020-03-05 | -213              | 126               |
+| 3           | 2020-03-19 | -188              | 123               |
+| 3           | 2020-04-12 | 493               | 149               |
+| 4           | 2020-01-07 | 458               | 145               |
+| 4           | 2020-01-21 | 390               | 139               |
+| 4           | 2020-03-25 | -193              | 124               |
+| ...         | ...        | ...               | ...               |
+| 500         | 2020-01-16 | 909               | 190               |
+| 500         | 2020-01-16 | 227               | 122               |
+| 500         | 2020-01-18 | 308               | 130               |
+| 500         | 2020-01-25 | -986              | 223               |
+| 500         | 2020-01-27 | 214               | 121               |
+| 500         | 2020-01-30 | 922               | 192               |
+| 500         | 2020-02-01 | 715               | 171               |
+| 500         | 2020-02-07 | -49               | 106               |
+| 500         | 2020-02-23 | 721               | 172               |
+| 500         | 2020-03-01 | -929              | 216               |
+| 500         | 2020-03-02 | 862               | 186               |
+| 500         | 2020-03-07 | -452              | 156               |
+| 500         | 2020-03-11 | -426              | 153               |
+| 500         | 2020-03-17 | 344               | 134               |
+| 500         | 2020-03-22 | -954              | 219               |
+| 500         | 2020-03-25 | 825               | 182               |
+
 ---
 
 ### D. Extra Challenge
