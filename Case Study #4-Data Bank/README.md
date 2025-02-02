@@ -1034,7 +1034,213 @@ This query provides a detailed view of storage volume changes in real time, refl
 ---
 
 ### D. Extra Challenge
-...
+
+Data Bank wants to try another option which is a bit more difficult to implement. They aim to calculate data growth using an interest calculation, similar to a traditional savings account.  
+
+If the annual interest rate is set at 6%, the Data Bank team wants to reward its customers by increasing their data allocation based on interest calculated **on a daily basis at the end of each day**. How much data would be required for this option **on a monthly basis**?  
+
+**Tasks:**  
+1. Perform the initial calculation `without compounding interest` (simple interest).  
+2. Calculate an `alternative version with daily compounding interest`, where accrued interest increases the base data allocation for subsequent days.  
+
+> **Interest calculation rules:**
+>
+> - Interest is accrued only on days when the customer's balance is positive.
+> - The daily interest rate is calculated based on an annual rate of 6%.
+> - The formula for interest calculation:
+>    - For a positive balance: `Interest = (balance * 0.06 / 365)`
+>    - For a negative balance: No interest is applied.
+
+#### 1. Storage volume calculation with simple interest
+
+***query:***
+```SQL
+WITH grouped_transactions AS (
+  SELECT
+    customer_id,
+    txn_date,
+    SUM(
+      CASE
+        WHEN txn_type = 'deposit' THEN txn_amount
+        ELSE -txn_amount
+      END
+    ) AS txn_amount_signed,
+    MIN(txn_date) OVER (PARTITION BY customer_id) AS first_txn_date
+  FROM
+    customer_transactions
+  GROUP BY
+    customer_id,
+    txn_date
+  ),
+next_txn_date_evaluation AS (
+  SELECT
+    customer_id,
+    first_txn_date,
+    txn_date,
+    LEAD(txn_date) OVER (
+        PARTITION BY customer_id
+        ORDER BY txn_date
+      ) - INTERVAL '1 days' AS next_txn_date,
+    txn_amount_signed
+  FROM
+    grouped_transactions
+  ),
+cumulative_balance_counting AS (
+  SELECT
+    customer_id,
+    first_txn_date,
+    txn_date,
+    COALESCE(next_txn_date, txn_date)::DATE AS next_txn_date,
+    SUM(txn_amount_signed) OVER (
+      PARTITION BY customer_id
+      ORDER BY txn_date
+    ) AS cumulative_balance
+  FROM
+    next_txn_date_evaluation
+  ),
+min_max_txn_dates AS (
+  SELECT
+    customer_id,
+    MIN(txn_date) AS min_date,
+    MAX(txn_date) AS max_date
+  FROM
+    customer_transactions
+  GROUP BY
+    customer_id
+  ),
+make_date_series AS (
+  SELECT
+    mmtd.customer_id,
+    g.txn_date::DATE AS txn_date
+  FROM
+    min_max_txn_dates mmtd
+  CROSS JOIN
+    generate_series(mmtd.min_date, mmtd.max_date, '1 day') AS g(txn_date)
+  ),
+filled_daily_balances AS (
+  SELECT
+    cbc.customer_id,
+    cbc.first_txn_date,
+    mds.txn_date,
+    cbc.cumulative_balance
+  FROM
+    make_date_series mds
+  LEFT JOIN
+    cumulative_balance_counting cbc
+  ON
+    mds.customer_id = cbc.customer_id
+    AND
+    mds.txn_date BETWEEN cbc.txn_date AND cbc.next_txn_date
+  WHERE
+    cbc.cumulative_balance > 0
+  ),
+set_initial_storage_volume AS (
+  SELECT
+    *,
+    100 AS storage_volume_gb
+  FROM
+    filled_daily_balances
+  ),
+days_with_positive_balance_counting AS (
+  SELECT
+    ROW_NUMBER() OVER (
+      PARTITION BY customer_id ORDER BY txn_date
+    ) - 1 AS days_with_positive_balance,
+    customer_id,
+    txn_date,
+    cumulative_balance,
+    storage_volume_gb
+  FROM
+    set_initial_storage_volume
+  )
+SELECT
+  customer_id,
+  DATE_TRUNC('month', txn_date)::DATE AS month,
+  MAX(storage_volume_gb) AS end_month_storage_volume_gb
+FROM (
+  SELECT
+    customer_id,
+    txn_date,
+    ROUND(
+      storage_volume_gb * (1 + (0.06 / 365) * days_with_positive_balance),
+      4
+    ) AS storage_volume_gb 
+  FROM
+    days_with_positive_balance_counting
+) subquery
+GROUP BY
+  customer_id,
+  month
+ORDER BY 
+  customer_id,
+  DATE_TRUNC('month', txn_date)::DATE;
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+The SQL query calculates the storage volume for each customer on a monthly basis, applying simple interest on days with a positive balance. The logic follows a step-by-step approach using multiple Common Table Expressions (CTEs).  
+
+- CTE `grouped_transactions`:  
+  - Aggregates all transactions per customer and transaction date.  
+  - Applies a sign to each transaction amount:  
+    - Positive for deposits (`txn_type = 'deposit'`).  
+    - Negative for withdrawals or purchases.  
+  - Identifies the first transaction date for each customer.  
+
+- CTE `next_txn_date_evaluation`:  
+  - Determines the date of the next transaction for each customer using the `LEAD()` function.  
+  - Adjusts the next transaction date by subtracting one day to establish transaction periods.  
+
+- CTE `cumulative_balance_counting`:  
+  - Calculates the cumulative balance for each customer over time using a running sum.  
+  - Ensures that the last available transaction date is correctly set for further calculations.  
+
+- CTE `make_date_series`:  
+  - Generates a complete date series between the minimum and maximum transaction dates for each customer.  
+  - Ensures continuous daily data availability.  
+
+- CTE `filled_daily_balances`:  
+  - Joins the generated date series with cumulative balances to fill missing dates with the last known balance.  
+  - Filters out negative balances, as interest is only applied on positive balances.  
+
+- CTE `set_initial_storage_volume`:  
+  - Assigns an initial storage volume of 100 GB to all entries.  
+
+- CTE `days_with_positive_balance_counting`:  
+  - Assigns a row number to count the number of days with a positive balance for each customer.  
+  - This number is used to calculate storage growth over time.  
+
+- Main `SELECT` statement:  
+  - Computes storage volume with simple interest, applying the formula:  
+    - `storage_volume_gb * (1 + (0.06 / 365) * days_with_positive_balance)`.  
+  - Groups by month (`DATE_TRUNC('month', txn_date)`) and customer ID.  
+  - Uses `MAX(storage_volume_gb)` to retrieve the highest storage volume at the end of each month.  
+
+- `ORDER BY customer_id, month`:  
+  - Ensures the output is sorted by customer and month for a structured view.  
+
+This query provides a structured method for calculating non-compounded simple interest on cloud storage allocations. The result gives a monthly summary of storage volume growth, ensuring compliance with business rules.  
+
+</details>
+
+***answer:***
+| customer_id | month      | end_month_storage_volume_gb |
+| ----------- | ---------- | --------------------------- |
+| 1           | 2020-01-01 | 100.4767                    |
+| 1           | 2020-02-01 | 100.9534                    |
+| 1           | 2020-03-01 | 101.0521                    |
+| 2           | 2020-01-01 | 100.4603                    |
+| 2           | 2020-02-01 | 100.9370                    |
+| 2           | 2020-03-01 | 101.3315                    |
+| 3           | 2020-01-01 | 100.0658                    |
+| 3           | 2020-02-01 | 100.4110                    |
+| ---         | ---        | ---                         |
+| 500         | 2020-01-01 | 100.2466                    |
+| 500         | 2020-02-01 | 100.7233                    |
+| 500         | 2020-03-01 | 101.1342                    |
+
+---
 
 ### Extension Request
 ... 
