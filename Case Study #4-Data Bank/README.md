@@ -1248,7 +1248,7 @@ This query provides a structured method for calculating non-compounded simple in
 > This query follows the same structure as the **simple interest calculation**, but the storage volume calculation has been updated to apply **compound interest**.  
 >
 > The formula in the main `SELECT` statement has been modified from:
-
+>
 > ```sql
 > storage_volume_gb * (1 + (0.06 / 365) * days_with_positive_balance)
 > ```
