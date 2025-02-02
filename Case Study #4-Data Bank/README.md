@@ -1242,5 +1242,39 @@ This query provides a structured method for calculating non-compounded simple in
 
 ---
 
+#### 2. Storage volume calculation with compound interest
+
+>**\*Note**:
+> This query follows the same structure as the **simple interest calculation**, but the storage volume calculation has been updated to apply **compound interest**.  
+>
+> The formula in the main `SELECT` statement has been modified from:
+
+> ```sql
+> storage_volume_gb * (1 + (0.06 / 365) * days_with_positive_balance)
+> ```
+> to
+>
+> ```sql
+> storage_volume_gb * POWER(1 + (0.06 / 365), days_with_positive_balance)
+> ```
+
+***answer:***
+| customer_id | month      | end_month_storage_volume_gb |
+| ----------- | ---------- | --------------------------- |
+| 1           | 2020-01-01 | 100.4778                    |
+| 1           | 2020-02-01 | 100.9579                    |
+| 1           | 2020-03-01 | 101.0575                    |
+| 2           | 2020-01-01 | 100.4613                    |
+| 2           | 2020-02-01 | 100.9413                    |
+| 2           | 2020-03-01 | 101.3403                    |
+| 3           | 2020-01-01 | 100.0658                    |
+| 3           | 2020-02-01 | 100.4118                    |
+| ---         | ---        | ---                         |
+| 500         | 2020-01-01 | 100.2469                    |
+| 500         | 2020-02-01 | 100.7258                    |
+| 500         | 2020-03-01 | 101.1406                    |
+
+---
+
 ### Extension Request
 ... 
