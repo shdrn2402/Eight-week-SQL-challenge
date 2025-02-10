@@ -1064,33 +1064,51 @@ WITH grouped_transactions AS (
         WHEN txn_type = 'deposit' THEN txn_amount
         ELSE -txn_amount
       END
-    ) AS txn_amount_signed,
-    MIN(txn_date) OVER (PARTITION BY customer_id) AS first_txn_date
+    ) AS txn_amount_signed
   FROM
     customer_transactions
   GROUP BY
     customer_id,
     txn_date
   ),
+add_min_max_txn_dates AS (
+  SELECT
+    gt.customer_id,
+    sub.min_txn_date,
+    gt.txn_date,
+    sub.max_txn_date,
+    gt.txn_amount_signed
+  FROM
+    grouped_transactions gt
+  JOIN
+    (SELECT
+       customer_id,
+       MIN(txn_date) AS min_txn_date,
+       MAX(txn_date) AS max_txn_date
+     FROM
+       customer_transactions
+     GROUP BY
+       customer_id) sub
+  USING(customer_id)
+),
 next_txn_date_evaluation AS (
   SELECT
     customer_id,
-    first_txn_date,
     txn_date,
     LEAD(txn_date) OVER (
         PARTITION BY customer_id
         ORDER BY txn_date
       ) - INTERVAL '1 days' AS next_txn_date,
+    max_txn_date,
     txn_amount_signed
   FROM
-    grouped_transactions
+    add_min_max_txn_dates
   ),
 cumulative_balance_counting AS (
   SELECT
     customer_id,
-    first_txn_date,
     txn_date,
-    COALESCE(next_txn_date, txn_date)::DATE AS next_txn_date,
+    COALESCE(next_txn_date, max_txn_date)::DATE AS next_txn_date,
     SUM(txn_amount_signed) OVER (
       PARTITION BY customer_id
       ORDER BY txn_date
@@ -1098,29 +1116,18 @@ cumulative_balance_counting AS (
   FROM
     next_txn_date_evaluation
   ),
-min_max_txn_dates AS (
-  SELECT
-    customer_id,
-    MIN(txn_date) AS min_date,
-    MAX(txn_date) AS max_date
-  FROM
-    customer_transactions
-  GROUP BY
-    customer_id
-  ),
 make_date_series AS (
   SELECT
-    mmtd.customer_id,
+    DISTINCT ammtd.customer_id,
     g.txn_date::DATE AS txn_date
   FROM
-    min_max_txn_dates mmtd
+    add_min_max_txn_dates ammtd
   CROSS JOIN
-    generate_series(mmtd.min_date, mmtd.max_date, '1 day') AS g(txn_date)
+    generate_series(ammtd.min_txn_date, ammtd.max_txn_date, '1 day') AS g(txn_date)
   ),
 filled_daily_balances AS (
   SELECT
     cbc.customer_id,
-    cbc.first_txn_date,
     mds.txn_date,
     cbc.cumulative_balance
   FROM
@@ -1131,8 +1138,6 @@ filled_daily_balances AS (
     mds.customer_id = cbc.customer_id
     AND
     mds.txn_date BETWEEN cbc.txn_date AND cbc.next_txn_date
-  WHERE
-    cbc.cumulative_balance > 0
   ),
 set_initial_storage_volume AS (
   SELECT
@@ -1143,16 +1148,35 @@ set_initial_storage_volume AS (
   ),
 days_with_positive_balance_counting AS (
   SELECT
-    ROW_NUMBER() OVER (
-      PARTITION BY customer_id ORDER BY txn_date
-    ) - 1 AS days_with_positive_balance,
+    CASE 
+      WHEN cumulative_balance > 0 
+      THEN ROW_NUMBER() OVER (
+        PARTITION BY customer_id ORDER BY txn_date
+      )
+      ELSE NULL 
+    END AS days_with_positive_balance,
     customer_id,
     txn_date,
     cumulative_balance,
     storage_volume_gb
   FROM
     set_initial_storage_volume
+  ),
+filled_days_with_positive_balance AS (
+  SELECT
+    MAX(days_with_positive_balance) OVER (
+      PARTITION BY customer_id 
+      ORDER BY txn_date
+      ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS days_with_positive_balance,
+    customer_id,
+    txn_date,
+    cumulative_balance,
+    storage_volume_gb 
+  FROM
+    days_with_positive_balance_counting
   )
+
 SELECT
   customer_id,
   DATE_TRUNC('month', txn_date)::DATE AS month,
@@ -1166,7 +1190,7 @@ FROM (
       4
     ) AS storage_volume_gb 
   FROM
-    days_with_positive_balance_counting
+    filled_days_with_positive_balance
 ) subquery
 GROUP BY
   customer_id,
@@ -1186,10 +1210,13 @@ The SQL query calculates the storage volume for each customer on a monthly basis
   - Applies a sign to each transaction amount:  
     - Positive for deposits (`txn_type = 'deposit'`).  
     - Negative for withdrawals or purchases.  
-  - Identifies the first transaction date for each customer.  
+
+- CTE `add_min_max_txn_dates`:  
+  - Determines the first (`min_txn_date`) and last (`max_txn_date`) transaction dates for each customer.  
+  - Joins this information with aggregated transactions.  
 
 - CTE `next_txn_date_evaluation`:  
-  - Determines the date of the next transaction for each customer using the `LEAD()` function.  
+  - Determines the next transaction date for each customer using the `LEAD()` function.  
   - Adjusts the next transaction date by subtracting one day to establish transaction periods.  
 
 - CTE `cumulative_balance_counting`:  
@@ -1202,14 +1229,15 @@ The SQL query calculates the storage volume for each customer on a monthly basis
 
 - CTE `filled_daily_balances`:  
   - Joins the generated date series with cumulative balances to fill missing dates with the last known balance.  
-  - Filters out negative balances, as interest is only applied on positive balances.  
 
 - CTE `set_initial_storage_volume`:  
   - Assigns an initial storage volume of 100 GB to all entries.  
 
 - CTE `days_with_positive_balance_counting`:  
-  - Assigns a row number to count the number of days with a positive balance for each customer.  
-  - This number is used to calculate storage growth over time.  
+  - Assigns a row number to count the number of consecutive days with a positive balance for each customer.  
+
+- CTE `filled_days_with_positive_balance`:  
+  - Uses a running `MAX()` function to ensure that each day retains the last valid `days_with_positive_balance` value, filling in gaps caused by non-positive balances.  
 
 - Main `SELECT` statement:  
   - Computes storage volume with simple interest, applying the formula:  
@@ -1227,18 +1255,13 @@ This query provides a structured method for calculating non-compounded simple in
 ***answer:***
 | customer_id | month      | end_month_storage_volume_gb |
 | ----------- | ---------- | --------------------------- |
-| 1           | 2020-01-01 | 100.4767                    |
-| 1           | 2020-02-01 | 100.9534                    |
-| 1           | 2020-03-01 | 101.0521                    |
-| 2           | 2020-01-01 | 100.4603                    |
-| 2           | 2020-02-01 | 100.9370                    |
-| 2           | 2020-03-01 | 101.3315                    |
-| 3           | 2020-01-01 | 100.0658                    |
-| 3           | 2020-02-01 | 100.4110                    |
+| 1           | 2020-01-01 | 100.4932                    |
+| 1           | 2020-02-01 | 100.9699                    |
+| 1           | 2020-03-01 | 101.2658                    |
 | ---         | ---        | ---                         |
-| 500         | 2020-01-01 | 100.2466                    |
-| 500         | 2020-02-01 | 100.7233                    |
-| 500         | 2020-03-01 | 101.1342                    |
+| 500         | 2020-01-01 | 100.2630                    |
+| 500         | 2020-02-01 | 100.7397                    |
+| 500         | 2020-03-01 | 101.1507                    |
 
 ---
 
@@ -1261,18 +1284,13 @@ This query provides a structured method for calculating non-compounded simple in
 ***answer:***
 | customer_id | month      | end_month_storage_volume_gb |
 | ----------- | ---------- | --------------------------- |
-| 1           | 2020-01-01 | 100.4778                    |
-| 1           | 2020-02-01 | 100.9579                    |
-| 1           | 2020-03-01 | 101.0575                    |
-| 2           | 2020-01-01 | 100.4613                    |
-| 2           | 2020-02-01 | 100.9413                    |
-| 2           | 2020-03-01 | 101.3403                    |
-| 3           | 2020-01-01 | 100.0658                    |
-| 3           | 2020-02-01 | 100.4118                    |
+| 1           | 2020-01-01 | 100.4943                    |
+| 1           | 2020-02-01 | 100.9745                    |
+| 1           | 2020-03-01 | 101.2737                    |
 | ---         | ---        | ---                         |
-| 500         | 2020-01-01 | 100.2469                    |
-| 500         | 2020-02-01 | 100.7258                    |
-| 500         | 2020-03-01 | 101.1406                    |
+| 500         | 2020-01-01 | 100.2633                    |
+| 500         | 2020-02-01 | 100.7424                    |
+| 500         | 2020-03-01 | 101.1572                    |
 
 ---
 
