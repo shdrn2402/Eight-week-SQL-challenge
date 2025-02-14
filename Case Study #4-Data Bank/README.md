@@ -1245,12 +1245,12 @@ This query provides a structured method for calculating non-compounded simple in
 > The formula in the main `SELECT` statement has been modified from:
 >
 > ```sql
-> storage_volume_gb * (1 + (0.06 / 365) * days_with_positive_balance)
+> 100 * (1 + (0.06 / 365) * days_with_positive_balance)
 > ```
 > to
 >
 > ```sql
-> storage_volume_gb * POWER(1 + (0.06 / 365), days_with_positive_balance)
+> 100 * POWER(1 + (0.06 / 365), days_with_positive_balance)
 > ```
 
 ***answer:***
