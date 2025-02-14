@@ -1119,13 +1119,6 @@ filled_daily_balances AS (
     AND
     mds.txn_date BETWEEN cbc.txn_date AND cbc.next_txn_date
   ),
-set_initial_storage_volume AS (
-  SELECT
-    *,
-    100 AS storage_volume_gb
-  FROM
-    filled_daily_balances
-  ),
 days_with_positive_balance_counting AS (
   SELECT
     CASE 
@@ -1137,10 +1130,9 @@ days_with_positive_balance_counting AS (
     END AS days_with_positive_balance,
     customer_id,
     txn_date,
-    cumulative_balance,
-    storage_volume_gb
+    cumulative_balance
   FROM
-    set_initial_storage_volume
+    filled_daily_balances
   ),
 filled_days_with_positive_balance AS (
   SELECT
@@ -1151,12 +1143,11 @@ filled_days_with_positive_balance AS (
     ) AS days_with_positive_balance,
     customer_id,
     txn_date,
-    cumulative_balance,
-    storage_volume_gb 
+    cumulative_balance
   FROM
     days_with_positive_balance_counting
   )
-
+  
 SELECT
   customer_id,
   DATE_TRUNC('month', txn_date)::DATE AS month,
@@ -1165,10 +1156,14 @@ FROM (
   SELECT
     customer_id,
     txn_date,
-    ROUND(
-      storage_volume_gb * (1 + (0.06 / 365) * days_with_positive_balance),
-      4
-    ) AS storage_volume_gb 
+    CASE
+      WHEN days_with_positive_balance IS NOT NULL
+      THEN ROUND(
+        100 * (1 + (0.06 / 365) * days_with_positive_balance),
+        4
+      )
+      ELSE 100.0000
+    END AS storage_volume_gb
   FROM
     filled_days_with_positive_balance
 ) subquery
@@ -1210,9 +1205,6 @@ The SQL query calculates the storage volume for each customer on a monthly basis
 - CTE `filled_daily_balances`:  
   - Joins the generated date series with cumulative balances to fill missing dates with the last known balance.  
 
-- CTE `set_initial_storage_volume`:  
-  - Assigns an initial storage volume of 100 GB to all entries.  
-
 - CTE `days_with_positive_balance_counting`:  
   - Assigns a row number to count the number of consecutive days with a positive balance for each customer.  
 
@@ -1221,7 +1213,7 @@ The SQL query calculates the storage volume for each customer on a monthly basis
 
 - Main `SELECT` statement:  
   - Computes storage volume with simple interest, applying the formula:  
-    - `storage_volume_gb * (1 + (0.06 / 365) * days_with_positive_balance)`.  
+    - `100 * (1 + (0.06 / 365) * days_with_positive_balance)` where `100` represents the base storage volume available to all customers.
   - Groups by month (`DATE_TRUNC('month', txn_date)`) and customer ID.  
   - Uses `MAX(storage_volume_gb)` to retrieve the highest storage volume at the end of each month.  
 
