@@ -1084,7 +1084,7 @@ SELECT
   customer_id,
   DATE_TRUNC('month', txn_date)::DATE AS txn_month,
   MAX(simple_growth) AS simple_growth,
-  MAX(compound_growth) AScompound_growth
+  MAX(compound_growth) AS compound_growth
 FROM
   data_storage_calculation
 GROUP BY
