@@ -1126,7 +1126,7 @@ This query provides a structured method for calculating **monthly storage alloca
 </details>
 
 ***answer:***
-| customer_id | txn_month  | simple_growth | ascompound_growth |
+| customer_id | txn_month  | simple_growth | compound_growth   |
 | ----------- | ---------- | ------------- | ----------------- |
 | 1           | 2020-01-01 | 100.4932      | 100.4943          |
 | 1           | 2020-02-01 | 100.9699      | 100.9745          |
