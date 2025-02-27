@@ -1141,4 +1141,7 @@ This query provides a structured method for calculating **monthly storage alloca
 ---
 
 ### Extension Request
-... 
+
+> Prepare a presentation based on the conducted analysis, including visualizations and key insights. The goal is to showcase Data Bank's world-class security standards to potential investors and customers, as well as to summarize the data provisioning options to assist management in making an informed decision.
+
+[Presentation link](https://github.com/shdrn2402/Case_Study_4_Data_Bank)  
