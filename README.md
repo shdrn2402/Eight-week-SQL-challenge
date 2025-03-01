@@ -6,7 +6,7 @@ The repository represents the culmination of my experience in solving various SQ
 
 Through this repository, I aim to demonstrate my capability to solve complex SQL challenges and effectively address real-world data problems. It reflects my growth, technical expertise, and innovative approach to working with SQL.
 
-📊 Visualizations of SQL queries can be found in the **[Data Visualization Projects](https://github.com/shdrn2402/data_visualization_projects)** repository.
+📊 Visualizations of SQL queries can be found in the **[Eight week SQL challenge Visualization](https://github.com/shdrn2402/Eight-week-SQL-challenge_Visualization)** repository.
 
 Tools Used 🛠️: PostgreSQL
 
