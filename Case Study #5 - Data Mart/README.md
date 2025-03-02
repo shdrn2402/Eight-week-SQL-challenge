@@ -98,18 +98,18 @@ VALUES
 >
 >Add a new column called age_band after the original segment column using the following mapping on the number inside the segment value
 >
-| segment	| age_band    |
-|:--------|:------------|
-|1        |Young Adults |
-|2        |Middle Aged  |
-|3 or 4   | Retirees    |
+>| segment	| age_band    |
+>|:--------|:------------|
+>|1        |Young Adults |
+>|2        |Middle Aged  |
+>|3 or 4   | Retirees    |
 >
 >Add a new demographic column using the following mapping for the first letter in the segment values:
 >
-| segment | demographic |
-|:--------|:------------|
-|C        |Couples      |
-|F	      |Families     |
+>| segment | demographic |
+>|:--------|:------------|
+>|C        |Couples      |
+>|F	      |Families     |
 >
 >Ensure all null string values with an "unknown" string value in the original segment column as well as the new age_band and demographic columns
 >
