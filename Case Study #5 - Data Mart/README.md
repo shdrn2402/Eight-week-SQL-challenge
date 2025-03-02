@@ -4,7 +4,7 @@
 - [Introduction](#introduction)
 - [Entity Relationship Diagram](#entity-relationship-diagram)
 - [Case Study Questions](#case-study-questions)
-  - [A. Data Cleansing Steps](#a-data-cleancing-steps)
+  - [A. Data Cleansing Steps](#a-data-cleansing-steps)
   - [B. Data Exploration](#b-data-exploration)
   - [C. Before & After Analysis](#c-before--after-analysis)
   - [D. Bonus Question](#d-bonus-question)
@@ -56,7 +56,7 @@ VALUES
   ('31/8/20', 'AFRICA', 'Shopify', 'F2', 'New', '318', '49557'),
   ('31/8/20', 'AFRICA', 'Retail', 'C3', 'New', '111032', '3888162'),
   ...
-    ('26/3/18', 'SOUTH AMERICA', 'Shopify', 'F1', 'New', '3', '677'),
+  ('26/3/18', 'SOUTH AMERICA', 'Shopify', 'F1', 'New', '3', '677'),
   ('26/3/18', 'ASIA', 'Retail', 'F3', 'New', '81842', '2673553'),
   ('26/3/18', 'CANADA', 'Shopify', 'C3', 'New', '48', '7672'),
   ('26/3/18', 'EUROPE', 'Shopify', 'F3', 'New', '2', '300'),
@@ -100,6 +100,6 @@ VALUES
 
 ---
 
-### Conclusion
+## Conclusion
 
 ---
