@@ -16,4 +16,4 @@ Tools Used 🛠️: PostgreSQL
 - [Case Study #2 - Pizza Runner](https://github.com/shdrn2402/Eight-week-SQL-challenge/tree/main/Case%20Study%20%232-Pizza%20Runner)
 - [Case Study #3 - Foodie-Fi](https://github.com/shdrn2402/Eight-week-SQL-challenge/tree/main/Case%20Study%20%233-Foodie-Fi)
 - [Case Study #4 - Data Bank](https://github.com/shdrn2402/Eight-week-SQL-challenge/blob/main/Case%20Study%20%234-Data%20Bank)
-- [Case Study #5 - Data Mart](https://github.com/shdrn2402/Eight-week-SQL-challenge/blob/main/Case%20Study%20%234-Data%20Mart)
+- [Case Study #5 - Data Mart](https://github.com/shdrn2402/Eight-week-SQL-challenge/tree/main/Case%20Study%20%235%20-%20Data%20Mart)
