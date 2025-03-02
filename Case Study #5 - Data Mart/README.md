@@ -86,6 +86,7 @@ VALUES
 ## Case Study Questions
 ### A. Data Cleansing Steps
 
+***Task Description***
 >In a single query, perform the following operations and generate a new table in the data_mart schema named clean_weekly_sales:
 >
 >Convert the week_date to a DATE format
@@ -115,7 +116,7 @@ VALUES
 >
 >Generate a new avg_transaction column as the sales value divided by transactions rounded to 2 decimal places for each record
 
-***query:***
+***Solution:***
 ```SQL
 ```
 
@@ -123,7 +124,7 @@ VALUES
   <summary><em><strong>show description</strong></em></summary>
 </details>
 
-***answer:***
+***Result table:***
 
 ---
 
