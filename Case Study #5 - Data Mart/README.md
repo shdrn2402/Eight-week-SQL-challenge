@@ -89,15 +89,15 @@ VALUES
 ***Task Description***
 >In a single query, perform the following operations and generate a new table in the data_mart schema named clean_weekly_sales:
 >
->Convert the week_date to a DATE format
+>- Convert the week_date to a DATE format
 >
->Add a week_number as the second column for each week_date value, for example any value from the 1st of January to 7th of January will be 1, 8th to 14th will be 2 etc
+>- Add a week_number as the second column for each week_date value, for example any value from the 1st of January to 7th of January will be 1, 8th to 14th will be 2 etc
 >
->Add a month_number with the calendar month for each week_date value as the 3rd column
+>- Add a month_number with the calendar month for each week_date value as the 3rd column
 >
->Add a calendar_year column as the 4th column containing either 2018, 2019 or 2020 values
+>- Add a calendar_year column as the 4th column containing either 2018, 2019 or 2020 values
 >
->Add a new column called age_band after the original segment column using the following mapping on the number inside the segment value
+>- Add a new column called age_band after the original segment column using the following mapping on the number inside the segment value
 >
 >| segment	| age_band    |
 >|:--------|:------------|
@@ -105,16 +105,16 @@ VALUES
 >|2        |Middle Aged  |
 >|3 or 4   | Retirees    |
 >
->Add a new demographic column using the following mapping for the first letter in the segment values:
+>- Add a new demographic column using the following mapping for the first letter in the segment values:
 >
 >| segment | demographic |
 >|:--------|:------------|
 >|C        |Couples      |
 >|F	      |Families     |
 >
->Ensure all null string values with an "unknown" string value in the original segment column as well as the new age_band and demographic columns
+>- Ensure all null string values with an "unknown" string value in the original segment column as well as the new age_band and demographic columns
 >
->Generate a new avg_transaction column as the sales value divided by transactions rounded to 2 decimal places for each record
+>- Generate a new avg_transaction column as the sales value divided by transactions rounded to 2 decimal places for each record
 
 ***Solution:***
 ```SQL
@@ -219,13 +219,7 @@ SELECT * FROM clean_weekly_sales LIMIT 10;
 | 2020-08-31 | 36          | 8            | 2020          | F1      | Young Adults | Families    | 31.00           |
 | 2020-08-31 | 36          | 8            | 2020          | unknown | unknown      | unknown     | 31.00           |
 | 2020-08-31 | 36          | 8            | 2020          | C1      | Young Adults | Couples     | 31.00           |
-| 2020-08-31 | 36          | 8            | 2020          | C2      | Middle Aged  | Couples     | 30.00           |
-| 2020-08-31 | 36          | 8            | 2020          | F2      | Middle Aged  | Families    | 182.00          |
-| 2020-08-31 | 36          | 8            | 2020          | F3      | Retirees     | Families    | 206.00          |
 | ---        | ---         | ---          | ---           | ---     | ---          | ---         | ---             |
-| 2018-03-26 | 13          | 3            | 2018          | F3      | Retirees     | Families    | 150.00          |
-| 2018-03-26 | 13          | 3            | 2018          | C3      | Retirees     | Couples     | 41.00           |
-| 2018-03-26 | 13          | 3            | 2018          | C3      | Retirees     | Couples     | 37.00           |
 | 2018-03-26 | 13          | 3            | 2018          | C4      | Retirees     | Couples     | 174.00          |
 | 2018-03-26 | 13          | 3            | 2018          | F2      | Middle Aged  | Families    | 41.00           |
 | 2018-03-26 | 13          | 3            | 2018          | C4      | Retirees     | Couples     | 37.00           |
