@@ -212,18 +212,18 @@ SELECT * FROM clean_weekly_sales LIMIT 10;
 
 ***Result table:***
 
-
 | week_date  | week_number | month_number | calendar_year | segment | age_band     | demographic | avg_transaction |
 | ---------- | ----------- | ------------ | ------------- | ------- | ------------ | ----------- | --------------- |
 | 2020-08-31 | 36          | 8            | 2020          | C3      | Retirees     | Couples     | 30.00           |
 | 2020-08-31 | 36          | 8            | 2020          | F1      | Young Adults | Families    | 31.00           |
 | 2020-08-31 | 36          | 8            | 2020          | unknown | unknown      | unknown     | 31.00           |
 | 2020-08-31 | 36          | 8            | 2020          | C1      | Young Adults | Couples     | 31.00           |
-| ---        | ---         | ---          | ---           | ---     | ---          | ---         | ---             |
-| 2018-03-26 | 13          | 3            | 2018          | C4      | Retirees     | Couples     | 174.00          |
-| 2018-03-26 | 13          | 3            | 2018          | F2      | Middle Aged  | Families    | 41.00           |
-| 2018-03-26 | 13          | 3            | 2018          | C4      | Retirees     | Couples     | 37.00           |
-| 2018-03-26 | 13          | 3            | 2018          | C3      | Retirees     | Couples     | 55.00           |
+| 2020-08-31 | 36          | 8            | 2020          | C2      | Middle Aged  | Couples     | 30.00           |
+| 2020-08-31 | 36          | 8            | 2020          | F2      | Middle Aged  | Families    | 182.00          |
+| 2020-08-31 | 36          | 8            | 2020          | F3      | Retirees     | Families    | 206.00          |
+| 2020-08-31 | 36          | 8            | 2020          | F1      | Young Adults | Families    | 172.00          |
+| 2020-08-31 | 36          | 8            | 2020          | F2      | Middle Aged  | Families    | 155.00          |
+| 2020-08-31 | 36          | 8            | 2020          | C3      | Retirees     | Couples     | 35.00           |
 
 ---
 
