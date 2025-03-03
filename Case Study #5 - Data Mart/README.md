@@ -118,13 +118,118 @@ VALUES
 
 ***Solution:***
 ```SQL
+CREATE TABLE IF NOT EXISTS data_mart.clean_weekly_sales (
+  "week_date" DATE,
+  "week_number" INTEGER,
+  "month_number" INTEGER,
+  "calendar_year"  INTEGER,
+  "segment" VARCHAR(7),
+  "age_band" VARCHAR(12),
+  "demographic" VARCHAR(8),
+  "avg_transaction" NUMERIC(5, 2)
+  );
+  
+INSERT INTO data_mart.clean_weekly_sales
+SELECT
+  week_date,
+  EXTRACT('week' FROM week_date) AS week_number,
+  EXTRACT('month' FROM week_date) AS month_number,
+  EXTRACT('year' FROM week_date) AS calendar_year,
+  segment,
+  CASE
+    WHEN age_band = '1' THEN 'Young Adults'
+    ELSE 
+      CASE
+        WHEN age_band = '2' THEN 'Middle Aged'
+        ELSE 
+          CASE
+            WHEN age_band = 'unknown' THEN age_band
+            ELSE 'Retirees'
+          END
+      END
+  END AS age_band,
+  CASE
+    WHEN demographic = 'unknown' THEN demographic
+    ELSE
+      CASE
+        WHEN demographic = 'C' THEN 'Couples'
+        ELSE 'Families'
+      END
+  END AS demographic,
+  ROUND(sales / transactions, 2) AS avg_transaction 
+FROM (
+  SELECT
+    to_date(week_date, 'DD/MM/YY') AS week_date,
+    CASE
+      WHEN segment = 'null' THEN 'unknown'
+      ELSE segment
+    END AS segment,
+    CASE
+      WHEN segment = 'null' THEN 'unknown'
+      ELSE RIGHT(segment, 1)
+    END AS age_band,
+    CASE
+      WHEN segment = 'null' THEN 'unknown'
+      ELSE LEFT(segment, 1)
+    END AS demographic,
+    transactions,
+    sales
+  FROM
+    weekly_sales
+  ) sub
+;
+
+SELECT * FROM clean_weekly_sales LIMIT 10;
 ```
 
 <details>
   <summary><em><strong>show description</strong></em></summary>
+
+- Subquery `sub`:  
+  - Converts `week_date` from `VARCHAR` to `DATE` using `TO_DATE()`.  
+  - Replaces `'null'` values in `segment` with `'unknown'`.  
+  - Extracts the last character of `segment` as `age_band`.  
+  - Extracts the first character of `segment` as `demographic`.  
+
+- Main `SELECT` Statement:  
+  - Extracts `week_number`, `month_number`, and `calendar_year` using `EXTRACT()`.  
+  - Maps `age_band` based on predefined categories:  
+    - `'1'` → `'Young Adults'`  
+    - `'2'` → `'Middle Aged'`  
+    - `'3'` or `'4'` → `'Retirees'`  
+    - `'unknown'` remains unchanged.  
+  - Maps `demographic` values:  
+    - `'C'` → `'Couples'`  
+    - `'F'` → `'Families'`  
+    - `'unknown'` remains unchanged.  
+  - Calculates `avg_transaction` as `sales / transactions`, rounded to 2 decimal places.  
+
+- `Final Step`:  
+  - Inserts transformed data into `data_mart.clean_weekly_sales`.  
+  - Ensures structured and cleaned dataset for further analysis.  
+
 </details>
 
 ***Result table:***
+
+
+| week_date  | week_number | month_number | calendar_year | segment | age_band     | demographic | avg_transaction |
+| ---------- | ----------- | ------------ | ------------- | ------- | ------------ | ----------- | --------------- |
+| 2020-08-31 | 36          | 8            | 2020          | C3      | Retirees     | Couples     | 30.00           |
+| 2020-08-31 | 36          | 8            | 2020          | F1      | Young Adults | Families    | 31.00           |
+| 2020-08-31 | 36          | 8            | 2020          | unknown | unknown      | unknown     | 31.00           |
+| 2020-08-31 | 36          | 8            | 2020          | C1      | Young Adults | Couples     | 31.00           |
+| 2020-08-31 | 36          | 8            | 2020          | C2      | Middle Aged  | Couples     | 30.00           |
+| 2020-08-31 | 36          | 8            | 2020          | F2      | Middle Aged  | Families    | 182.00          |
+| 2020-08-31 | 36          | 8            | 2020          | F3      | Retirees     | Families    | 206.00          |
+| ---        | ---         | ---          | ---           | ---     | ---          | ---         | ---             |
+| 2018-03-26 | 13          | 3            | 2018          | F3      | Retirees     | Families    | 150.00          |
+| 2018-03-26 | 13          | 3            | 2018          | C3      | Retirees     | Couples     | 41.00           |
+| 2018-03-26 | 13          | 3            | 2018          | C3      | Retirees     | Couples     | 37.00           |
+| 2018-03-26 | 13          | 3            | 2018          | C4      | Retirees     | Couples     | 174.00          |
+| 2018-03-26 | 13          | 3            | 2018          | F2      | Middle Aged  | Families    | 41.00           |
+| 2018-03-26 | 13          | 3            | 2018          | C4      | Retirees     | Couples     | 37.00           |
+| 2018-03-26 | 13          | 3            | 2018          | C3      | Retirees     | Couples     | 55.00           |
 
 ---
 
