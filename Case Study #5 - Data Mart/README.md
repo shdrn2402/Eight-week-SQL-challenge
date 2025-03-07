@@ -255,6 +255,50 @@ The SQL query retrieves the distinct day names from the `week_date` column in th
 
 ---
 
+#### 2. What range of week numbers are missing from the dataset?
+
+***query:***
+```SQL
+WITH week_numbers AS (
+  SELECT
+    *
+  FROM
+    generate_series(
+      (SELECT MIN(week_number) FROM clean_weekly_sales),
+      (SELECT MAX(week_number) FROM clean_weekly_sales)
+    ) AS week_number
+  )
+
+SELECT
+  wn.week_number
+FROM
+  week_numbers wn
+LEFT JOIN 
+  clean_weekly_sales cws USING (week_number)
+WHERE cws.week_number IS NULL;
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+The SQL query identifies week numbers that are missing from the `clean_weekly_sales` table within the range of existing week numbers.
+
+-   `WITH week_numbers AS (...)`: Generates a series of all week numbers between the minimum and maximum week numbers found in the `clean_weekly_sales` table.
+-   `generate_series( (SELECT MIN(week_number) FROM clean_weekly_sales), (SELECT MAX(week_number) FROM clean_weekly_sales) )`: Creates a sequential list of integers from the minimum to the maximum `week_number` values.
+-   `LEFT JOIN clean_weekly_sales cws USING (week_number)`: Performs a left join between the generated week numbers and the `clean_weekly_sales` table, keeping all generated week numbers.
+-   `WHERE cws.week_number IS NULL`: Filters the results to include only those generated week numbers that do not have a corresponding entry in the `clean_weekly_sales` table, indicating missing week numbers.
+
+</details>
+
+***answer:***
+| week_number |
+| ------------|
+|             |
+
+**The query returned an empty table, no week numbers are missing**
+
+---
+
 ### C. Before & After Analysis
 
 ---
