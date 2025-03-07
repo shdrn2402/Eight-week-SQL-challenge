@@ -228,6 +228,30 @@ SELECT * FROM clean_weekly_sales LIMIT 10;
 ---
 
 ### B. Data Exploration
+#### 1. What day of the week is used for each `week_date` value?
+
+***query:***
+```SQL
+SELECT DISTINCT
+  TO_CHAR(week_date, 'Day') AS week_day
+FROM
+  clean_weekly_sales;
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+The SQL query retrieves the distinct day names from the `week_date` column in the `clean_weekly_sales` table.
+
+- `TO_CHAR(week_date, 'Day')`: Converts the `week_date` values into their corresponding weekday names.
+- `DISTINCT`: Ensures that only unique weekday names appear in the result.
+
+</details>
+
+***answer:***
+| week_day |
+| ---------|
+| Monday   |
 
 ---
 
