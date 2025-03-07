@@ -290,12 +290,12 @@ The SQL query identifies week numbers that are missing from the `clean_weekly_sa
 
 </details>
 
-*\*answer:*
+***answer:***
 | week_number |
 | ------------|
 |             |
 
-**The query returned an empty table, no week numbers are missing**
+*\*The query returned an empty table, no week numbers are missing*
 
 ---
 
