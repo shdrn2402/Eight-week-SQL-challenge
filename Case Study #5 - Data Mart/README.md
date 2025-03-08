@@ -400,6 +400,39 @@ The SQL query calculates the total sales for each region for each month, represe
 
 ---
 
+#### 5. What is the total count of transactions for each platform?
+
+***query:***
+```SQL
+SELECT
+ platform,
+ COUNT(transactions) AS transactions_amount
+FROM
+  weekly_sales
+GROUP BY
+  platform;
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+The SQL query counts the number of transactions for each platform in the `weekly_sales` table.
+
+-   `SELECT platform, COUNT(transactions) AS transactions_amount`: Selects the platform and counts the number of transactions, aliasing the count as `transactions_amount`.
+-   `COUNT(transactions)`: Counts the number of non-NULL values in the `transactions` column, effectively counting the number of transactions for each platform.
+-   `FROM weekly_sales`: Specifies the table from which to retrieve the data.
+-   `GROUP BY platform`: Groups the results by platform, so the count is performed for each unique platform.
+
+</details>
+
+***answer:***
+| platform | transactions_amount |
+| -------- | ------------------- |
+| Shopify  | 8549                |
+| Retail   | 8568                |
+
+---
+
 ### C. Before & After Analysis
 
 ---
