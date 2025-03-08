@@ -299,6 +299,107 @@ The SQL query identifies week numbers that are missing from the `clean_weekly_sa
 
 ---
 
+#### 3. How many total transactions were there for each year in the dataset?
+
+***query:***
+```SQL
+SELECT
+  calendar_year,
+  COUNT(avg_transaction) AS transactions_amount
+FROM
+  clean_weekly_sales
+GROUP BY
+  calendar_year
+ORDER BY
+  calendar_year;
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+The SQL query calculates the total number of transactions for each year in the `clean_weekly_sales` dataset.
+
+-   `SELECT calendar_year, COUNT(avg_transaction) AS transactions_amount`: Selects the calendar year and counts the number of transactions, aliasing the count as `transactions_amount`.
+-   `COUNT(avg_transaction)`: Counts the number of non-NULL values in the `avg_transaction` column, effectively counting the number of transactions.
+-   `FROM clean_weekly_sales`: Specifies the table from which to retrieve the data.
+-   `GROUP BY calendar_year`: Groups the results by calendar year, so the count is performed for each year separately.
+-   `ORDER BY calendar_year`: Orders the results by calendar year in ascending order.
+
+</details>
+
+***answer:***
+| calendar_year | transactions_amount |
+| ------------- | ------------------- |
+| 2018          | 5698                |
+| 2019          | 5708                |
+| 2020          | 5711                |
+
+---
+
+#### 4. What is the total sales for each region for each month?
+
+***query:***
+```SQL
+WITH short_weekly_sales AS (
+  SELECT
+    EXTRACT('month' FROM to_date(week_date, 'DD/MM/YY')) AS month_number,
+    region,
+    sales
+  FROM
+    weekly_sales
+)
+
+SELECT
+  region,
+  month_number,
+  SUM(sales) AS total_sales
+FROM
+  short_weekly_sales
+GROUP BY
+  region,
+  month_number
+ORDER BY
+  region,
+  month_number;
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+The SQL query calculates the total sales for each region for each month, represented by its numerical value.
+
+-   `WITH short_weekly_sales AS (...)`: Creates a common table expression (CTE) named `short_weekly_sales` to simplify the main query.
+-   `EXTRACT('month' FROM to_date(week_date, 'DD/MM/YY')) AS month_number`: Extracts the month number from the `week_date` column, converting it to a date using the specified format.
+-   `region, sales`: Selects the region and sales columns.
+-   `SELECT region, month_number, SUM(sales) AS total_sales`: Selects the region, month number, and the sum of sales, aliasing the sum as `total_sales`.
+-   `SUM(sales)`: Calculates the sum of the sales for each group.
+-   `FROM short_weekly_sales`: Specifies the CTE as the data source.
+-   `GROUP BY region, month_number`: Groups the results by region and month number.
+-   `ORDER BY region, month_number`: Orders the results by region and month number in ascending order.
+
+</details>
+
+***answer:***
+| region        | month_number | total_sales |
+| ------------- | ------------ | ----------- |
+| AFRICA        | 3            | 567767480   |
+| AFRICA        | 4            | 1911783504  |
+| AFRICA        | 5            | 1647244738  |
+| AFRICA        | 6            | 1767559760  |
+| AFRICA        | 7            | 1960219710  |
+| AFRICA        | 8            | 1809596890  |
+| AFRICA        | 9            | 276320987   |
+| ---           | ---          | ---         |
+| USA           | 3            | 225353043   |
+| USA           | 4            | 759786323   |
+| USA           | 5            | 655967121   |
+| USA           | 6            | 703878990   |
+| USA           | 7            | 760331754   |
+| USA           | 8            | 712002790   |
+| USA           | 9            | 110532368   |
+
+---
+
 ### C. Before & After Analysis
 
 ---
