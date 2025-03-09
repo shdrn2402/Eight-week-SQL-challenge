@@ -352,7 +352,7 @@ WITH short_weekly_sales AS (
 SELECT
   region,
   month_number,
-  SUM(sales) AS total_sales
+  SUM(sales)::money AS total_sales
 FROM
   short_weekly_sales
 GROUP BY
@@ -380,23 +380,23 @@ The SQL query calculates the total sales for each region for each month, represe
 </details>
 
 ***answer:***
-| region        | month_number | total_sales |
-| ------------- | ------------ | ----------- |
-| AFRICA        | 3            | 567767480   |
-| AFRICA        | 4            | 1911783504  |
-| AFRICA        | 5            | 1647244738  |
-| AFRICA        | 6            | 1767559760  |
-| AFRICA        | 7            | 1960219710  |
-| AFRICA        | 8            | 1809596890  |
-| AFRICA        | 9            | 276320987   |
-| ---           | ---          | ---         |
-| USA           | 3            | 225353043   |
-| USA           | 4            | 759786323   |
-| USA           | 5            | 655967121   |
-| USA           | 6            | 703878990   |
-| USA           | 7            | 760331754   |
-| USA           | 8            | 712002790   |
-| USA           | 9            | 110532368   |
+| region        | month_number | total_sales       |
+| ------------- | ------------ | ----------------- |
+| AFRICA        | 3            | $567,767,480.00   |
+| AFRICA        | 4            | $1,911,783,504.00 |
+| AFRICA        | 5            | $1,647,244,738.00 |
+| AFRICA        | 6            | $1,767,559,760.00 |
+| AFRICA        | 7            | $1,960,219,710.00 |
+| AFRICA        | 8            | $1,809,596,890.00 |
+| AFRICA        | 9            | $276,320,987.00   |
+| ---           | ---          | ---               |
+| USA           | 3            | $225,353,043.00   |
+| USA           | 4            | $759,786,323.00   |
+| USA           | 5            | $655,967,121.00   |
+| USA           | 6            | $703,878,990.00   |
+| USA           | 7            | $760,331,754.00   |
+| USA           | 8            | $712,002,790.00   |
+| USA           | 9            | $110,532,368.00   |
 
 ---
 
