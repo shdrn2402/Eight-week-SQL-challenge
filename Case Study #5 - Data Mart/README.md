@@ -433,6 +433,87 @@ The SQL query counts the number of transactions for each platform in the `weekly
 
 ---
 
+#### 6. What is the percentage of sales for Retail vs Shopify for each month?
+
+***query:***
+```SQL
+WITH total_month_sales AS (
+  SELECT
+    EXTRACT('month' FROM to_date(week_date, 'DD/MM/YY')) AS month_number,
+    SUM(sales) AS total_sales
+  FROM
+    weekly_sales
+  GROUP BY
+    month_number
+  ),
+platform_month_sales AS (
+  SELECT
+    EXTRACT('month' FROM to_date(week_date, 'DD/MM/YY')) AS month_number,
+    platform,
+    SUM(sales) AS platform_sales
+  FROM
+    weekly_sales
+  GROUP BY
+    month_number,
+    platform
+)
+
+SELECT
+  pms.month_number,
+  pms.platform,
+  pms.platform_sales,
+  tms.total_sales,
+  ROUND((pms.platform_sales::numeric / tms.total_sales) * 100, 2) AS sales_percentage  
+FROM
+  platform_month_sales pms
+JOIN
+  total_month_sales tms USING(month_number)
+ORDER BY
+  pms.month_number,
+  pms.platform
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+The SQL query calculates the percentage of sales for each platform (Retail and Shopify) for each month.
+
+-   `WITH total_month_sales AS (...)`: Creates a Common Table Expression (CTE) named `total_month_sales` to calculate the total sales for each month.
+    -   `EXTRACT('month' FROM to_date(week_date, 'DD/MM/YY')) AS month_number`: Extracts the month number from the `week_date` column, converting it to a date using the specified format.
+    -   `SUM(sales) AS total_sales`: Calculates the sum of sales for each month.
+    -   `GROUP BY month_number`: Groups the results by month number.
+-   `WITH platform_month_sales AS (...)`: Creates another CTE named `platform_month_sales` to calculate the total sales for each platform within each month.
+    -   `EXTRACT('month' FROM to_date(week_date, 'DD/MM/YY')) AS month_number`: Extracts the month number from the `week_date` column.
+    -   `platform`: Selects the platform.
+    -   `SUM(sales) AS platform_sales`: Calculates the sum of sales for each platform within each month.
+    -   `GROUP BY month_number, platform`: Groups the results by month number and platform.
+-   `SELECT pms.month_number, pms.platform, pms.platform_sales, tms.total_sales, ROUND((pms.platform_sales::numeric / tms.total_sales) * 100, 2) AS sales_percentage`: Selects the month number, platform, platform sales, total month sales, and calculates the percentage of sales for each platform within each month.
+    -   `ROUND((pms.platform_sales::numeric / tms.total_sales) * 100, 2)`: Calculates the percentage of platform sales to total month sales and rounds the result to 2 decimal places.
+-   `FROM platform_month_sales pms JOIN total_month_sales tms USING(month_number)`: Joins the two CTEs on the `month_number` column.
+-   `ORDER BY pms.month_number, pms.platform`: Orders the results by month number and platform.
+
+</details>
+
+***answer:***
+| month_number | platform | platform_sales | total_sales | sales_percentage |
+| ------------ | -------- | -------------- | ----------- | ---------------- |
+| 3            | Retail   | 2299188417     | 2357168735  | 97.54            |
+| 3            | Shopify  | 57980318       | 2357168735  | 2.46             |
+| 4            | Retail   | 7735592234     | 7926304534  | 97.59            |
+| 4            | Shopify  | 190712300      | 7926304534  | 2.41             |
+| 5            | Retail   | 6585838223     | 6768263125  | 97.30            |
+| 5            | Shopify  | 182424902      | 6768263125  | 2.70             |
+| 6            | Retail   | 7049949260     | 7247714362  | 97.27            |
+| 6            | Shopify  | 197765102      | 7247714362  | 2.73             |
+| 7            | Retail   | 7688091448     | 7902330809  | 97.29            |
+| 7            | Shopify  | 214239361      | 7902330809  | 2.71             |
+| 8            | Retail   | 7191449998     | 7407576007  | 97.08            |
+| 8            | Shopify  | 216126009      | 7407576007  | 2.92             |
+| 9            | Retail   | 1104506857     | 1134276655  | 97.38            |
+| 9            | Shopify  | 29769798       | 1134276655  | 2.62             |
+
+---
+
 ### C. Before & After Analysis
 
 ---
