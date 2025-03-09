@@ -461,8 +461,8 @@ platform_month_sales AS (
 SELECT
   pms.month_number,
   pms.platform,
-  pms.platform_sales,
-  tms.total_sales,
+  pms.platform_sales::money,
+  tms.total_sales::money,
   ROUND((pms.platform_sales::numeric / tms.total_sales) * 100, 2) AS sales_percentage  
 FROM
   platform_month_sales pms
@@ -476,7 +476,7 @@ ORDER BY
 <details>
   <summary><em><strong>show description:</strong></em></summary>
 
-The SQL query calculates the percentage of sales for each platform (Retail and Shopify) for each month.
+The SQL query calculates the percentage of sales for each platform (Retail and Shopify) for each month, displaying sales values in money format.
 
 -   `WITH total_month_sales AS (...)`: Creates a Common Table Expression (CTE) named `total_month_sales` to calculate the total sales for each month.
     -   `EXTRACT('month' FROM to_date(week_date, 'DD/MM/YY')) AS month_number`: Extracts the month number from the `week_date` column, converting it to a date using the specified format.
@@ -487,7 +487,8 @@ The SQL query calculates the percentage of sales for each platform (Retail and S
     -   `platform`: Selects the platform.
     -   `SUM(sales) AS platform_sales`: Calculates the sum of sales for each platform within each month.
     -   `GROUP BY month_number, platform`: Groups the results by month number and platform.
--   `SELECT pms.month_number, pms.platform, pms.platform_sales, tms.total_sales, ROUND((pms.platform_sales::numeric / tms.total_sales) * 100, 2) AS sales_percentage`: Selects the month number, platform, platform sales, total month sales, and calculates the percentage of sales for each platform within each month.
+-   `SELECT pms.month_number, pms.platform, pms.platform_sales::money, tms.total_sales::money, ROUND((pms.platform_sales::numeric / tms.total_sales) * 100, 2) AS sales_percentage`: Selects the month number, platform, platform sales (formatted as money), total month sales (formatted as money), and calculates the percentage of sales for each platform within each month.
+    -   `pms.platform_sales::money` and `tms.total_sales::money`: Converts sales values to the money data type for display.
     -   `ROUND((pms.platform_sales::numeric / tms.total_sales) * 100, 2)`: Calculates the percentage of platform sales to total month sales and rounds the result to 2 decimal places.
 -   `FROM platform_month_sales pms JOIN total_month_sales tms USING(month_number)`: Joins the two CTEs on the `month_number` column.
 -   `ORDER BY pms.month_number, pms.platform`: Orders the results by month number and platform.
@@ -495,22 +496,22 @@ The SQL query calculates the percentage of sales for each platform (Retail and S
 </details>
 
 ***answer:***
-| month_number | platform | platform_sales | total_sales | sales_percentage |
-| ------------ | -------- | -------------- | ----------- | ---------------- |
-| 3            | Retail   | 2299188417     | 2357168735  | 97.54            |
-| 3            | Shopify  | 57980318       | 2357168735  | 2.46             |
-| 4            | Retail   | 7735592234     | 7926304534  | 97.59            |
-| 4            | Shopify  | 190712300      | 7926304534  | 2.41             |
-| 5            | Retail   | 6585838223     | 6768263125  | 97.30            |
-| 5            | Shopify  | 182424902      | 6768263125  | 2.70             |
-| 6            | Retail   | 7049949260     | 7247714362  | 97.27            |
-| 6            | Shopify  | 197765102      | 7247714362  | 2.73             |
-| 7            | Retail   | 7688091448     | 7902330809  | 97.29            |
-| 7            | Shopify  | 214239361      | 7902330809  | 2.71             |
-| 8            | Retail   | 7191449998     | 7407576007  | 97.08            |
-| 8            | Shopify  | 216126009      | 7407576007  | 2.92             |
-| 9            | Retail   | 1104506857     | 1134276655  | 97.38            |
-| 9            | Shopify  | 29769798       | 1134276655  | 2.62             |
+| month_number | platform | platform_sales    | total_sales       | sales_percentage |
+| ------------ | -------- | ----------------- | ----------------- | ---------------- |
+| 3            | Retail   | $2,299,188,417.00 | $2,357,168,735.00 | 97.54            |
+| 3            | Shopify  | $57,980,318.00    | $2,357,168,735.00 | 2.46             |
+| 4            | Retail   | $7,735,592,234.00 | $7,926,304,534.00 | 97.59            |
+| 4            | Shopify  | $190,712,300.00   | $7,926,304,534.00 | 2.41             |
+| 5            | Retail   | $6,585,838,223.00 | $6,768,263,125.00 | 97.30            |
+| 5            | Shopify  | $182,424,902.00   | $6,768,263,125.00 | 2.70             |
+| 6            | Retail   | $7,049,949,260.00 | $7,247,714,362.00 | 97.27            |
+| 6            | Shopify  | $197,765,102.00   | $7,247,714,362.00 | 2.73             |
+| 7            | Retail   | $7,688,091,448.00 | $7,902,330,809.00 | 97.29            |
+| 7            | Shopify  | $214,239,361.00   | $7,902,330,809.00 | 2.71             |
+| 8            | Retail   | $7,191,449,998.00 | $7,407,576,007.00 | 97.08            |
+| 8            | Shopify  | $216,126,009.00   | $7,407,576,007.00 | 2.92             |
+| 9            | Retail   | $1,104,506,857.00 | $1,134,276,655.00 | 97.38            |
+| 9            | Shopify  | $29,769,798.00    | $1,134,276,655.00 | 2.62             |
 
 ---
 
