@@ -116,6 +116,9 @@ VALUES
 >
 >- Generate a new avg_transaction column as the sales value divided by transactions rounded to 2 decimal places for each record
 
+**\*Note**: 
+While the original task does not specify the inclusion of the 'sales' column in the clean_weekly_sales table, it is added to streamline subsequent analysis. This decision is made to avoid redundant data extraction and transformations from the weekly_sales table in later queries, particularly when calculating metrics that rely on the 'sales' data. Given that the original weekly_sales table lacks a primary key, which could have facilitated efficient joins, two main approaches were considered: 1) adding a primary key to the clean_weekly_sales table, either by identifying a unique combination of columns or creating a surrogate key, or 2) including the 'sales' column directly. Opting for the latter, despite slightly deviating from the original task, simplifies the overall analysis workflow and ensures data consistency.
+
 ***Solution:***
 ```SQL
 CREATE TABLE IF NOT EXISTS data_mart.clean_weekly_sales (
@@ -126,9 +129,9 @@ CREATE TABLE IF NOT EXISTS data_mart.clean_weekly_sales (
   "segment" VARCHAR(7),
   "age_band" VARCHAR(12),
   "demographic" VARCHAR(8),
+  "sales" REAL,
   "avg_transaction" NUMERIC(5, 2)
   );
-  
 INSERT INTO data_mart.clean_weekly_sales
 SELECT
   week_date,
@@ -156,6 +159,7 @@ SELECT
         ELSE 'Families'
       END
   END AS demographic,
+  sales,
   ROUND(sales / transactions, 2) AS avg_transaction 
 FROM (
   SELECT
@@ -212,18 +216,18 @@ SELECT * FROM clean_weekly_sales LIMIT 10;
 
 ***Result table:***
 
-| week_date  | week_number | month_number | calendar_year | segment | age_band     | demographic | avg_transaction |
-| ---------- | ----------- | ------------ | ------------- | ------- | ------------ | ----------- | --------------- |
-| 2020-08-31 | 36          | 8            | 2020          | C3      | Retirees     | Couples     | 30.00           |
-| 2020-08-31 | 36          | 8            | 2020          | F1      | Young Adults | Families    | 31.00           |
-| 2020-08-31 | 36          | 8            | 2020          | unknown | unknown      | unknown     | 31.00           |
-| 2020-08-31 | 36          | 8            | 2020          | C1      | Young Adults | Couples     | 31.00           |
-| 2020-08-31 | 36          | 8            | 2020          | C2      | Middle Aged  | Couples     | 30.00           |
-| 2020-08-31 | 36          | 8            | 2020          | F2      | Middle Aged  | Families    | 182.00          |
-| 2020-08-31 | 36          | 8            | 2020          | F3      | Retirees     | Families    | 206.00          |
-| 2020-08-31 | 36          | 8            | 2020          | F1      | Young Adults | Families    | 172.00          |
-| 2020-08-31 | 36          | 8            | 2020          | F2      | Middle Aged  | Families    | 155.00          |
-| 2020-08-31 | 36          | 8            | 2020          | C3      | Retirees     | Couples     | 35.00           |
+| week_date  | week_number | month_number | calendar_year | segment | age_band     | demographic | sales    | avg_transaction |
+| ---------- | ----------- | ------------ | ------------- | ------- | ------------ | ----------- | -------- | --------------- |
+| 2020-08-31 | 36          | 8            | 2020          | C3      | Retirees     | Couples     | 3656163  | 30.00           |
+| 2020-08-31 | 36          | 8            | 2020          | F1      | Young Adults | Families    | 996575   | 31.00           |
+| 2020-08-31 | 36          | 8            | 2020          | unknown | unknown      | unknown     | 16509610 | 31.00           |
+| 2020-08-31 | 36          | 8            | 2020          | C1      | Young Adults | Couples     | 141942   | 31.00           |
+| 2020-08-31 | 36          | 8            | 2020          | C2      | Middle Aged  | Couples     | 1758388  | 30.00           |
+| 2020-08-31 | 36          | 8            | 2020          | F2      | Middle Aged  | Families    | 243878   | 182.00          |
+| 2020-08-31 | 36          | 8            | 2020          | F3      | Retirees     | Families    | 519502   | 206.00          |
+| 2020-08-31 | 36          | 8            | 2020          | F1      | Young Adults | Families    | 371417   | 172.00          |
+| 2020-08-31 | 36          | 8            | 2020          | F2      | Middle Aged  | Families    | 49557    | 155.00          |
+| 2020-08-31 | 36          | 8            | 2020          | C3      | Retirees     | Couples     | 3888162  | 35.00           |
 
 ---
 
@@ -512,6 +516,25 @@ The SQL query calculates the percentage of sales for each platform (Retail and S
 | 8            | Shopify  | $216,126,009.00   | $7,407,576,007.00 | 2.92             |
 | 9            | Retail   | $1,104,506,857.00 | $1,134,276,655.00 | 97.38            |
 | 9            | Shopify  | $29,769,798.00    | $1,134,276,655.00 | 2.62             |
+
+---
+
+#### 7. What is the percentage of sales by demographic for each year in the dataset?
+
+***query:***
+```SQL
+
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+
+
+</details>
+
+***answer:***
+
 
 ---
 
