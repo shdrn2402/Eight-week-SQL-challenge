@@ -117,7 +117,9 @@ VALUES
 >- Generate a new avg_transaction column as the sales value divided by transactions rounded to 2 decimal places for each record
 
 **\*Note**: 
-While the original task does not specify the inclusion of the 'sales' column in the clean_weekly_sales table, it is added to streamline subsequent analysis. This decision is made to avoid redundant data extraction and transformations from the weekly_sales table in later queries, particularly when calculating metrics that rely on the 'sales' data. Given that the original weekly_sales table lacks a primary key, which could have facilitated efficient joins, two main approaches were considered: 1) adding a primary key to the clean_weekly_sales table, either by identifying a unique combination of columns or creating a surrogate key, or 2) including the 'sales' column directly. Opting for the latter, despite slightly deviating from the original task, simplifies the overall analysis workflow and ensures data consistency.
+While the original task does not specify the inclusion of the `sales` column in the clean_weekly_sales table, it is added to streamline subsequent analysis. This decision is made to avoid redundant data extraction and transformations from the weekly_sales table in later queries, particularly when calculating metrics that rely on the 'sales' data. Given that the original weekly_sales table lacks a primary key, which could have facilitated efficient joins, two main approaches were considered:
+1. Adding a primary key to the clean_weekly_sales table, either by identifying a unique combination of columns or creating a surrogate key;
+2. Including the `sales` column directly. Opting for the latter, despite slightly deviating from the original task, simplifies the overall analysis workflow and ensures data consistency.
 
 ***Solution:***
 ```SQL
