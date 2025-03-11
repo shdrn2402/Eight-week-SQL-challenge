@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS data_mart.clean_weekly_sales (
   "segment" VARCHAR(7),
   "age_band" VARCHAR(12),
   "demographic" VARCHAR(8),
-  "sales" REAL,
+  "sales" NUMERIC(15, 2),
   "avg_transaction" NUMERIC(5, 2)
   );
 INSERT INTO data_mart.clean_weekly_sales
@@ -525,18 +525,76 @@ The SQL query calculates the percentage of sales for each platform (Retail and S
 
 ***query:***
 ```SQL
+WITH total_yearly_sales AS (
+  SELECT
+    calendar_year,
+    SUM(sales) AS total_sales
+  FROM
+    clean_weekly_sales
+  GROUP BY
+    calendar_year
+  ),
+demographic_yearly_sales AS (
+  SELECT
+    calendar_year,
+    demographic,
+    SUM(sales) AS demographic_sales
+  FROM
+    clean_weekly_sales
+  GROUP BY
+    calendar_year,
+    demographic
+  )
 
+SELECT
+  dys.calendar_year,
+  dys.demographic,
+  dys.demographic_sales::money,
+  tys.total_sales::money,
+  ROUND((dys.demographic_sales::numeric / tys.total_sales) * 100, 2) AS sales_percentage  
+FROM
+  demographic_yearly_sales dys
+JOIN
+  total_yearly_sales tys USING(calendar_year)
+ORDER BY
+  dys.calendar_year,
+  dys.demographic
 ```
 
 <details>
   <summary><em><strong>show description:</strong></em></summary>
 
+The SQL query calculates the percentage of sales by demographic for each year in the `clean_weekly_sales` dataset.
 
+-   `WITH total_yearly_sales AS (...)`: Creates a Common Table Expression (CTE) named `total_yearly_sales` to calculate the total sales for each calendar year.
+    -   `calendar_year`: Selects the calendar year.
+    -   `SUM(sales) AS total_sales`: Calculates the sum of sales for each year.
+    -   `GROUP BY calendar_year`: Groups the results by calendar year.
+-   `WITH demographic_yearly_sales AS (...)`: Creates another CTE named `demographic_yearly_sales` to calculate the total sales for each demographic within each calendar year.
+    -   `calendar_year, demographic`: Selects the calendar year and demographic.
+    -   `SUM(sales) AS demographic_sales`: Calculates the sum of sales for each demographic within each year.
+    -   `GROUP BY calendar_year, demographic`: Groups the results by calendar year and demographic.
+-   `SELECT dys.calendar_year, dys.demographic, dys.demographic_sales::money, tys.total_sales::money, ROUND((dys.demographic_sales::numeric / tys.total_sales) * 100, 2) AS sales_percentage`: Selects the calendar year, demographic, demographic sales (formatted as money), total yearly sales (formatted as money), and calculates the percentage of sales for each demographic within each year.
+    -   `dys.demographic_sales::money` and `tys.total_sales::money`: Converts sales values to the money data type for display.
+    -   `ROUND((dys.demographic_sales::numeric / tys.total_sales) * 100, 2)`: Calculates the percentage of demographic sales to total yearly sales and rounds the result to 2 decimal places.
+-   `FROM demographic_yearly_sales dys JOIN total_yearly_sales tys USING(calendar_year)`: Joins the two CTEs on the `calendar_year` column.
+-   `ORDER BY dys.calendar_year, dys.demographic`: Orders the results by calendar year and demographic.
 
 </details>
 
 ***answer:***
 
+| calendar_year | demographic | demographic_sales | total_sales        | sales_percentage |
+| ------------- | ----------- | ----------------- | ------------------ | ---------------- |
+| 2018          | Couples     | $3,402,388,688.00 | $12,897,380,827.00 | 26.38            |
+| 2018          | Families    | $4,125,558,033.00 | $12,897,380,827.00 | 31.99            |
+| 2018          | unknown     | $5,369,434,106.00 | $12,897,380,827.00 | 41.63            |
+| 2019          | Couples     | $3,749,251,935.00 | $13,746,032,500.00 | 27.28            |
+| 2019          | Families    | $4,463,918,344.00 | $13,746,032,500.00 | 32.47            |
+| 2019          | unknown     | $5,532,862,221.00 | $13,746,032,500.00 | 40.25            |
+| 2020          | Couples     | $4,049,566,928.00 | $14,100,220,900.00 | 28.72            |
+| 2020          | Families    | $4,614,338,065.00 | $14,100,220,900.00 | 32.73            |
+| 2020          | unknown     | $5,436,315,907.00 | $14,100,220,900.00 | 38.55            |
 
 ---
 
