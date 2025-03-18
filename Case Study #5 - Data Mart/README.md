@@ -117,9 +117,9 @@ VALUES
 >- Generate a new avg_transaction column as the sales value divided by transactions rounded to 2 decimal places for each record
 
 **\*Note**: 
-While the original task does not specify the inclusion of `sales` and `platform` columns in the `clean_weekly_sales` table, they were added to streamline subsequent analysis. This decision is made to avoid redundant data extraction and transformations from the `weekly_sales` table in later queries, particularly when calculating metrics that rely on the 'sales' data. Given that the original weekly_sales table lacks a primary key, which could have facilitated efficient joins, two main approaches were considered:
+While the original task does not specify the inclusion of `sales`, `platform` and `transactions` columns in the `clean_weekly_sales` table, they were added to streamline subsequent analysis. This decision is made to avoid redundant data extraction and transformations from the `weekly_sales` table in later queries, particularly when calculating metrics that rely on the 'sales' data. Given that the original weekly_sales table lacks a primary key, which could have facilitated efficient joins, two main approaches were considered:
 1. Adding a primary key to the clean_weekly_sales table, either by identifying a unique combination of columns or creating a surrogate key;
-2. Including the `sales` and `platform` columns directly. Opting for the latter, despite slightly deviating from the original task, simplifies the overall analysis workflow and ensures data consistency.
+2. Including the `sales`, `platform` and `transactions` columns directly. Opting for the latter, despite slightly deviating from the original task, simplifies the overall analysis workflow and ensures data consistency.
 
 ***Solution:***
 ```SQL
@@ -133,6 +133,7 @@ CREATE TABLE IF NOT EXISTS data_mart.clean_weekly_sales (
   "age_band" VARCHAR(12),
   "demographic" VARCHAR(8),
   "sales" NUMERIC(15, 2),
+  "transactions" INTEGER,
   "avg_transaction" NUMERIC(5, 2)
   );
 INSERT INTO data_mart.clean_weekly_sales
@@ -164,6 +165,7 @@ SELECT
       END
   END AS demographic,
   sales,
+  transactions,
   ROUND(sales / transactions, 2) AS avg_transaction 
 FROM (
   SELECT
@@ -221,18 +223,18 @@ SELECT * FROM clean_weekly_sales LIMIT 10;
 
 ***Result table:***
 
-| week_date  | week_number | month_number | calendar_year | platform | segment | age_band     | demographic | sales       | avg_transaction |
-| ---------- | ----------- | ------------ | ------------- | -------- | ------- | ------------ | ----------- | ----------- | --------------- |
-| 2020-08-31 | 36          | 8            | 2020          | Retail   | C3      | Retirees     | Couples     | 3656163.00  | 30.00           |
-| 2020-08-31 | 36          | 8            | 2020          | Retail   | F1      | Young Adults | Families    | 996575.00   | 31.00           |
-| 2020-08-31 | 36          | 8            | 2020          | Retail   | unknown | unknown      | unknown     | 16509610.00 | 31.00           |
-| 2020-08-31 | 36          | 8            | 2020          | Retail   | C1      | Young Adults | Couples     | 141942.00   | 31.00           |
-| 2020-08-31 | 36          | 8            | 2020          | Retail   | C2      | Middle Aged  | Couples     | 1758388.00  | 30.00           |
-| 2020-08-31 | 36          | 8            | 2020          | Shopify  | F2      | Middle Aged  | Families    | 243878.00   | 182.00          |
-| 2020-08-31 | 36          | 8            | 2020          | Shopify  | F3      | Retirees     | Families    | 519502.00   | 206.00          |
-| 2020-08-31 | 36          | 8            | 2020          | Shopify  | F1      | Young Adults | Families    | 371417.00   | 172.00          |
-| 2020-08-31 | 36          | 8            | 2020          | Shopify  | F2      | Middle Aged  | Families    | 49557.00    | 155.00          |
-| 2020-08-31 | 36          | 8            | 2020          | Retail   | C3      | Retirees     | Couples     | 3888162.00  | 35.00           |
+| week_date  | week_number | month_number | calendar_year | platform | segment | age_band     | demographic | sales       | transactions | avg_transaction |
+| ---------- | ----------- | ------------ | ------------- | -------- | ------- | ------------ | ----------- | ----------- | ------------ | --------------- |
+| 2020-08-31 | 36          | 8            | 2020          | Retail   | C3      | Retirees     | Couples     | 3656163.00  | 120631       | 30.00           |
+| 2020-08-31 | 36          | 8            | 2020          | Retail   | F1      | Young Adults | Families    | 996575.00   | 31574        | 31.00           |
+| 2020-08-31 | 36          | 8            | 2020          | Retail   | unknown | unknown      | unknown     | 16509610.00 | 529151       | 31.00           |
+| 2020-08-31 | 36          | 8            | 2020          | Retail   | C1      | Young Adults | Couples     | 141942.00   | 4517         | 31.00           |
+| 2020-08-31 | 36          | 8            | 2020          | Retail   | C2      | Middle Aged  | Couples     | 1758388.00  | 58046        | 30.00           |
+| 2020-08-31 | 36          | 8            | 2020          | Shopify  | F2      | Middle Aged  | Families    | 243878.00   | 1336         | 182.00          |
+| 2020-08-31 | 36          | 8            | 2020          | Shopify  | F3      | Retirees     | Families    | 519502.00   | 2514         | 206.00          |
+| 2020-08-31 | 36          | 8            | 2020          | Shopify  | F1      | Young Adults | Families    | 371417.00   | 2158         | 172.00          |
+| 2020-08-31 | 36          | 8            | 2020          | Shopify  | F2      | Middle Aged  | Families    | 49557.00    | 318          | 155.00          |
+| 2020-08-31 | 36          | 8            | 2020          | Retail   | C3      | Retirees     | Couples     | 3888162.00  | 111032       | 35.00           |
 
 ---
 
@@ -645,6 +647,61 @@ The SQL query calculates the total sales for each combination of `age_band` and 
 | Young Adults | Couples     | $2,602,922,797.00  |
 | Middle Aged  | Couples     | $1,854,160,330.00  |
 | Young Adults | Families    | $1,770,889,293.00  |
+
+---
+#### 9. Can we use the `avg_transaction` column to find the average transaction size for each year for *Retail* vs *Shopify*? If not - how would you calculate it instead?
+
+***answer:***
+
+The `avg_transaction` column represents the average transaction value at the individual record level, calculated as `sales` / `transactions`, as per the initial data transformation requirements.
+
+We must understand that this column does not reflect the aggregated average transaction size for each year, segmented by Retail and Shopify platforms. To calculate the latter, we need to aggregate sales and transactions by year and platform, then divide the total sales by the total transactions for each group. This is because avg_transaction is a record-level calculation, whereas the required average is a group-level calculation.
+
+**Average transaction size for each year for Retail vs Shopify calculation**
+
+***query:***
+```SQL
+
+SELECT
+    calendar_year,
+    platform,
+    ROUND(SUM(sales) / SUM(transactions), 2)::money AS average_transaction_size
+FROM
+    clean_weekly_sales
+GROUP BY
+    calendar_year,
+    platform
+ORDER BY
+    calendar_year,
+    platform;
+
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+The SQL query calculates the average transaction size for each year for Retail vs Shopify, displaying the result in money format.
+
+-   `SELECT calendar_year, platform, ROUND(SUM(sales) / SUM(transactions), 2)::money AS average_transaction_size`: Selects the calendar year, platform, and calculates the average transaction size, aliasing it as `average_transaction_size`.
+    -   `SUM(sales) / SUM(transactions)`: Calculates the average transaction size by dividing the sum of sales by the sum of transactions.
+    -   `ROUND(..., 2)`: Rounds the result to two decimal places.
+    -   `::money`: Converts the rounded result to the money data type for display.
+-   `FROM clean_weekly_sales`: Specifies the `clean_weekly_sales` table as the data source.
+-   `GROUP BY calendar_year, platform`: Groups the results by calendar year and platform.
+-   `ORDER BY calendar_year, platform`: Orders the results by calendar year and platform in ascending order.
+
+</details>
+
+***Result table:***
+
+| calendar_year | platform | average_transaction_size |
+| ------------- | -------- | ------------------------ |
+| 2018          | Retail   | $36.56                   |
+| 2018          | Shopify  | $192.48                  |
+| 2019          | Retail   | $36.83                   |
+| 2019          | Shopify  | $183.36                  |
+| 2020          | Retail   | $36.56                   |
+| 2020          | Shopify  | $179.03                  |
 
 ---
 
