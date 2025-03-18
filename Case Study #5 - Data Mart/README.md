@@ -117,9 +117,9 @@ VALUES
 >- Generate a new avg_transaction column as the sales value divided by transactions rounded to 2 decimal places for each record
 
 **\*Note**: 
-While the original task does not specify the inclusion of the `sales` column in the `clean_weekly_sales` table, it is added to streamline subsequent analysis. This decision is made to avoid redundant data extraction and transformations from the `weekly_sales` table in later queries, particularly when calculating metrics that rely on the 'sales' data. Given that the original weekly_sales table lacks a primary key, which could have facilitated efficient joins, two main approaches were considered:
+While the original task does not specify the inclusion of `sales` and `platform` columns in the `clean_weekly_sales` table, they were added to streamline subsequent analysis. This decision is made to avoid redundant data extraction and transformations from the `weekly_sales` table in later queries, particularly when calculating metrics that rely on the 'sales' data. Given that the original weekly_sales table lacks a primary key, which could have facilitated efficient joins, two main approaches were considered:
 1. Adding a primary key to the clean_weekly_sales table, either by identifying a unique combination of columns or creating a surrogate key;
-2. Including the `sales` column directly. Opting for the latter, despite slightly deviating from the original task, simplifies the overall analysis workflow and ensures data consistency.
+2. Including the `sales` and `platform` columns directly. Opting for the latter, despite slightly deviating from the original task, simplifies the overall analysis workflow and ensures data consistency.
 
 ***Solution:***
 ```SQL
@@ -128,6 +128,7 @@ CREATE TABLE IF NOT EXISTS data_mart.clean_weekly_sales (
   "week_number" INTEGER,
   "month_number" INTEGER,
   "calendar_year"  INTEGER,
+  "platform" VARCHAR(7),
   "segment" VARCHAR(7),
   "age_band" VARCHAR(12),
   "demographic" VARCHAR(8),
@@ -140,6 +141,7 @@ SELECT
   EXTRACT('week' FROM week_date) AS week_number,
   EXTRACT('month' FROM week_date) AS month_number,
   EXTRACT('year' FROM week_date) AS calendar_year,
+  platform,
   segment,
   CASE
     WHEN age_band = '1' THEN 'Young Adults'
@@ -166,6 +168,7 @@ SELECT
 FROM (
   SELECT
     to_date(week_date, 'DD/MM/YY') AS week_date,
+    platform,
     CASE
       WHEN segment = 'null' THEN 'unknown'
       ELSE segment
@@ -218,18 +221,18 @@ SELECT * FROM clean_weekly_sales LIMIT 10;
 
 ***Result table:***
 
-| week_date  | week_number | month_number | calendar_year | segment | age_band     | demographic | sales    | avg_transaction |
-| ---------- | ----------- | ------------ | ------------- | ------- | ------------ | ----------- | -------- | --------------- |
-| 2020-08-31 | 36          | 8            | 2020          | C3      | Retirees     | Couples     | 3656163  | 30.00           |
-| 2020-08-31 | 36          | 8            | 2020          | F1      | Young Adults | Families    | 996575   | 31.00           |
-| 2020-08-31 | 36          | 8            | 2020          | unknown | unknown      | unknown     | 16509610 | 31.00           |
-| 2020-08-31 | 36          | 8            | 2020          | C1      | Young Adults | Couples     | 141942   | 31.00           |
-| 2020-08-31 | 36          | 8            | 2020          | C2      | Middle Aged  | Couples     | 1758388  | 30.00           |
-| 2020-08-31 | 36          | 8            | 2020          | F2      | Middle Aged  | Families    | 243878   | 182.00          |
-| 2020-08-31 | 36          | 8            | 2020          | F3      | Retirees     | Families    | 519502   | 206.00          |
-| 2020-08-31 | 36          | 8            | 2020          | F1      | Young Adults | Families    | 371417   | 172.00          |
-| 2020-08-31 | 36          | 8            | 2020          | F2      | Middle Aged  | Families    | 49557    | 155.00          |
-| 2020-08-31 | 36          | 8            | 2020          | C3      | Retirees     | Couples     | 3888162  | 35.00           |
+| week_date  | week_number | month_number | calendar_year | platform | segment | age_band     | demographic | sales       | avg_transaction |
+| ---------- | ----------- | ------------ | ------------- | -------- | ------- | ------------ | ----------- | ----------- | --------------- |
+| 2020-08-31 | 36          | 8            | 2020          | Retail   | C3      | Retirees     | Couples     | 3656163.00  | 30.00           |
+| 2020-08-31 | 36          | 8            | 2020          | Retail   | F1      | Young Adults | Families    | 996575.00   | 31.00           |
+| 2020-08-31 | 36          | 8            | 2020          | Retail   | unknown | unknown      | unknown     | 16509610.00 | 31.00           |
+| 2020-08-31 | 36          | 8            | 2020          | Retail   | C1      | Young Adults | Couples     | 141942.00   | 31.00           |
+| 2020-08-31 | 36          | 8            | 2020          | Retail   | C2      | Middle Aged  | Couples     | 1758388.00  | 30.00           |
+| 2020-08-31 | 36          | 8            | 2020          | Shopify  | F2      | Middle Aged  | Families    | 243878.00   | 182.00          |
+| 2020-08-31 | 36          | 8            | 2020          | Shopify  | F3      | Retirees     | Families    | 519502.00   | 206.00          |
+| 2020-08-31 | 36          | 8            | 2020          | Shopify  | F1      | Young Adults | Families    | 371417.00   | 172.00          |
+| 2020-08-31 | 36          | 8            | 2020          | Shopify  | F2      | Middle Aged  | Families    | 49557.00    | 155.00          |
+| 2020-08-31 | 36          | 8            | 2020          | Retail   | C3      | Retirees     | Couples     | 3888162.00  | 35.00           |
 
 ---
 
@@ -595,6 +598,53 @@ The SQL query calculates the percentage of sales by demographic for each year in
 | 2020          | Couples     | $4,049,566,928.00 | $14,100,220,900.00 | 28.72            |
 | 2020          | Families    | $4,614,338,065.00 | $14,100,220,900.00 | 32.73            |
 | 2020          | unknown     | $5,436,315,907.00 | $14,100,220,900.00 | 38.55            |
+
+---
+
+#### 8. Which `age_band` and `demographic` values contribute the most to Retail sales?
+
+***query:***
+```SQL
+SELECT
+  age_band,
+  demographic,
+  SUM(sales)::money AS sales_per_group
+FROM
+  clean_weekly_sales
+WHERE
+  platform = 'Retail'
+GROUP BY
+  age_band,
+  demographic
+ORDER BY
+  sales_per_group DESC;
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+The SQL query calculates the total sales for each combination of `age_band` and `demographic` for Retail sales, and orders the results by total sales in descending order.
+
+-   `SELECT age_band, demographic, SUM(sales)::money AS sales_per_group`: Selects the `age_band`, `demographic`, and the sum of `sales` (formatted as money), aliasing the sum as `sales_per_group`.
+-   `SUM(sales)::money`: Calculates the sum of sales and converts the result to the `money` data type.
+-   `FROM clean_weekly_sales`: Specifies the `clean_weekly_sales` table as the data source.
+-   `WHERE platform = 'Retail'`: Filters the results to include only records where the `platform` is 'Retail'.
+-   `GROUP BY age_band, demographic`: Groups the results by `age_band` and `demographic`.
+-   `ORDER BY sales_per_group DESC`: Orders the results by `sales_per_group` in descending order, showing the highest sales groups first.
+
+</details>
+
+***answer:***
+
+| age_band     | demographic | sales_per_group    |
+| ------------ | ----------- | ------------------ |
+| unknown      | unknown     | $16,067,285,533.00 |
+| Retirees     | Families    | $6,634,686,916.00  |
+| Retirees     | Couples     | $6,370,580,014.00  |
+| Middle Aged  | Families    | $4,354,091,554.00  |
+| Young Adults | Couples     | $2,602,922,797.00  |
+| Middle Aged  | Couples     | $1,854,160,330.00  |
+| Young Adults | Families    | $1,770,889,293.00  |
 
 ---
 
