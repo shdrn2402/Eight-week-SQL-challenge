@@ -720,10 +720,12 @@ WITH total_sales_counting AS (
   SELECT
     (SELECT SUM(sales)
      FROM clean_weekly_sales
-     WHERE week_date BETWEEN to_date('2020-06-15', 'YYYY-MM-DD') - INTERVAL '4 weeks' AND to_date('2020-06-14', 'YYYY-MM-DD')) AS total_sales_before,
+     WHERE week_date BETWEEN to_date('2020-06-15', 'YYYY-MM-DD') - INTERVAL '4 weeks' AND to_date('2020-06-14', 'YYYY-MM-DD')
+    ) AS total_sales_before,
     (SELECT SUM(sales)
      FROM clean_weekly_sales
-     WHERE week_date BETWEEN to_date('2020-06-15', 'YYYY-MM-DD') AND to_date('2020-06-15', 'YYYY-MM-DD') + INTERVAL '4 weeks') AS total_sales_after
+     WHERE week_date BETWEEN to_date('2020-06-15', 'YYYY-MM-DD') AND to_date('2020-06-15', 'YYYY-MM-DD') + INTERVAL '4 weeks'
+    ) AS total_sales_after
   ),
 sales_difference AS (
   SELECT
