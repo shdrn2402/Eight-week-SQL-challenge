@@ -649,6 +649,7 @@ The SQL query calculates the total sales for each combination of `age_band` and 
 | Young Adults | Families    | $1,770,889,293.00  |
 
 ---
+
 #### 9. Can we use the `avg_transaction` column to find the average transaction size for each year for *Retail* vs *Shopify*? If not - how would you calculate it instead?
 
 ***answer:***
@@ -657,7 +658,7 @@ The `avg_transaction` column represents the average transaction value at the ind
 
 We must understand that this column does not reflect the aggregated average transaction size for each year, segmented by Retail and Shopify platforms. To calculate the latter, we need to aggregate sales and transactions by year and platform, then divide the total sales by the total transactions for each group. This is because avg_transaction is a record-level calculation, whereas the required average is a group-level calculation.
 
-**Average transaction size for each year for Retail vs Shopify calculation**
+**Average transaction size for each year for Retail vs Shopify calculation:**
 
 ***query:***
 ```SQL
@@ -706,6 +707,64 @@ The SQL query calculates the average transaction size for each year for Retail v
 ---
 
 ### C. Before & After Analysis
+
+> For this task we will take the `week_date` value of **2020-06-15** as the baseline week where the Data Mart sustainable packaging changes came into effect.
+>
+> We would include all `week_date` values for **2020-06-15** as the start of the period **after** the change and the previous `week_date` values would be **before**
+
+#### 1. What is the total sales for the 4 weeks before and after 2020-06-15? What is the growth or reduction rate in actual values and percentage of sales?
+
+***query:***
+```SQL
+WITH total_sales_counting AS (
+  SELECT
+    (SELECT SUM(sales) FROM clean_weekly_sales WHERE week_date BETWEEN to_date('2020-06-15', 'YYYY-MM-DD') -         INTERVAL '4 weeks' AND to_date('2020-06-14', 'YYYY-MM-DD')) AS total_sales_before,
+    (SELECT SUM(sales) FROM clean_weekly_sales WHERE week_date BETWEEN to_date('2020-06-15', 'YYYY-MM-DD') AND       to_date('2020-06-15', 'YYYY-MM-DD') + INTERVAL '4 weeks') AS total_sales_after
+  ),
+sales_difference AS (
+  SELECT
+    total_sales_before,
+    total_sales_after,
+    CASE
+      WHEN total_sales_after > total_sales_before THEN 'growth'
+      ELSE 'reduction'
+    END AS rate_type,
+      total_sales_after - total_sales_before AS rate
+  FROM total_sales_counting
+  )
+SELECT
+  total_sales_before::money,
+  total_sales_after::money,
+  rate_type,
+  rate::money,
+  ROUND((rate::numeric / total_sales_before) * 100, 2) AS percentage_rate
+FROM sales_difference;
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+The SQL query calculates the total sales for the 4 weeks before and after '2020-06-15', determines the growth or reduction, and calculates the percentage change.
+
+-   `WITH total_sales_counting AS (...)`: Creates a Common Table Expression (CTE) named `total_sales_counting` to calculate the total sales for the periods before and after '2020-06-15'.
+    -   `(SELECT SUM(sales) FROM clean_weekly_sales WHERE week_date BETWEEN to_date('2020-06-15', 'YYYY-MM-DD') - INTERVAL '4 weeks' AND to_date('2020-06-14', 'YYYY-MM-DD')) AS total_sales_before`: Calculates the sum of sales for the 4 weeks before '2020-06-15'.
+    -   `(SELECT SUM(sales) FROM clean_weekly_sales WHERE week_date BETWEEN to_date('2020-06-15', 'YYYY-MM-DD') AND to_date('2020-06-15', 'YYYY-MM-DD') + INTERVAL '4 weeks') AS total_sales_after`: Calculates the sum of sales for the 4 weeks including and after '2020-06-15'.
+-   `WITH sales_difference AS (...)`: Creates another CTE named `sales_difference` to calculate the difference in sales and determine the type of change (growth or reduction).
+    -   `total_sales_before, total_sales_after`: Selects the calculated total sales.
+    -   `CASE WHEN total_sales_after > total_sales_before THEN 'growth' ELSE 'reduction' END AS rate_type`: Determines the type of change based on the sales difference.
+    -   `total_sales_after - total_sales_before AS rate`: Calculates the difference in sales.
+-   `SELECT total_sales_before::money, total_sales_after::money, rate_type, rate::money, ROUND((rate::numeric / total_sales_before) * 100, 2) AS percentage_rate`: Selects the total sales (formatted as money), the type of change, the difference in sales (formatted as money), and calculates the percentage change.
+    -   `total_sales_before::money, total_sales_after::money, rate::money`: Converts sales values to the money data type for display.
+    -   `ROUND((rate::numeric / total_sales_before) * 100, 2) AS percentage_rate`: Calculates the percentage change and rounds the result to 2 decimal places.
+-   `FROM sales_difference`: Specifies the `sales_difference` CTE as the data source.
+
+</details>
+
+***answer:***
+
+| total_sales_before | total_sales_after | rate_type | rate            | percentage_rate |
+| ------------------ | ----------------- | --------- | --------------- | --------------- |
+| $2,345,878,357.00  | $2,904,930,571.00 | growth    | $559,052,214.00 | 23.83           |
 
 ---
 
