@@ -713,7 +713,7 @@ The SQL query calculates the average transaction size for each year for Retail v
 > We would include all `week_date` values for **2020-06-15** as the start of the period **after** the change and the previous `week_date` values would be **before**
 
 #### 1. Determine the total sales and the growth/reduction rate (in actual values and percentage) before and after 2020-06-15 for:
-#### a. 4 weeks before and after the specified date.
+####   a) 4 weeks before and after the specified date.
 
 ***query:***
 ```SQL
@@ -775,7 +775,7 @@ The SQL query calculates the total sales for the 4 weeks before and after '2020-
 
 ---
 
-#### b. 12 weeks before and after the specified date.
+####   b) 12 weeks before and after the specified date.
 
 **To answer sub-question (b), the query from the previous solution is used, with INTERVAL '4 weeks' replaced by INTERVAL '12 weeks' in both subqueries.**
 
@@ -788,7 +788,7 @@ The SQL query calculates the total sales for the 4 weeks before and after '2020-
 ---
 
 #### 3. How do the sale metrics for these 2 periods before and after compare with the previous years in 2018 and 2019?
-#### a. 4 weeks before and after the specified date.
+####   a) 4 weeks before and after the specified date.
 
 ***query:***
 ```SQL
@@ -892,7 +892,7 @@ The query effectively compares sales performance across years, highlighting both
 
 ---
 
-#### b. 12 weeks before and after the specified date.
+####   b) 12 weeks before and after the specified date.
 **Similar to the previous question, the changes will only affect the time interval, which will be increased from 4 to 12 weeks in both subqueries.**
 
 ***answer:***
