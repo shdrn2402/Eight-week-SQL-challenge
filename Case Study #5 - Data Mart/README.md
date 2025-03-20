@@ -712,7 +712,8 @@ The SQL query calculates the average transaction size for each year for Retail v
 >
 > We would include all `week_date` values for **2020-06-15** as the start of the period **after** the change and the previous `week_date` values would be **before**
 
-#### 1. What is the total sales for the 4 weeks before and after 2020-06-15? What is the growth or reduction rate in actual values and percentage of sales?
+#### 1. Determine the total sales and the growth/reduction rate (in actual values and percentage) before and after 2020-06-15 for:
+#### a. 4 weeks before and after the specified date.
 
 ***query:***
 ```SQL
@@ -771,6 +772,146 @@ The SQL query calculates the total sales for the 4 weeks before and after '2020-
 | total_sales_before | total_sales_after | rate_type | rate            | percentage_rate |
 | ------------------ | ----------------- | --------- | --------------- | --------------- |
 | $2,345,878,357.00  | $2,904,930,571.00 | growth    | $559,052,214.00 | 23.83           |
+
+---
+
+#### b. 12 weeks before and after the specified date.
+
+**To answer sub-question (b), the query from the previous solution is used, with INTERVAL '4 weeks' replaced by INTERVAL '12 weeks' in both subqueries.**
+
+***answer:***
+
+| total_sales_before | total_sales_after | rate_type | rate             | percentage_rate |
+| ------------------ | ----------------- | --------- | ---------------- | --------------- |
+| $7,126,273,147.00  | $6,973,947,753.00 | reduction | -$152,325,394.00 | -2.14           |
+
+---
+
+#### 3. How do the sale metrics for these 2 periods before and after compare with the previous years in 2018 and 2019?
+#### a. 4 weeks before and after the specified date.
+
+***query:***
+```SQL
+WITH total_2018_sales_counting AS (
+  SELECT
+    2018 AS calendar_year,
+    (SELECT SUM(sales)
+     FROM clean_weekly_sales
+     WHERE week_date BETWEEN to_date('2018-06-15', 'YYYY-MM-DD') - INTERVAL '4 weeks' AND to_date('2018-06-    14', 'YYYY-MM-DD')
+    ) AS total_sales_before,
+    (SELECT SUM(sales)
+     FROM clean_weekly_sales
+     WHERE week_date BETWEEN to_date('2018-06-15', 'YYYY-MM-DD') AND to_date('2018-06-15', 'YYYY-MM-DD') + INTERVAL '4 weeks'
+    ) AS total_sales_after
+  ),
+total_2019_sales_counting AS (
+  SELECT
+    2019 AS calendar_year,
+    (SELECT SUM(sales)
+     FROM clean_weekly_sales
+     WHERE week_date BETWEEN to_date('2019-06-15', 'YYYY-MM-DD') - INTERVAL '4 weeks' AND to_date('2019-06-    14', 'YYYY-MM-DD')
+    ) AS total_sales_before,
+    (SELECT SUM(sales)
+     FROM clean_weekly_sales
+     WHERE week_date BETWEEN to_date('2019-06-15', 'YYYY-MM-DD') AND to_date('2019-06-15', 'YYYY-MM-DD') + INTERVAL '4 weeks'
+    ) AS total_sales_after
+  ),
+total_2020_sales_counting AS (
+  SELECT
+    2020 AS calendar_year,
+    (SELECT SUM(sales)
+     FROM clean_weekly_sales
+     WHERE week_date BETWEEN to_date('2020-06-15', 'YYYY-MM-DD') - INTERVAL '4 weeks' AND to_date('2020-06-    14', 'YYYY-MM-DD')
+    ) AS total_sales_before,
+    (SELECT SUM(sales)
+     FROM clean_weekly_sales
+     WHERE week_date BETWEEN to_date('2020-06-15', 'YYYY-MM-DD') AND to_date('2020-06-15', 'YYYY-MM-DD') + INTERVAL '4 weeks'
+    ) AS total_sales_after
+  ),
+sales_difference AS (
+  SELECT
+    calendar_year,
+    total_sales_before,
+    total_sales_after,
+    CASE
+      WHEN total_sales_after > total_sales_before THEN 'growth'
+      ELSE 'reduction'
+    END AS rate_type,
+      total_sales_after - total_sales_before AS rate
+  FROM (
+    SELECT *
+    FROM total_2018_sales_counting
+    UNION ALL
+    SELECT *
+    FROM total_2019_sales_counting
+    UNION ALL
+    SELECT *
+    FROM total_2020_sales_counting
+  ) sub
+)
+
+SELECT
+  calendar_year,
+  total_sales_before::money,
+  total_sales_after::money,
+  rate_type,
+  rate::money,
+  ROUND((rate::numeric / total_sales_before) * 100, 2) AS percentage_rate
+FROM sales_difference;
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+The SQL query compares total sales for 4-week periods before and after June 15th across three consecutive years (2018, 2019, 2020) to determine sales growth or reduction.
+
+-   `WITH total_2018_sales_counting AS (...)`, `total_2019_sales_counting AS (...)`, `total_2020_sales_counting AS (...)`: Three Common Table Expressions (CTEs) are created to calculate the total sales for the 4 weeks before and after June 15th for each year.
+    -   Each CTE calculates `total_sales_before` and `total_sales_after` by summing the `sales` column from the `clean_weekly_sales` table, filtering by `week_date` using `BETWEEN` and `INTERVAL` to define the 4-week periods.
+    -   The `calendar_year` is added as a constant to identify the year for each set of results.
+-   `sales_difference AS (...)`: A CTE named `sales_difference` is created to calculate the difference in sales and determine the type of change (growth or reduction).
+    -   It selects `calendar_year`, `total_sales_before`, and `total_sales_after` from the combined results of the previous CTEs (using `UNION ALL`).
+    -   A `CASE` statement determines `rate_type` as 'growth' if `total_sales_after` is greater than `total_sales_before`, or 'reduction' otherwise.
+    -   `rate` is calculated as the difference between `total_sales_after` and `total_sales_before`.
+-   `SELECT total_sales_before::money, total_sales_after::money, rate_type, rate::money, ROUND((rate::numeric / total_sales_before) * 100, 2) AS percentage_rate`: The final `SELECT` statement retrieves and formats the results.
+    -   `total_sales_before` and `total_sales_after` are converted to the `money` data type.
+    -   `rate` is also converted to `money`.
+    -   `percentage_rate` is calculated as the percentage change in sales and rounded to 2 decimal places.
+-   `FROM sales_difference`: The data source for the final `SELECT` statement is the `sales_difference` CTE.
+
+The query effectively compares sales performance across years, highlighting both the absolute and percentage changes in sales before and after the specified date.
+
+</details>
+
+***answer:***
+
+| calendar_year | total_sales_before | total_sales_after | rate_type | rate            | percentage_rate |
+| ------------- | ------------------ | ----------------- | --------- | --------------- | --------------- |
+| 2018          | $2,125,140,809.00  | $2,129,242,914.00 | growth    | $4,102,105.00   | 0.19            |
+| 2019          | $2,249,989,796.00  | $2,252,326,390.00 | growth    | $2,336,594.00   | 0.10            |
+| 2020          | $2,345,878,357.00  | $2,904,930,571.00 | growth    | $559,052,214.00 | 23.83           |
+
+---
+
+#### b. 12 weeks before and after the specified date.
+**Similar to the previous question, the changes will only affect the time interval, which will be increased from 4 to 12 weeks in both subqueries.**
+
+***answer:***
+
+| calendar_year | total_sales_before | total_sales_after | rate_type | rate             | percentage_rate |
+| ------------- | ------------------ | ----------------- | --------- | ---------------- | --------------- |
+| 2018          | $6,396,562,317.00  | $6,500,818,510.00 | growth    | $104,256,193.00  | 1.63            |
+| 2019          | $6,883,386,397.00  | $6,862,646,103.00 | reduction | -$20,740,294.00  | -0.30           |
+| 2020          | $7,126,273,147.00  | $6,973,947,753.00 | reduction | -$152,325,394.00 | -2.14           |
+
+>***Before & After Analysis Summary:***
+>
+>In June 2020, Data Mart implemented large-scale supply chain changes, transitioning to sustainable packaging. To assess the impact of these changes on sales, an analysis of sales for 4 and 12 weeks before and after June 15, 2020, was conducted, along with a comparison with similar periods in 2018 and 2019.
+>
+>The 4-week sales analysis revealed a significant sales increase in 2020 of 23.83%, equivalent to $559,052,214. This contrasts sharply with the marginal growth in 2018 and 2019 (0.19% and 0.10%, respectively). This may indicate a positive short-term impact of the shift to sustainable packaging.
+>
+>However, the 12-week sales analysis showed a sales reduction in 2020 of 2.14%, amounting to -$152,325,394. This also differs from the results of 2018 and 2019, where 2018 saw a growth of 1.63% and 2019 saw a reduction of 0.30%. This may suggest that the short-term positive effect was not sustained in the long term.
+>
+>For a more comprehensive understanding of the impact of the changes, further analysis by platform, region, segment, and customer type is necessary, as outlined in Danny's key questions. This will identify which business areas were most affected and develop recommendations to minimize negative impacts when introducing similar changes in the future."
 
 ---
 
