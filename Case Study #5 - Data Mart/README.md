@@ -777,7 +777,7 @@ The SQL query calculates the total sales for the 4 weeks before and after '2020-
 
 ####   b) 12 weeks before and after the specified date.
 
-**To answer sub-question (b), the query from the previous solution is used, with INTERVAL '4 weeks' replaced by INTERVAL '12 weeks' in both subqueries.**
+To answer sub-question (b), the query from the previous solution is used, with INTERVAL '4 weeks' replaced by INTERVAL '12 weeks' in both subqueries.
 
 ***answer:***
 
