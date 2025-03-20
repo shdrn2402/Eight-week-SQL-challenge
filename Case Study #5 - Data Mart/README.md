@@ -893,7 +893,7 @@ The query effectively compares sales performance across years, highlighting both
 ---
 
 ####   b) 12 weeks before and after the specified date.
-**Similar to the previous question, the changes will only affect the time interval, which will be increased from 4 to 12 weeks in both subqueries.**
+Similar to the previous question, the changes will only affect the time interval, which will be increased from 4 to 12 weeks in both subqueries.
 
 ***answer:***
 
