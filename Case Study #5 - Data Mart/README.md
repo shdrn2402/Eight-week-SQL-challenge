@@ -917,8 +917,207 @@ Similar to the previous question, the changes will only affect the time interval
 
 ### D. Bonus Question
 
+>Which areas of the business have the highest negative impact in sales metrics performance in 2020 for the 12 week before and after period?
+>
+>- `region`
+>- `platform`
+>- `age_band`
+>- `demographic`
+>
+>Do you have any further recommendations for Danny’s team at Data Mart or any interesting insights based off this analysis?
+
+***query:***
+```SQL
+WITH region_sales_before AS(
+  SELECT 
+    region,
+    SUM(sales) AS total_sales_before
+  FROM
+    clean_weekly_sales
+  WHERE
+    week_date BETWEEN to_date('2020-06-15', 'YYYY-MM-DD') - INTERVAL '12 weeks' AND to_date('2020-06-14', 'YYYY-MM-DD')
+  GROUP BY
+    region
+  ),
+region_sales_after AS(
+  SELECT 
+    region,
+    SUM(sales) AS total_sales_after
+  FROM
+    clean_weekly_sales
+  WHERE
+    week_date BETWEEN to_date('2020-06-15', 'YYYY-MM-DD') AND to_date('2020-06-15', 'YYYY-MM-DD') + INTERVAL '12 weeks' 
+  GROUP BY
+    region
+  ),
+min_region_rate AS(  
+  SELECT
+    'region' AS category,
+    rsb.region AS category_value,
+    rsa.total_sales_after - rsb.total_sales_before AS rate
+  FROM region_sales_before rsb
+  JOIN region_sales_after rsa USING(region)
+  ORDER BY rate ASC
+  LIMIT 1
+  ),
+platform_sales_before AS(
+  SELECT 
+    platform,
+    SUM(sales) AS total_sales_before
+  FROM
+    clean_weekly_sales
+  WHERE
+    week_date BETWEEN to_date('2020-06-15', 'YYYY-MM-DD') - INTERVAL '12 weeks' AND to_date('2020-06-14', 'YYYY-MM-DD')
+  GROUP BY
+    platform
+  ),
+platform_sales_after AS(
+  SELECT 
+    platform,
+    SUM(sales) AS total_sales_after
+  FROM
+    clean_weekly_sales
+  WHERE
+    week_date BETWEEN to_date('2020-06-15', 'YYYY-MM-DD') AND to_date('2020-06-15', 'YYYY-MM-DD') + INTERVAL '12 weeks' 
+  GROUP BY
+    platform
+  ),
+min_platform_rate AS(  
+  SELECT
+    'platform' AS category,
+    psb.platform AS category_value,
+    psa.total_sales_after - psb.total_sales_before AS rate
+  FROM platform_sales_before psb
+  JOIN platform_sales_after psa USING(platform)
+  ORDER BY rate ASC
+  LIMIT 1
+  ),
+age_band_sales_before AS(
+  SELECT 
+    age_band,
+    SUM(sales) AS total_sales_before
+  FROM
+    clean_weekly_sales
+  WHERE
+    week_date BETWEEN to_date('2020-06-15', 'YYYY-MM-DD') - INTERVAL '12 weeks' AND to_date('2020-06-14', 'YYYY-MM-DD')
+  GROUP BY
+    age_band
+  ),
+age_band_sales_after AS(
+  SELECT 
+    age_band,
+    SUM(sales) AS total_sales_after
+  FROM
+    clean_weekly_sales
+  WHERE
+    week_date BETWEEN to_date('2020-06-15', 'YYYY-MM-DD') AND to_date('2020-06-15', 'YYYY-MM-DD') + INTERVAL '12 weeks' 
+  GROUP BY
+    age_band
+  ),
+min_age_band_rate AS(  
+  SELECT
+    'age_band' AS category,
+    asb.age_band AS category_value,
+    asa.total_sales_after - asb.total_sales_before AS rate
+  FROM age_band_sales_before asb
+  JOIN age_band_sales_after asa USING(age_band)
+  ORDER BY rate ASC
+  LIMIT 1
+  ),
+demographic_sales_before AS(
+  SELECT 
+    demographic,
+    SUM(sales) AS total_sales_before
+  FROM
+    clean_weekly_sales
+  WHERE
+    week_date BETWEEN to_date('2020-06-15', 'YYYY-MM-DD') - INTERVAL '12 weeks' AND to_date('2020-06-14', 'YYYY-MM-DD')
+  GROUP BY
+    demographic
+  ),
+demographic_sales_after AS(
+  SELECT 
+    demographic,
+    SUM(sales) AS total_sales_after
+  FROM
+    clean_weekly_sales
+  WHERE
+    week_date BETWEEN to_date('2020-06-15', 'YYYY-MM-DD') AND to_date('2020-06-15', 'YYYY-MM-DD') + INTERVAL '12 weeks' 
+  GROUP BY
+    demographic
+  ),
+min_demographic_rate AS(  
+  SELECT
+    'demographic' AS category,
+    dsb.demographic AS category_value,
+    dsa.total_sales_after - dsb.total_sales_before AS rate
+  FROM demographic_sales_before dsb
+  JOIN demographic_sales_after dsa USING(demographic)
+  ORDER BY rate ASC
+  LIMIT 1
+  )
+
+SELECT
+  category,
+  category_value,
+  rate::money
+FROM(
+  SELECT * FROM min_region_rate
+  UNION ALL SELECT * FROM min_platform_rate
+  UNION ALL SELECT * FROM min_age_band_rate
+  UNION ALL SELECT * FROM min_demographic_rate
+  ORDER BY rate ASC
+ ) sub;
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+The SQL query identifies the business area with the highest negative impact on sales performance in 2020, comparing 12-week periods before and after June 15th.
+
+-   `WITH region_sales_before AS (...)`, `region_sales_after AS (...)`, etc.: Multiple Common Table Expressions (CTEs) are used to calculate total sales before and after June 15th, 2020, for different business categories: region, platform, age_band, and demographic.
+    -   Each `*_sales_before` CTE calculates the sum of sales for the 12 weeks preceding June 15th.
+    -   Each `*_sales_after` CTE calculates the sum of sales for the 12 weeks following June 15th.
+    -   The `GROUP BY` clause aggregates sales by the respective category (region, platform, etc.).
+    -   The `WHERE` clause filters sales based on the 12-week date range using `BETWEEN` and `INTERVAL`.
+-   `min_region_rate AS (...)`, `min_platform_rate AS (...)`, etc.: CTEs are used to calculate the difference in sales (rate) between the before and after periods for each category and select the category value with the minimum rate.
+    -   The `JOIN` clause combines the `*_sales_before` and `*_sales_after` CTEs based on the category value (region, platform, etc.).
+    -   The `rate` is calculated as `total_sales_after - total_sales_before`.
+    -   `ORDER BY rate ASC LIMIT 1` selects the category value with the lowest (most negative) rate.
+    -   The category name (region, platform, etc.) is added as a constant.
+-   `SELECT category, category_value, rate::money FROM (...) sub LIMIT 1;`: The final `SELECT` statement retrieves the category, category value, and rate (formatted as money) with the overall minimum rate from the combined results of the `min_*_rate` CTEs.
+    -   `UNION ALL` combines the results of the `min_*_rate` CTEs.
+    -   `rate::money` formats the rate as a currency.
+
+The query effectively identifies the specific business category and its value (e.g., a specific region) that experienced the largest negative impact on sales during the 12-week period surrounding June 15th, 2020.
+
+</details>
+
+***answer:***
+
+| category    | category_value | rate             |
+| ----------- | -------------- | ---------------- |
+| platform    | Retail         | -$168,083,834.00 |
+| age_band    | unknown        | -$92,393,021.00  |
+| demographic | unknown        | -$92,393,021.00  |
+| region      | OCEANIA        | -$71,321,100.00  |
+
 ---
 
-## Conclusion
+## Analysis of Results
 
----
+>The presented results show the business areas that experienced the greatest negative impact on sales in 2020 during the 12-week period before and after June 15th.
+>- Platform (`platform`): The largest drop in sales was observed on the **Retail** platform, amounting to **-$168,083,834.00**.
+>- Age group (`age_band`): The largest drop in sales was observed in the **unknow** age group, amounting to **-$92,393,021.00**.
+>- Demographic group (`demographic`): Similar to the age group, the largest drop in sales was observed in the **unknown** demographic group, amounting to **-$92,393,021.00**. This is due to the fact that both the `age_band` and `demographic` columns were created from the same `segment` column, and the **unknown** values in both columns correspond to the same segment.
+>- Region (`region`): The largest drop in sales was observed in the **OCEANIA** region, amounting to **-$71,321,100.00**.
+>
+>**Conclusions:**
+>- The **Retail** platform had the greatest negative impact on sales.
+>- A significant drop in sales was observed in segments for which age and demographic affiliation were not defined.
+>- The **Oceania** region also showed a significant decline in sales.
+
+>**Recommendations:**
+>- Additional analysis is needed to determine the causes of the sales decline on the "Retail" platform.
+>- Special attention should be paid to segments with undefined age and demographic characteristics to understand why they are showing such a significant decline in sales.
+>- It is necessary to study the situation in the Oceania region and develop measures to stabilize sales.
