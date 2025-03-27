@@ -80,7 +80,7 @@ VALUES
 
 </details>
 
-![Project Logo](../images/case4_diagram.png)
+![Project Logo](../images/case5_diagram.png)
 
 
 ## Case Study Questions
