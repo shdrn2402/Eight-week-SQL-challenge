@@ -114,7 +114,8 @@ VALUES
 
 ![Project Logo](../images/case6_diagram.png)
 
-# Digital Analysis
+## Case Study Questions
+### Digital Analysis
 #### 1. How many users are there?
 
 ***query:***
