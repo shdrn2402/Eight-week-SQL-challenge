@@ -20,7 +20,7 @@
 
 ```SQL
 CREATE SCHEMA clique_bait;
-SET search_path = clique_bait;
+SET SEARCH_PATH TO clique_bait;
 
 CREATE TABLE event_identifier (
   "event_type" INTEGER,
@@ -113,3 +113,242 @@ VALUES
 </details>
 
 ![Project Logo](../images/case6_diagram.png)
+
+# Digital Analysis
+#### 1. How many users are there?
+
+***query:***
+```SQL
+SELECT
+  COUNT(DISTINCT user_id) AS unique_users
+FROM
+  users;
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+This SQL query calculates the total number of unique user IDs present in the `users` table.
+
+-   `SELECT COUNT(DISTINCT user_id) AS unique_users`: 
+    -   `DISTINCT user_id`: Selects all the unique values from the `user_id` column, eliminating any duplicate user IDs.
+    -   `COUNT(...)`: Counts the number of distinct (unique) user IDs.
+    -   `AS unique_users`: Renames the resulting count to the column alias `unique_users`.
+-   `FROM users`:
+    -   Specifies that the data is retrieved from the `users` table.
+
+</details>
+
+***result table:***
+
+| unique_users |
+| ------------ |
+| 500          |
+
+---
+
+#### 2. How many cookies does each user have on average?
+
+***query:***
+```SQL
+SELECT
+  ROUND(AVG(cookies_amount)) AS average_cookies_amount
+FROM (
+  SELECT
+    user_id,
+    COUNT(DISTINCT cookie_id) AS cookies_amount
+  FROM
+    users
+  GROUP BY  user_id) sub;
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+This SQL query calculates the average number of unique cookies per user from the `users` table.
+
+-   `SELECT ROUND(AVG(cookie_count) AS average_cookies_per_user`:
+    -   Calculates the average number of cookies per user, rounding the result to the nearest integer.
+    -   `AVG(cookie_count)`: Computes the average of the `cookie_count` values.
+    -   `ROUND(..., 2)`: Rounds the average to two decimal places for readability.
+    -   `AS average_cookies_per_user`: Aliases the resulting column as `average_cookies_per_user`.
+-   `FROM (...) sub`:
+    -   Specifies the subquery as the data source.
+-   Subquery:
+    -   `SELECT user_id, COUNT(DISTINCT cookie_id) AS cookie_count FROM users GROUP BY user_id`:
+        -   Calculates the number of unique cookies (`cookie_id`) for each user (`user_id`).
+        -   `COUNT(DISTINCT cookie_id)`: Counts the distinct cookies for each user.
+        -   `GROUP BY user_id`: Groups the results by `user_id` to count cookies per user.
+        -   `AS cookie_count`: Aliases the count of cookies as `cookie_count`.
+        -   `FROM users`: Specifies that the data is retrieved from the `users` table.
+
+</details>
+
+***result table:***
+
+| averege_cookies_amount |
+| ---------------------- |
+| 4                      |
+
+---
+
+#### 3. What is the unique number of visits by all users per month?
+
+***query:***
+```SQL
+SELECT
+  EXTRACT(YEAR FROM event_time) AS year,
+  TO_CHAR(event_time, 'Month') AS month,
+  COUNT(DISTINCT visit_id) AS unique_visits
+FROM
+  events
+GROUP BY
+  year,
+  month
+ORDER BY
+  unique_visits DESC;
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+This SQL query calculates the unique number of visits (identified by `visit_id`) per month and year from the `events` table.
+
+-   `SELECT EXTRACT(YEAR FROM event_time) AS year, TO_CHAR(event_time, 'Month') AS month, COUNT(DISTINCT visit_id) AS unique_visits`:
+    -   `EXTRACT(YEAR FROM event_time) AS year`: Extracts the year from the `event_time` column and aliases it as `year`.
+    -   `TO_CHAR(event_time, 'Month') AS month`: Extracts the month from the `event_time` column and aliases it as `month`.
+    -   `COUNT(DISTINCT visit_id) AS unique_visits`: Counts the number of unique `visit_id` values, representing unique visits, and aliases the result as `unique_visits`.
+-   `FROM events`:
+    -   Specifies the `events` table as the data source.
+-   `GROUP BY year, month`:
+    -   Groups the results by `year` and `month` to count unique visits per month and year.
+-   `ORDER BY unique_visits DESC`:
+    -   Orders the results in descending order based on the `unique_visits` count.
+
+</details>
+
+***result table:***
+
+| year | month     | unique_visits |
+| ---- | --------- | ------------- |
+| 2020 | February  | 1488          |
+| 2020 | March     | 916           |
+| 2020 | January   | 876           |
+| 2020 | April     | 248           |
+| 2020 | May       | 36            |
+
+---
+
+#### 4. What is the number of events for each event type?
+
+***query:***
+```SQL
+
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+
+
+</details>
+
+***result table:***
+
+
+---
+
+#### 5. What is the percentage of visits which have a purchase event?
+
+***query:***
+```SQL
+
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+
+
+</details>
+
+***result table:***
+
+
+---
+
+#### 6. What is the percentage of visits which view the checkout page but do not have a purchase event?
+
+***query:***
+```SQL
+
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+
+
+</details>
+
+***result table:***
+
+
+---
+
+#### 7. What are the top 3 pages by number of views?
+
+***query:***
+```SQL
+
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+
+
+</details>
+
+***result table:***
+
+
+---
+
+#### 8. What is the number of views and cart adds for each product category?
+
+***query:***
+```SQL
+
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+
+
+</details>
+
+***result table:***
+
+
+---
+
+#### 9. What are the top 3 products by purchases?
+
+***query:***
+```SQL
+
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+
+
+</details>
+
+***result table:***
+
+
+---
