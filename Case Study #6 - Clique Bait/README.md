@@ -115,7 +115,7 @@ VALUES
 ![Project Logo](../images/case6_diagram.png)
 
 ## Case Study Questions
-### Digital Analysis
+### A. Digital Analysis
 #### 1. How many users are there?
 
 ***query:***
@@ -244,18 +244,48 @@ This SQL query calculates the unique number of visits (identified by `visit_id`)
 
 ***query:***
 ```SQL
-
+SELECT
+  ei.event_name,
+  sub.events_amount
+FROM
+  (SELECT 
+    event_type,
+    COUNT(*) AS events_amount
+  FROM
+    events
+  GROUP BY
+    event_type) sub
+JOIN event_identifier ei
+USING (event_type)
 ```
 
 <details>
   <summary><em><strong>show description:</strong></em></summary>
 
+This SQL query calculates the number of events for each event type, displaying the corresponding event name.
 
+-   `SELECT ei.event_name, sub.events_amount`:
+    -   Selects the `event_name` from the `event_identifier` table.
+    -   Selects the `events_amount` (count of events) from the subquery.
+-   `FROM (SELECT event_type, COUNT(*) AS events_amount FROM events GROUP BY event_type) sub`:
+    -   Subquery:
+        -   `SELECT event_type, COUNT(*) AS events_amount`: Counts all events for each `event_type`.
+        -   `FROM events`: Specifies the `events` table as the data source.
+        -   `GROUP BY event_type`: Groups the results by `event_type`.
+-   `JOIN event_identifier ei USING (event_type)`:
+    -   Joins the subquery results with the `event_identifier` table using the `event_type` column.
 
 </details>
 
 ***result table:***
 
+| event_name    | events_amount |
+| ------------- | ------------- |
+| Page View     | 20928         |
+| Add to Cart   | 8451          |
+| Purchase      | 1777          |
+| Ad Impression | 876           |
+| Ad Click      | 702           |
 
 ---
 
@@ -263,18 +293,38 @@ This SQL query calculates the unique number of visits (identified by `visit_id`)
 
 ***query:***
 ```SQL
-
+SELECT
+  ROUND((COUNT(DISTINCT CASE WHEN ei.event_name = 'Purchase' THEN e.visit_id END)::decimal / COUNT(DISTINCT e.visit_id)) * 100, 2) AS purchase_percentage
+FROM
+  events e
+JOIN
+  event_identifier ei USING(event_type);
 ```
 
 <details>
   <summary><em><strong>show description:</strong></em></summary>
 
+This SQL query calculates the percentage of unique visits (identified by `visit_id`) that include a purchase event.
 
+-   `SELECT ROUND((COUNT(DISTINCT CASE WHEN ei.event_name = 'Purchase' THEN e.visit_id END)::decimal / COUNT(DISTINCT e.visit_id)) * 100, 2) AS purchase_percentage`:
+    -   Calculates the percentage of visits with a purchase.
+    -   `COUNT(DISTINCT CASE WHEN ei.event_name = 'Purchase' THEN e.visit_id END)`: Counts the number of unique `visit_id` values associated with purchase events.
+        -   `CASE WHEN ei.event_name = 'Purchase' THEN e.visit_id END`: Selects the `visit_id` only when the `event_name` is 'Purchase', otherwise returns NULL.
+        -   `COUNT(DISTINCT ...)`: Counts the distinct `visit_id` values, effectively counting unique visits with purchases.
+    -   `COUNT(DISTINCT e.visit_id)`: Counts the total number of unique `visit_id` values, representing all unique visits.
+    -   `::decimal`: Casts the count to decimal to ensure accurate percentage calculation.
+    -   `(... / ...) * 100`: Calculates the percentage.
+    -   `ROUND(..., 2)`: Rounds the percentage to two decimal places.
+    -   `AS purchase_percentage`: Aliases the resulting percentage as `purchase_percentage`.
+-   `FROM events e JOIN event_identifier ei USING(event_type)`:
+    -   Joins the `events` table (aliased as `e`) with the `event_identifier` table (aliased implicitly by `USING`) using the `event_type` column to access the `event_name`.
 
 </details>
 
 ***result table:***
-
+| purchase_percentage |
+| ------------------- |
+| 49.86               |
 
 ---
 
@@ -282,18 +332,71 @@ This SQL query calculates the unique number of visits (identified by `visit_id`)
 
 ***query:***
 ```SQL
-
+WITH checkout_visits AS (
+  SELECT DISTINCT
+    e.visit_id
+  FROM
+    clique_bait.events e
+  JOIN
+    clique_bait.page_hierarchy ph ON e.page_id = ph.page_id
+  WHERE
+    ph.page_name = 'Checkout'
+),
+purchase_visits AS (
+  SELECT DISTINCT
+    e.visit_id
+  FROM
+    clique_bait.events e
+  JOIN
+    clique_bait.event_identifier ei ON e.event_type = 3
+  WHERE
+    ei.event_name = 'Purchase'
+),
+checkout_no_purchase AS (
+  SELECT
+    cv.visit_id
+  FROM
+    checkout_visits cv
+  LEFT JOIN
+    purchase_visits pv ON cv.visit_id = pv.visit_id
+  WHERE
+    pv.visit_id IS NULL
+)
+SELECT
+  ROUND((COUNT(cnp.visit_id)::decimal / (SELECT COUNT(DISTINCT visit_id) FROM checkout_visits)) * 100, 2) AS checkout_no_purchase_percentage
+FROM
+  checkout_no_purchase cnp;
 ```
 
 <details>
   <summary><em><strong>show description:</strong></em></summary>
 
+This SQL query calculates the percentage of visits which viewed the 'Checkout' page but did not have a 'Purchase' event.
 
+-   `WITH checkout_visits AS (...)`:
+    -   Defines a Common Table Expression (CTE) named `checkout_visits` that selects the distinct `visit_id` of all visits where the `page_name` in the `page_hierarchy` table is 'Checkout'. It joins the `events` table with `page_hierarchy` on `page_id`.
+-   `WITH purchase_visits AS (...)`:
+    -   Defines a CTE named `purchase_visits` that selects the distinct `visit_id` of all visits where the `event_name` in the `event_identifier` table is 'Purchase'. It joins the `events` table with `event_identifier` on `event_type`.
+-   `WITH checkout_no_purchase AS (...)`:
+    -   Defines a CTE named `checkout_no_purchase` that selects the `visit_id` from `checkout_visits` that do not exist in `purchase_visits`. This is achieved using a `LEFT JOIN` and filtering for rows where `pv.visit_id` is `NULL`.
+-   `SELECT ROUND((COUNT(cnp.visit_id)::decimal / (SELECT COUNT(DISTINCT visit_id) FROM checkout_visits)) * 100, 2) AS checkout_no_purchase_percentage`:
+    -   Calculates the percentage of visits with a 'Checkout' view but no 'Purchase' event.
+    -   `COUNT(cnp.visit_id)`: Counts the number of `visit_id` values in the `checkout_no_purchase` CTE.
+    -   `(SELECT COUNT(DISTINCT visit_id) FROM checkout_visits)`: Counts the total number of distinct `visit_id` values in the `checkout_visits` CTE.
+    -   `::decimal`: Casts the count to decimal for accurate division.
+    -   `* 100`: Multiplies the result by 100 to get the percentage.
+    -   `ROUND(..., 2)`: Rounds the percentage to two decimal places.
+    -   `AS checkout_no_purchase_percentage`: Aliases the resulting column name.
+-   `FROM checkout_no_purchase cnp`:
+    -   Specifies the `checkout_no_purchase` CTE as the source for the final selection.
 
 </details>
 
 ***result table:***
 
+| checkout_no_purchase_percentage |
+| ------------------------------- |
+| 15.50                           |
 
 ---
 
@@ -301,18 +404,50 @@ This SQL query calculates the unique number of visits (identified by `visit_id`)
 
 ***query:***
 ```SQL
-
+SELECT
+    ph.page_name,
+    COUNT(e.page_id) AS view_count
+FROM
+    clique_bait.events e
+JOIN
+    clique_bait.page_hierarchy ph ON e.page_id = ph.page_id
+WHERE
+    e.event_type = 1
+GROUP BY
+    ph.page_name
+ORDER BY
+    view_count DESC
+LIMIT 3;
 ```
 
 <details>
   <summary><em><strong>show description:</strong></em></summary>
 
+This SQL query identifies the top 3 pages with the highest number of views.
 
+-   `SELECT ph.page_name, COUNT(e.page_id) AS view_count`:
+    -   Selects the `page_name` from the `page_hierarchy` table.
+    -   Counts the occurrences of each `page_id` in the `events` table and aliases the count as `view_count`.
+-   `FROM clique_bait.events e JOIN clique_bait.page_hierarchy ph ON e.page_id = ph.page_id`:
+    -   Joins the `events` table (aliased as `e`) with the `page_hierarchy` table (aliased as `ph`) using the common column `page_id` to link events to page names.
+-   `WHERE e.event_type = 1`:
+    -   Filters the events to include only those where `event_type` is equal to `1`. This assumes that `event_type = 1` represents page view events. **You might need to adjust this value based on your actual data.**
+-   `GROUP BY ph.page_name`:
+    -   Groups the results by `page_name` so that the `COUNT()` function aggregates views for each unique page.
+-   `ORDER BY view_count DESC`:
+    -   Orders the grouped results in descending order based on the `view_count`, placing the pages with the most views at the top.
+-   `LIMIT 3`:
+    -   Restricts the output to the top 3 rows, effectively giving the top 3 pages by view count.
 
 </details>
 
 ***result table:***
 
+| page_name    | view_count |
+| ------------ | ---------- |
+| All Products | 3174       |
+| Checkout     | 2103       |
+| Home Page    | 1782       |
 
 ---
 
@@ -320,18 +455,46 @@ This SQL query calculates the unique number of visits (identified by `visit_id`)
 
 ***query:***
 ```SQL
-
+SELECT
+  ph.product_category,
+  SUM(CASE WHEN ev.event_type = 1 THEN 1 ELSE 0 END) AS product_views,
+  SUM(CASE WHEN ev.event_type = 2 THEN 1 ELSE 0 END) AS cart_adds
+FROM
+  page_hierarchy AS ph
+LEFT JOIN
+  events AS ev ON ph.page_id = ev.page_id
+GROUP BY
+  ph.product_category
+ORDER BY
+  ph.product_category;
 ```
 
 <details>
   <summary><em><strong>show description:</strong></em></summary>
 
+This SQL query calculates the number of views and cart adds for each product category.
 
+-   `SELECT ph.product_category, SUM(CASE WHEN ev.event_type = 1 THEN 1 ELSE 0 END) AS product_views, SUM(CASE WHEN ev.event_type = 2 THEN 1 ELSE 0 END) AS cart_adds`:
+    -   Selects the `product_category` from the `page_hierarchy` table (aliased as `ph`).
+    -   Calculates the total number of events with `ev.event_type` equal to `1` for each category and names the resulting column `product_views`.
+    -   Calculates the total number of events with `ev.event_type` equal to `2` for each category and names the resulting column `cart_adds`.
+-   `FROM page_hierarchy AS ph LEFT JOIN events AS ev ON ph.page_id = ev.page_id`:
+    -   Performs a `LEFT JOIN` between the `page_hierarchy` table (aliased as `ph`) and the `events` table (aliased as `ev`) based on the matching `page_id`. This ensures that all categories from `page_hierarchy` are included in the result.
+-   `GROUP BY ph.product_category`:
+    -   Aggregates the results, grouping rows with the same `product_category` together.
+-   `ORDER BY ph.product_category`:
+    -   Sorts the final result set alphabetically by the `product_category`.
 
 </details>
 
 ***result table:***
 
+| product_category | product_views | cart_adds |
+| ---------------- | ------------- | --------- |
+| Fish             | 4633          | 2789      |
+| Luxury           | 3032          | 1870      |
+| Shellfish        | 6204          | 3792      |
+| null             | 7059          | 0         |
 
 ---
 
@@ -339,17 +502,72 @@ This SQL query calculates the unique number of visits (identified by `visit_id`)
 
 ***query:***
 ```SQL
-
+WITH purchase_visits AS (
+    SELECT DISTINCT
+        e.visit_id
+    FROM
+        clique_bait.events e
+    JOIN
+        clique_bait.page_hierarchy ph ON e.page_id = ph.page_id
+    JOIN
+        clique_bait.event_identifier ei ON e.event_type = ei.event_type
+    WHERE
+        ei.event_name = 'Purchase' AND ph.page_name = 'Confirmation'
+),
+products_added_to_cart_in_purchase_visits AS (
+    SELECT
+        pv.visit_id,
+        ph.page_name AS product_name
+    FROM
+        purchase_visits pv
+    JOIN
+        clique_bait.events e ON pv.visit_id = e.visit_id
+    JOIN
+        clique_bait.page_hierarchy ph ON e.page_id = ph.page_id
+    WHERE
+        ph.product_id IS NOT NULL
+        AND e.event_type = 2
+)
+SELECT
+    product_name,
+    COUNT(visit_id) AS purchase_count
+FROM
+    products_added_to_cart_in_purchase_visits
+GROUP BY
+    product_name
+ORDER BY
+    purchase_count DESC
+LIMIT 3;
 ```
 
 <details>
   <summary><em><strong>show description:</strong></em></summary>
 
+This SQL query identifies the top 3 products by the number of visits that resulted in a purchase, based on whether the product was added to the cart during those visits.
 
+-   `WITH purchase_visits AS (...)`:
+    -   Defines a CTE named `purchase_visits` that selects the distinct `visit_id` values for visits where a 'Purchase' event occurred on the 'Confirmation' page. This identifies sessions that ended in a purchase.
+-   `WITH products_added_to_cart_in_purchase_visits AS (...)`:
+    -   Defines a CTE named `products_added_to_cart_in_purchase_visits`. It joins `purchase_visits` with the `events` and `page_hierarchy` tables to find the `page_name` (assumed to be the product name) of pages with a non-null `product_id` that had an 'Add to Cart' event (`e.event_type = 2`) within those purchase visits.
+-   `SELECT product_name, COUNT(visit_id) AS purchase_count`:
+    -   Selects the `product_name` and counts the number of distinct `visit_id` values associated with each `product_name` within the `products_added_to_cart_in_purchase_visits` CTE. This effectively counts how many purchase visits included adding each specific product to the cart.
+-   `FROM products_added_to_cart_in_purchase_visits`:
+    -   Specifies the `products_added_to_cart_in_purchase_visits` CTE as the data source.
+-   `GROUP BY product_name`:
+    -   Groups the results by `product_name` to aggregate the purchase visit counts for each product.
+-   `ORDER BY purchase_count DESC`:
+    -   Orders the results in descending order based on the `purchase_count`, showing the products that were most frequently added to the cart in purchase sessions first.
+-   `LIMIT 3`:
+    -   Limits the output to the top 3 products.
 
 </details>
 
 ***result table:***
 
+| product_name | purchase_count |
+| ------------ | -------------- |
+| Lobster      | 754            |
+| Oyster       | 726            |
+| Crab         | 719            |
 
 ---
