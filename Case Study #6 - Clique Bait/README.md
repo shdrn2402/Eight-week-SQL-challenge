@@ -114,9 +114,8 @@ VALUES
 
 ![Project Logo](../images/case6_diagram.png)
 
-## Case Study Questions
-### A. Digital Analysis
-#### 1. How many users are there?
+## Digital Analysis
+### 1. How many users are there?
 
 ***query:***
 ```SQL
@@ -148,7 +147,7 @@ This SQL query calculates the total number of unique user IDs present in the `us
 
 ---
 
-#### 2. How many cookies does each user have on average?
+### 2. How many cookies does each user have on average?
 
 ***query:***
 ```SQL
@@ -193,7 +192,7 @@ This SQL query calculates the average number of unique cookies per user from the
 
 ---
 
-#### 3. What is the unique number of visits by all users per month?
+### 3. What is the unique number of visits by all users per month?
 
 ***query:***
 ```SQL
@@ -240,7 +239,7 @@ This SQL query calculates the unique number of visits (identified by `visit_id`)
 
 ---
 
-#### 4. What is the number of events for each event type?
+### 4. What is the number of events for each event type?
 
 ***query:***
 ```SQL
@@ -289,7 +288,7 @@ This SQL query calculates the number of events for each event type, displaying t
 
 ---
 
-#### 5. What is the percentage of visits which have a purchase event?
+### 5. What is the percentage of visits which have a purchase event?
 
 ***query:***
 ```SQL
@@ -328,7 +327,7 @@ This SQL query calculates the percentage of unique visits (identified by `visit_
 
 ---
 
-#### 6. What is the percentage of visits which view the checkout page but do not have a purchase event?
+### 6. What is the percentage of visits which view the checkout page but do not have a purchase event?
 
 ***query:***
 ```SQL
@@ -400,7 +399,7 @@ This SQL query calculates the percentage of visits which viewed the 'Checkout' p
 
 ---
 
-#### 7. What are the top 3 pages by number of views?
+### 7. What are the top 3 pages by number of views?
 
 ***query:***
 ```SQL
@@ -451,7 +450,7 @@ This SQL query identifies the top 3 pages with the highest number of views.
 
 ---
 
-#### 8. What is the number of views and cart adds for each product category?
+### 8. What is the number of views and cart adds for each product category?
 
 ***query:***
 ```SQL
@@ -498,7 +497,7 @@ This SQL query calculates the number of views and cart adds for each product cat
 
 ---
 
-#### 9. What are the top 3 products by purchases?
+### 9. What are the top 3 products by purchases?
 
 ***query:***
 ```SQL
