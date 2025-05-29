@@ -644,4 +644,63 @@ This SQL query creates a new output table summarizing various interaction counts
 | Shellfish        | Lobster        | 1                | 1547       | 968               | 214                  | 0              |
 | Shellfish        | Oyster         | 1                | 1568       | 943               | 217                  | 0              |
 
+
+- Additionally, create another table which further aggregates the data for the above points but this time for each product category instead of individual products:
+
+***query:***
+```SQL
+SELECT
+    ph.product_category,
+    SUM(CASE WHEN e.event_type = 1 THEN 1 ELSE 0 END) AS total_views,
+    SUM(CASE WHEN e.event_type = 2 THEN 1 ELSE 0 END) AS total_add_to_cart,
+    SUM(CASE WHEN e.event_type = 2 AND pv.visit_id IS NULL THEN 1 ELSE 0 END) AS total_abandoned_cart,
+    SUM(CASE WHEN e.event_type = 3 THEN 1 ELSE 0 END) AS total_purchases
+FROM
+    clique_bait.page_hierarchy ph
+LEFT JOIN
+    clique_bait.events e ON ph.page_id = e.page_id
+LEFT JOIN
+    (SELECT DISTINCT visit_id FROM clique_bait.events WHERE event_type = 3) pv ON e.visit_id = pv.visit_id
+WHERE
+    ph.product_id IS NOT NULL -- Still focus only on product pages, not general ones
+GROUP BY
+    ph.product_category
+ORDER BY
+    ph.product_category;
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+This SQL query aggregates the previously calculated interaction counts for each product category.
+
+-   `SELECT ph.product_category, SUM(CASE WHEN e.event_type = 1 THEN 1 ELSE 0 END) AS total_views, SUM(CASE WHEN e.event_type = 2 THEN 1 ELSE 0 END) AS total_add_to_cart, SUM(CASE WHEN e.event_type = 2 AND pv.visit_id IS NULL THEN 1 ELSE 0 END) AS total_abandoned_cart, SUM(CASE WHEN e.event_type = 3 THEN 1 ELSE 0 END) AS total_purchases`:
+    -   Selects the **product category**.
+    -   Calculates `total_views`: the sum of all view events (`event_type` is 1) across all products within that category.
+    -   Calculates `total_add_to_cart`: the sum of all 'add to cart' events (`event_type` is 2) across all products within that category.
+    -   Calculates `total_abandoned_cart`: the sum of all 'add to cart' events (`event_type` is 2) that occurred in visits **without** a subsequent purchase event (`pv.visit_id IS NULL`), aggregated for each category.
+    -   Calculates `total_purchases`: the sum of all purchase events (`event_type` is 3) across all products within that category.
+-   `FROM clique_bait.page_hierarchy ph`:
+    -   Starts with the `page_hierarchy` table to get product category information.
+-   `LEFT JOIN clique_bait.events e ON ph.page_id = e.page_id`:
+    -   Connects product pages to associated events (`e`) via `page_id`.
+-   `LEFT JOIN (SELECT DISTINCT visit_id FROM clique_bait.events WHERE event_type = 3) pv ON e.visit_id = pv.visit_id`:
+    -   Joins with a subquery that identifies `visit_id`s with a purchase, used to determine abandoned carts.
+-   `WHERE ph.product_id IS NOT NULL`:
+    -   Filters the data to include only records associated with actual **products** (those with a non-null `product_id`), ensuring that general pages do not affect category totals.
+-   `GROUP BY ph.product_category`:
+    -   Aggregates the counts for each unique `product_category`.
+-   `ORDER BY ph.product_category`:
+    -   Orders the final output alphabetically by product category.
+
+</details>
+
+***result table:***
+
+| product_category | total_views | total_add_to_cart | total_abandoned_cart | total_purchases |
+| ---------------- | ----------- | ----------------- | -------------------- | --------------- |
+| Fish             | 4633        | 2789              | 674                  | 0               |
+| Luxury           | 3032        | 1870              | 466                  | 0               |
+| Shellfish        | 6204        | 3792              | 894                  | 0               |
+
 ---
