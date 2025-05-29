@@ -570,3 +570,78 @@ This SQL query identifies the top 3 products by the number of visits that result
 | Crab         | 719            |
 
 ---
+
+## Product Funnel Analysis
+### 1. Using a single SQL query - create a new output table which has the following details:
+- How many times was each product viewed?
+- How many times was each product added to cart?
+- How many times was each product added to a cart but not purchased (abandoned)?
+- How many times was each product purchased?
+
+***query:***
+```SQL
+SELECT
+    ph.product_category,
+    ph.page_name AS product_name,
+    COUNT(DISTINCT ph.page_id) AS product_id_count,
+    SUM(CASE WHEN e.event_type = 1 THEN 1 ELSE 0 END) AS view_count,
+    SUM(CASE WHEN e.event_type = 2 THEN 1 ELSE 0 END) AS add_to_cart_count,
+    SUM(CASE WHEN e.event_type = 2 AND pv.visit_id IS NULL THEN 1 ELSE 0 END) AS abandoned_cart_count,
+    SUM(CASE WHEN e.event_type = 3 THEN 1 ELSE 0 END) AS purchase_count
+FROM
+    clique_bait.page_hierarchy ph
+LEFT JOIN
+    clique_bait.events e ON ph.page_id = e.page_id
+LEFT JOIN
+    (SELECT DISTINCT visit_id FROM clique_bait.events WHERE event_type = 3) pv ON e.visit_id = pv.visit_id
+WHERE
+    ph.product_id IS NOT NULL
+GROUP BY
+    ph.product_category,
+    ph.page_name
+ORDER BY
+    ph.product_category,
+    ph.page_name;
+```
+
+<details>
+  <summary><em><strong>show description:</strong></em></summary>
+
+This SQL query creates a new output table summarizing various interaction counts for each product.
+
+-   `SELECT ph.product_category, ph.page_name AS product_name, SUM(CASE WHEN e.event_type = 1 THEN 1 ELSE 0 END) AS view_count, SUM(CASE WHEN e.event_type = 2 THEN 1 ELSE 0 END) AS add_to_cart_count, SUM(CASE WHEN e.event_type = 2 AND pv.visit_id IS NULL THEN 1 ELSE 0 END) AS abandoned_cart_count, SUM(CASE WHEN e.event_type = 3 THEN 1 ELSE 0 END) AS purchase_count`:
+    -   Selects the **product category** and **product name** (from `page_name`).
+    -   Calculates `view_count`: the total number of times each product's page was viewed (where `event_type` is 1).
+    -   Calculates `add_to_cart_count`: the total number of times each product was added to a cart (where `event_type` is 2).
+    -   Calculates `abandoned_cart_count`: the number of times each product was added to a cart (`event_type` is 2) but **not** purchased (i.e., the `visit_id` did not have a corresponding purchase event).
+    -   Calculates `purchase_count`: the total number of times each product was purchased (where `event_type` is 3).
+-   `FROM clique_bait.page_hierarchy ph`:
+    -   Starts by selecting all known products from the `page_hierarchy` table (aliased as `ph`).
+-   `LEFT JOIN clique_bait.events e ON ph.page_id = e.page_id`:
+    -   Connects product pages to **all** associated events (`e`) via `page_id`. A `LEFT JOIN` ensures all products are included, even if they have no events.
+-   `LEFT JOIN (SELECT DISTINCT visit_id FROM clique_bait.events WHERE event_type = 3) pv ON e.visit_id = pv.visit_id`:
+    -   This is a crucial join. It creates a subquery `pv` that lists all `visit_id`s where a purchase occurred (`event_type` is 3). By `LEFT JOIN`ing this back to our main query, we can identify which specific `events` (like "add to cart") were part of a purchase session. If `pv.visit_id IS NULL`, it means that particular event was not part of a purchased session.
+-   `WHERE ph.product_id IS NOT NULL`:
+    -   Filters the results to include only entries that are actual **products**, based on having a non-null `product_id` in the `page_hierarchy` table. This excludes generic pages like "Home Page" or "Checkout".
+-   `GROUP BY ph.product_category, ph.page_name`:
+    -   Aggregates the counts for each unique product, grouping by its category and name.
+-   `ORDER BY ph.product_category, ph.page_name`:
+    -   Orders the final output for readability, sorting first by product category and then by product name.
+
+</details>
+
+***result table:***
+
+| product_category | product_name   | product_id_count | view_count | add_to_cart_count | abandoned_cart_count | purchase_count |
+| ---------------- | -------------- | ---------------- | ---------- | ----------------- | -------------------- | -------------- |
+| Fish             | Kingfish       | 1                | 1559       | 920               | 213                  | 0              |
+| Fish             | Salmon         | 1                | 1559       | 938               | 227                  | 0              |
+| Fish             | Tuna           | 1                | 1515       | 931               | 234                  | 0              |
+| Luxury           | Black Truffle  | 1                | 1469       | 924               | 217                  | 0              |
+| Luxury           | Russian Caviar | 1                | 1563       | 946               | 249                  | 0              |
+| Shellfish        | Abalone        | 1                | 1525       | 932               | 233                  | 0              |
+| Shellfish        | Crab           | 1                | 1564       | 949               | 230                  | 0              |
+| Shellfish        | Lobster        | 1                | 1547       | 968               | 214                  | 0              |
+| Shellfish        | Oyster         | 1                | 1568       | 943               | 217                  | 0              |
+
+---
